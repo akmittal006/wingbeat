@@ -5,7 +5,6 @@ dist/
 *.log
 *.tsbuildinfo
 .claude/settings.local.json
-.github/workflows/ci.yml
 
 .env
 .env.local
