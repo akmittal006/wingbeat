@@ -8,3 +8,7 @@ dist/
 
 .env
 .env.local
+
+# Generated codex sensor candidate digests (bulk redacted transcript data)
+scripts/sensors/.candidates.json
+scripts/sensors/.candidates.digest.md

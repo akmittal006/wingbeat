@@ -24,7 +24,8 @@
     "agency:run": "node scripts/run-agency.mjs",
     "agency:demo": "node scripts/run-agency.mjs --no-hermes",
     "test": "node --test test/*.test.mjs",
-    "x:self-test": "node scripts/x-execution/x-executor.mjs self-test"
+    "x:self-test": "node scripts/x-execution/x-executor.mjs self-test",
+    "sensors:codex": "node scripts/sensors/run-codex.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
