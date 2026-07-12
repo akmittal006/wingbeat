@@ -252,6 +252,45 @@ export const latestRun = query({
   },
 })
 
+export const runProof = query({
+  args: { runId: v.string() },
+  handler: async (ctx, { runId }) => {
+    const run = await ctx.db
+      .query("runs")
+      .withIndex("by_runId", (q) => q.eq("runId", runId))
+      .unique()
+    if (!run) return null
+    const project = await ctx.db.get(run.projectId)
+    const contentPackage = await ctx.db
+      .query("contentPackages")
+      .withIndex("by_runId", (q) => q.eq("runId", runId))
+      .first()
+    const events = await ctx.db
+      .query("events")
+      .withIndex("by_run_sequence", (q) => q.eq("runId", runId))
+      .collect()
+    const memory = await ctx.db
+      .query("memoryRecords")
+      .withIndex("by_run_layer", (q) => q.eq("runId", runId))
+      .collect()
+    const jobs = await ctx.db
+      .query("executionJobs")
+      .withIndex("by_runId", (q) => q.eq("runId", runId))
+      .collect()
+
+    return {
+      project,
+      run,
+      eventCount: events.length,
+      events,
+      contentPackage,
+      memoryCount: memory.length,
+      memory,
+      jobs,
+    }
+  },
+})
+
 export const getJob = query({
   args: { jobId: v.string() },
   handler: async (ctx, { jobId }) => {

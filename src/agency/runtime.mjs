@@ -34,6 +34,21 @@ function event(runId, agentId, type, title, detail) {
   }
 }
 
+function displayProjectName(context) {
+  return context.project || "this project"
+}
+
+function projectMentioned(text, context) {
+  const project = displayProjectName(context).toLowerCase()
+  const lower = text.toLowerCase()
+  const pieces = project
+    .replace(/^@/, "")
+    .split(/[\/\s_-]+/)
+    .map((part) => part.trim())
+    .filter((part) => part.length >= 3)
+  return lower.includes(project) || pieces.some((part) => lower.includes(part))
+}
+
 async function runSpecialist({ runId, role, objective, parentId, context, work }) {
   const started = Date.now()
   const id = stableId("agent", `${runId}:${role}`)
@@ -88,11 +103,14 @@ function selectCrew(context) {
 }
 
 function buildDraftPrompt(context, specialistOutputs) {
+  const project = displayProjectName(context)
   return [
     "You are Wingbeat's agency manager.",
-    "Write a concise channel-independent first draft for a build-in-public narrative marketing the Wingbeat repo itself.",
+    `Write a concise channel-independent first draft for a build-in-public narrative marketing ${project}.`,
     "Use only the provided evidence. Avoid fake metrics, fake publishing receipts, and unsupported claims.",
     "",
+    `Project: ${project}`,
+    `Project description: ${context.description}`,
     `Objective: ${context.objective}`,
     "",
     "Context references:",
@@ -106,11 +124,14 @@ function buildDraftPrompt(context, specialistOutputs) {
 }
 
 function buildRevisionPrompt({ context, specialistOutputs, draft, findings }) {
+  const project = displayProjectName(context)
   return [
     "You are Wingbeat's Editor / Critic revising a build-in-public narrative.",
     "Revise the draft using the named findings. Keep only source-backed claims from the context.",
     "Do not add fake metrics, fake receipts, or live publishing claims.",
     "",
+    `Project: ${project}`,
+    `Project description: ${context.description}`,
     `Objective: ${context.objective}`,
     "",
     "Named findings:",
@@ -135,13 +156,13 @@ function evidenceTerms(evidence) {
     .filter((term, index, all) => all.indexOf(term) === index)
 }
 
-function evaluateDraft({ draft, evidence }) {
+function evaluateDraft({ draft, evidence, context }) {
   const lower = draft.toLowerCase()
   const findings = []
   const terms = evidenceTerms(evidence)
   const evidenceHits = terms.filter((term) => lower.includes(term)).slice(0, 8)
 
-  if (!lower.includes("wingbeat")) findings.push("missing-project-name")
+  if (!projectMentioned(draft, context)) findings.push("missing-project-name")
   if (evidenceHits.length < 2) findings.push("insufficient-evidence-anchoring")
   if (lower.includes("everyone") || lower.includes("everything")) findings.push("overbroad-audience-claim")
   if ((lower.includes("published") || lower.includes("live post")) && !lower.includes("receipt")) {
@@ -242,21 +263,22 @@ function introProof(context) {
 }
 
 function buildIntroductionCopy({ context }) {
-  const list = "code -> stories / proof -> posts / draft -> veto-ready X"
+  const project = displayProjectName(context)
+  const list = "evidence -> story / proof -> reusable post / draft -> veto-ready X"
   const copyWithoutLink =
-    `Building Wingbeat, an AI Marketing Agency for indie developers.\n` +
-    `Helps builders ship and post consistently.\n` +
+    `Building ${project} in public.\n` +
+    `${sentenceFrom(context.description, "Turning current repo evidence into a clear product update.")}\n` +
     `Handles: ${list}.\n` +
-    `Week 1: shipped repo-backed X draft loop.\n` +
-    `Want early access? Reply "Wingbeat".`
+    `Today: prepared a source-backed X draft from local repo context.\n` +
+    `Want the longer note? Reply with a question.`
   return appendRepositoryUrl(copyWithoutLink, context)
 }
 
 function buildBuildInPublicCopy({ narrative, context }) {
   const source = evidenceSourceLabel(context).replace(/\.md$/, "")
+  const project = displayProjectName(context)
   const copy =
-    `Building Wingbeat in public.\n` +
-    `It is an AI marketing team for builders who would rather ship than post.\n` +
+    `Building ${project} in public.\n` +
     `Today: drafted an X post from ${source} and local git context, before any live posting.\n` +
     `What should it notice next?`
   return truncateForX(copy, reservedXLimit(context))
@@ -274,8 +296,7 @@ function evaluateIntroductionXQuality(copy, context) {
   const limit = 280
   const autoRejectFindings = []
 
-  if (!/^(building|introducing) wingbeat/i.test(copy)) autoRejectFindings.push("missing-direct-intro-first-line")
-  if (!/(ai marketing agency|ai marketing team)/.test(lower)) autoRejectFindings.push("wingbeat-unexplained")
+  if (!/^building /i.test(copy) || !projectMentioned(copy, context)) autoRejectFindings.push("missing-direct-intro-first-line")
   if (/commit|diff|merged|branch|sha|runtime|specialist|manager|critic|handoff|trace|architecture/.test(lower)) {
     autoRejectFindings.push("commit-summary-or-internal-architecture-voice")
   }
@@ -285,7 +306,7 @@ function evaluateIntroductionXQuality(copy, context) {
   if (/principle:|infrastructure|canonical|channel-independent|source-backed|no fluff/.test(lower)) {
     autoRejectFindings.push("abstract-principle-dominates")
   }
-  if (hashtags > 0 && !/wingbeat/.test(lower)) autoRejectFindings.push("hashtags-supply-context")
+  if (hashtags > 0 && !projectMentioned(copy, context)) autoRejectFindings.push("hashtags-supply-context")
 
   const questions = (copy.match(/\?/g) ?? []).length
   const capabilities = capabilityLines(context).filter((item) => lower.includes(item.toLowerCase()))
@@ -293,11 +314,11 @@ function evaluateIntroductionXQuality(copy, context) {
   const rubric = [
     {
       name: "product-introduction",
-      score: scoreCriterion(/^(building|introducing) wingbeat/i.test(copy) && /ai marketing agency/i.test(copy)),
+      score: scoreCriterion(/^building /i.test(copy) && projectMentioned(copy, context)),
     },
     {
       name: "audience-value",
-      score: scoreCriterion(/indie developers|builders/.test(lower) && /post consistently|ship more|rather ship/.test(lower)),
+      score: scoreCriterion(/source-backed|repo|product update|question/.test(lower), /draft|story|evidence/.test(lower)),
     },
     {
       name: "capability-clarity",
@@ -305,11 +326,11 @@ function evaluateIntroductionXQuality(copy, context) {
     },
     {
       name: "grounded-capabilities",
-      score: scoreCriterion(/code -> stories/.test(lower) && /proof -> (reusable )?posts/.test(lower) && /draft -> veto-ready x/.test(lower)),
+      score: scoreCriterion(/evidence -> story/.test(lower) && /proof -> (reusable )?post/.test(lower) && /draft -> veto-ready x/.test(lower)),
     },
     {
       name: "shipped-proof",
-      score: scoreCriterion(/week 1: shipped/.test(lower) && /repo|docs|git|x loop|agency run/.test(lower)),
+      score: scoreCriterion(/today: prepared/.test(lower) && /repo|docs|git|context/.test(lower)),
     },
     {
       name: "evidence-integrity",
@@ -321,11 +342,11 @@ function evaluateIntroductionXQuality(copy, context) {
     },
     {
       name: "specific-cta",
-      score: scoreCriterion(/want early access\? reply "wingbeat"\.?/i.test(copy), questions === 1 && /early access/.test(lower)),
+      score: scoreCriterion(/reply with a question\.?$/i.test(copy.trim()), questions === 1 && /reply/.test(lower)),
     },
     {
       name: "intro-structure",
-      score: scoreCriterion(copy.split(/\n/).length >= 5 && /^handles:/im.test(copy) && /^(first up|week 1):/im.test(copy)),
+      score: scoreCriterion(copy.split(/\n/).length >= 5 && /^handles:/im.test(copy) && /^today:/im.test(copy)),
     },
     {
       name: "compression",
@@ -361,21 +382,21 @@ function evaluateBuildInPublicXQuality(copy, context) {
   const hashtags = hashtagCount(copy)
   const limit = 280
   const autoRejectFindings = []
-  if (!/wingbeat/.test(lower) || !/ai marketing team/.test(lower)) autoRejectFindings.push("wingbeat-unexplained")
+  if (!projectMentioned(copy, context)) autoRejectFindings.push("project-unexplained")
   if (/(launched|published|posted itself|live post|public repo)/.test(lower) && !/receipt/.test(lower)) {
     autoRejectFindings.push("unsupported-launch-or-publish-claim")
   }
-  if (hashtags > 0 && !/wingbeat/.test(lower)) autoRejectFindings.push("hashtags-supply-context")
+  if (hashtags > 0 && !projectMentioned(copy, context)) autoRejectFindings.push("hashtags-supply-context")
   const rubric = [
-    { name: "standalone-context", score: scoreCriterion(/wingbeat/.test(lower) && /ai marketing team/.test(lower)) },
-    { name: "plain-product-clarity", score: scoreCriterion(/builders/.test(lower) && /post/.test(lower)) },
+    { name: "standalone-context", score: scoreCriterion(projectMentioned(copy, context)) },
+    { name: "plain-product-clarity", score: scoreCriterion(/draft|post|story|update/.test(lower)) },
     { name: "concrete-progress", score: scoreCriterion(/today:/.test(lower) && /drafted/.test(lower)) },
     { name: "specificity", score: scoreCriterion(/docs|git|repo/.test(lower)) },
     { name: "evidence-integrity", score: scoreCriterion(!/(launched|published|live post|posted itself|public repo)/.test(lower)) },
     { name: "native-voice", score: scoreCriterion(copy.split(/\s+/).length <= 48, copy.split(/\s+/).length <= 56) },
     { name: "specific-invitation", score: scoreCriterion(/\?$/.test(copy.trim())) },
     { name: "compression", score: scoreCriterion(chars <= limit && hashtags <= 1) },
-    { name: "mode-fit", score: scoreCriterion(/^building wingbeat in public/i.test(copy)) },
+    { name: "mode-fit", score: scoreCriterion(/^building /i.test(copy) && /in public/i.test(copy)) },
     { name: "not-pain-forced", score: scoreCriterion(true) },
   ]
   const score = rubric.reduce((sum, item) => sum + item.score, 0)
@@ -410,7 +431,7 @@ function repairXCopy({ narrative, context, mode }) {
 function buildContentPackage({ runId, context, narrative, finalEvaluation }) {
   const whatChanged = sentenceFrom(
     narrative,
-    "Wingbeat now has a repo-inspecting agency runtime that can produce a UI-consumable run package.",
+    `${displayProjectName(context)} has repository evidence ready for a source-backed build-in-public update.`,
   )
   const whyItMatters =
     narrative
@@ -440,19 +461,19 @@ function buildContentPackage({ runId, context, narrative, finalEvaluation }) {
     audience: "Technical product builders who want consistent, evidence-backed build-in-public marketing.",
     narrative,
     supportedClaims: [
-      "Wingbeat is defined as a dynamic AI marketing agency for Hermes.",
-      "The MVP roadmap calls for dynamic crew selection, parallel specialists, revision, context layers, trace, cost, latency, and a UI-consumable run.",
-      "The first complete channel loop is X, with veto-window semantics before publishing.",
+      `${displayProjectName(context)} was inspected from local repository files.`,
+      "The generated story must remain backed by README, docs, package metadata, git history, or local file evidence.",
+      "The prepared X copy is a draft only; publishing stays behind a separate human-controlled execution step.",
     ],
     prohibitedClaims: [
       "Do not claim a live X post was published unless an external execution receipt exists.",
-      "Do not claim performance analytics or learning from X results in this runtime-only lane.",
+      "Do not claim performance analytics or learning from X results in this draft-only run.",
       "Do not claim generic audience reach beyond technical product builders.",
     ],
     hooks: [
       "The post is the last step, not the product.",
-      "Wingbeat is turning marketing into inspectable infrastructure.",
-      "Today the agency stopped being a diagram and started producing runs.",
+      `${displayProjectName(context)} has a story hiding in the repo evidence.`,
+      "A source-backed draft is easier to trust than a generic launch blurb.",
     ],
     channelNeutralBody: narrative,
     evidence: context.evidence,
@@ -528,7 +549,7 @@ export async function runAgency({ rootDir, trigger, objective, useHermes = true 
       objective: "Summarize the repo-backed facts and implementation surface.",
       work: async (ctx) => {
         await sleep(15)
-        return `Wingbeat is a Hermes dynamic marketing agency. Current repo has docs for concept and MVP roadmap, a Vite UI shell, and a safe X execution boundary. Dirty files: ${ctx.layers.currentJob.dirtyFiles.slice(0, 8).join(", ") || "none"}.`
+        return `${ctx.project} is described as: ${ctx.description}. Local evidence includes ${ctx.evidence.map((item) => item.label).join(", ") || "workspace files"}. Dirty files: ${ctx.layers.currentJob.dirtyFiles.slice(0, 8).join(", ") || "none"}.`
       },
     },
     {
@@ -587,7 +608,7 @@ export async function runAgency({ rootDir, trigger, objective, useHermes = true 
             return "Fact-check: claims must stay within docs and runtime output. Live publishing and analytics are out of scope unless receipts are present."
           }
           if (role === "Product Mockup Specialist") {
-            return "Mockup path: use a deterministic agency-trace card brief rather than live image generation for the two-hour MVP."
+            return "Mockup path: use a deterministic evidence-card brief rather than live image generation for the first local run."
           }
           return "Execution plan: keep live X publishing behind the existing veto-window browser executor boundary."
         },
@@ -622,7 +643,7 @@ export async function runAgency({ rootDir, trigger, objective, useHermes = true 
     ),
   )
 
-  const firstEvaluation = evaluateDraft({ draft: draftGeneration.text, evidence: context.evidence })
+  const firstEvaluation = evaluateDraft({ draft: draftGeneration.text, evidence: context.evidence, context })
   events.push(
     event(
       runId,
@@ -660,7 +681,7 @@ export async function runAgency({ rootDir, trigger, objective, useHermes = true 
     )
   }
 
-  const finalEval = evaluateDraft({ draft: revisedNarrative, evidence: context.evidence })
+  const finalEval = evaluateDraft({ draft: revisedNarrative, evidence: context.evidence, context })
   const criticStatus = finalEval.passed ? "passed" : "revising"
   events.push(
     event(

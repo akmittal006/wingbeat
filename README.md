@@ -6,6 +6,51 @@ It reads a software project, gathers evidence from the repository, assembles a t
 
 > Break down every barrier preventing you from marketing consistently.
 
+## Run Wingbeat from Hermes
+
+Wingbeat ships as a Hermes plugin. The plugin adds a `hermes wingbeat` command and a namespaced `wingbeat:agency` skill.
+
+Requirements:
+
+- Hermes Agent with plugin support (`hermes plugins --help`)
+- Git
+- Node.js 20.19+ or 22.12+
+- A configured Convex deployment exposed as `CONVEX_URL`
+
+Install and enable the plugin:
+
+```bash
+hermes plugins install akmittal006/wingbeat --enable
+```
+
+From any software project, run the deterministic local fallback first:
+
+```bash
+cd /path/to/your/project
+export CONVEX_URL=<your-convex-deployment-url>
+hermes wingbeat run --project . --no-hermes
+```
+
+Wingbeat writes the project, run, ordered events, content package, three-layer memory, and queued execution job to Convex. There is no `.wingbeat` directory, local JSON mirror, or local persistence fallback.
+
+For provider-backed generation, omit `--no-hermes` only after reviewing your repository privacy requirements:
+
+```bash
+hermes wingbeat run --project .
+```
+
+Provider-backed runs may send repository-derived context to the model provider configured in Hermes. The deterministic fallback does not call Hermes for generation and labels the result as `deterministic-fallback`, but it still persists the completed run to Convex.
+
+If Hermes generation fails, Wingbeat falls back to deterministic output and records the fallback status instead of presenting it as model output. If the project path is invalid, Node is missing, `CONVEX_URL` is missing, or Convex cannot be reached, the command exits non-zero and does not claim a completed run.
+
+For interactive Hermes sessions, the plugin also registers the `wingbeat:agency` skill and `/wingbeat` helper command. The verified non-interactive path is `hermes wingbeat run`.
+
+The plugin is Git-installed. Until this branch is published to the default branch of `akmittal006/wingbeat`, validate from a local checkout with:
+
+```bash
+hermes plugins install "file:///absolute/path/to/wingbeat" --enable
+```
+
 ## Why Wingbeat exists
 
 Shipping a product creates plenty of stories: decisions, trade-offs, mistakes, fixes, and lessons. Most never leave the repository because turning work into honest, useful content is another job. Wingbeat explores whether an agent team can do that work without becoming a commit-summary bot or an unsafe auto-poster.
@@ -69,7 +114,7 @@ Useful commands:
 pnpm agency:demo
 
 # Run with an installed and configured Hermes CLI
-pnpm agency:run
+pnpm agency:run -- --project .
 
 # Validate the X executor state machine without publishing
 pnpm x:self-test
