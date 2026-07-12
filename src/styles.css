@@ -12,15 +12,16 @@
 :root {
   color-scheme: dark;
 
-  /* surfaces: page near-black, panels one step lighter */
-  --bg: #171717;
-  --surface: #1e1e1e;
-  --surface-2: #232323;
-  --surface-hover: #2a2a2b;
-  --utility-surface: #202120;
+  /* surfaces: page near-black, framed shell one step up, panels above that */
+  --bg: #121213;
+  --shell: #1b1b1c;
+  --surface: #242426;
+  --surface-2: #2a2a2c;
+  --surface-hover: #313134;
+  --utility-surface: #242426;
 
-  /* elevated selected pill (active tab) */
-  --pill-active-bg: #38383b;
+  /* selected tab pill: darker than the shell, near-black */
+  --pill-active-bg: #0e0e0f;
 
   /* text: near-white primary, warm muted grays below */
   --text: #f4f4f5;
@@ -141,21 +142,23 @@ a {
 /* --- shell + header ---------------------------------------------------- */
 
 .ops-shell {
-  min-height: 100vh;
+  width: min(1240px, calc(100% - 32px));
+  min-height: calc(100vh - 32px);
+  margin: 16px auto;
   display: flex;
   flex-direction: column;
+  background: var(--shell);
+  border: 0.5px solid var(--line);
+  border-radius: 16px;
 }
 
 .ops-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 12px 20px;
-  background: var(--surface);
+  padding: 14px 22px;
+  background: transparent;
   border-bottom: 0.5px solid var(--line);
 }
 
@@ -166,47 +169,45 @@ a {
 }
 
 .wordmark {
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text);
 }
 
 .ops-tabs {
   display: flex;
-  gap: 2px;
+  gap: 4px;
 }
 
 .ops-tab {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 32px;
-  padding: 0 12px;
+  height: 36px;
+  padding: 0 16px;
   border: 0.5px solid transparent;
-  border-radius: var(--radius-sm);
+  border-radius: 999px;
   background: transparent;
   color: var(--muted);
-  font-size: 0.85rem;
+  font-size: 0.92rem;
 }
 
 .ops-tab:hover {
-  background: var(--surface-2);
+  background: var(--surface);
   color: var(--text);
 }
 
 .ops-tab.active {
   background: var(--pill-active-bg);
-  border-color: rgba(255, 255, 255, 0.28);
+  border-color: var(--line);
   color: var(--text);
   font-weight: 600;
 }
 
 .ops-main {
   flex: 1;
-  width: min(1080px, 100%);
-  margin: 0 auto;
-  padding: 20px;
+  width: 100%;
+  padding: 22px;
 }
 
 /* --- pills ------------------------------------------------------------- */
@@ -259,17 +260,25 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  height: 30px;
-  padding: 0 11px;
-  border-radius: var(--radius-sm);
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 10px;
   border: 0.5px solid var(--line-strong);
-  background: var(--surface-2);
+  background: transparent;
   color: var(--text);
-  font-size: 0.8rem;
+  font-size: 0.82rem;
 }
 
 .btn:hover {
   background: var(--surface-hover);
+}
+
+.btn-quiet {
+  border-color: var(--line);
+  color: var(--muted);
+}
+.btn-quiet:hover {
+  color: var(--text);
 }
 
 /* "primary" reads as an emphasized outlined button on dark:
@@ -316,8 +325,7 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
-  border-bottom: 0.5px solid var(--line);
+  padding: 14px 16px 4px;
 }
 
 .card-head-left {
@@ -339,7 +347,7 @@ a {
 }
 
 .card-body {
-  padding: 6px 14px 12px;
+  padding: 4px 16px 14px;
 }
 
 /* collapsible card header */
@@ -444,10 +452,9 @@ a {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
+  padding: 14px 16px 2px;
   font-weight: 600;
   color: var(--amber-fg);
-  border-bottom: 0.5px solid rgba(251, 191, 36, 0.18);
 }
 
 .needs-you-list {
@@ -460,12 +467,12 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 12px 14px;
-  border-top: 0.5px solid rgba(251, 191, 36, 0.14);
+  padding: 6px 16px 14px;
 }
 
-.needs-you-row:first-child {
-  border-top: none;
+.needs-you-row + .needs-you-row {
+  padding-top: 12px;
+  border-top: 0.5px solid rgba(251, 191, 36, 0.14);
 }
 
 .needs-you-main {
@@ -476,14 +483,14 @@ a {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 0.88rem;
+  font-size: 0.95rem;
   color: var(--text);
 }
 
 .needs-you-meta {
   display: block;
   margin-top: 2px;
-  font-size: 0.76rem;
+  font-size: 0.82rem;
   color: var(--amber-fg);
 }
 
@@ -536,18 +543,48 @@ a {
   color: var(--amber-fg);
 }
 
-/* opportunities inbox */
+/* floating section heads (opportunities inbox, activity) */
 
-.inbox-row {
+.section-head {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 2px;
-  border-top: 0.5px solid var(--line);
+  gap: 8px;
+  padding: 0 2px;
+  color: var(--muted);
 }
 
-.inbox-row:first-child {
-  border-top: none;
+.section-head h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* opportunities inbox: each row is its own bordered card */
+
+.inbox-section,
+.activity-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inbox-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inbox-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 0.5px solid var(--line);
+  border-radius: var(--radius);
 }
 
 .type-badge {
@@ -566,10 +603,10 @@ a {
   background: var(--purple-bg);
   color: var(--purple-fg);
 }
-/* claude logs -> green / teal tint */
+/* claude logs -> green tint */
 .type-claude {
-  background: var(--teal-bg);
-  color: var(--teal-fg);
+  background: var(--green-bg);
+  color: var(--green-fg);
 }
 .type-hermes {
   background: var(--green-bg);
@@ -601,14 +638,9 @@ a {
 
 .timeline-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
-  padding: 9px 2px;
-  border-top: 0.5px solid var(--line);
-}
-
-.timeline-row:first-child {
-  border-top: none;
+  padding: 7px 2px;
 }
 
 .timeline-icon {
@@ -617,9 +649,12 @@ a {
   justify-content: center;
   width: 18px;
   height: 18px;
-  margin-top: 1px;
-  color: var(--green-fg);
+  color: var(--muted);
   flex-shrink: 0;
+}
+
+.timeline-icon.ok {
+  color: var(--green-fg);
 }
 
 .timeline-dot {
@@ -629,24 +664,19 @@ a {
   background: var(--faint);
 }
 
-.timeline-body {
+.timeline-title {
   flex: 1;
   min-width: 0;
-}
-
-.timeline-title {
-  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
   font-weight: 500;
   color: var(--text);
 }
 
-.timeline-detail {
-  font-size: 0.78rem;
-  color: var(--muted);
-}
-
 .timeline-time {
-  font-size: 0.74rem;
+  font-size: 0.8rem;
   color: var(--faint);
   white-space: nowrap;
   flex-shrink: 0;

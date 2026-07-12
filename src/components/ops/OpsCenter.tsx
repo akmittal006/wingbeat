@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { LayoutGrid, Network, Archive, KanbanSquare } from "lucide-react"
 import type { AgentNode, TraceEvent } from "../../types"
 import { Pill, isRunLive } from "./shared"
 import { Overview } from "./Overview"
@@ -16,11 +15,11 @@ export interface ConsoleRun {
   events: TraceEvent[]
 }
 
-const TABS: Array<{ key: TabKey; label: string; icon: typeof LayoutGrid }> = [
-  { key: "overview", label: "Overview", icon: LayoutGrid },
-  { key: "agents", label: "Agents", icon: Network },
-  { key: "pipeline", label: "Pipeline", icon: KanbanSquare },
-  { key: "catalog", label: "Catalog", icon: Archive },
+const TABS: Array<{ key: TabKey; label: string }> = [
+  { key: "overview", label: "Overview" },
+  { key: "agents", label: "Agents" },
+  { key: "pipeline", label: "Pipeline" },
+  { key: "catalog", label: "Catalog" },
 ]
 
 export function OpsCenter({ run }: { run: ConsoleRun | null }) {
@@ -37,15 +36,14 @@ export function OpsCenter({ run }: { run: ConsoleRun | null }) {
           </Pill>
         </div>
         <nav className="ops-tabs">
-          {TABS.map(({ key, label, icon: Icon }) => (
+          {TABS.map(({ key, label }) => (
             <button
               key={key}
               type="button"
               className={tab === key ? "ops-tab active" : "ops-tab"}
               onClick={() => setTab(key)}
             >
-              <Icon size={15} />
-              <span>{label}</span>
+              {label}
             </button>
           ))}
         </nav>

@@ -1,14 +1,13 @@
 import { useMutation, useQuery } from "convex/react"
 import { useState } from "react"
 import {
-  Activity as ActivityIcon,
   Antenna,
-  BellRing,
   Check,
-  Inbox,
+  Hand,
+  History,
+  Lightbulb,
+  Pencil,
   Repeat,
-  ShieldX,
-  Sparkles,
 } from "lucide-react"
 import { api } from "../../../convex/_generated/api"
 import {
@@ -21,11 +20,11 @@ import {
 import {
   Card,
   EmptyLine,
-  Pill,
   clockTime,
   countdown,
   ellipsize,
   isStale,
+  sentenceCase,
   timeAgo,
   useNow,
 } from "./shared"
@@ -89,33 +88,34 @@ function NeedsYou({
   return (
     <section className="needs-you active">
       <header className="needs-you-head">
-        <BellRing size={15} />
-        <span>Needs you</span>
+        <Hand size={15} />
+        <span>
+          Needs you · {jobs.length} item{jobs.length === 1 ? "" : "s"}
+        </span>
       </header>
       <div className="needs-you-list">
         {jobs.map((job) => {
           const { label, expired } = countdown(job.vetoEndsAt, now)
-          const preview = job.payload?.copy ? ellipsize(job.payload.copy, 96) : "No draft copy recorded"
           return (
             <article className="needs-you-row" key={job.id}>
               <div className="needs-you-main">
-                <p className="needs-you-preview">{preview}</p>
+                <p className="needs-you-preview">
+                  {channelLabel(job.channel)} ·{" "}
+                  {job.payload?.copy ? `“${ellipsize(job.payload.copy, 96)}”` : "No draft copy recorded"}
+                </p>
                 <span className="needs-you-meta">
-                  {expired
-                    ? "Veto window elapsed"
-                    : `Publishes in ${label} unless vetoed`}{" "}
-                  · {job.channel}
+                  {expired ? "Veto window elapsed" : `Publishes in ${label} unless vetoed`}
                 </span>
               </div>
               <div className="needs-you-actions">
                 <button
-                  className="btn btn-danger"
+                  className="btn"
                   type="button"
                   onClick={() => block({ jobId: job.id, reason: "Vetoed from ops center" })}
                 >
-                  <ShieldX size={14} /> Veto
+                  Veto
                 </button>
-                <button className="btn btn-ghost" type="button" onClick={() => onReview(job.runId)}>
+                <button className="btn" type="button" onClick={() => onReview(job.runId)}>
                   Review
                 </button>
               </div>
@@ -125,6 +125,11 @@ function NeedsYou({
       </div>
     </section>
   )
+}
+
+function channelLabel(channel: string): string {
+  if (channel.toLowerCase() === "x") return "X post"
+  return `${sentenceCase(channel)} post`
 }
 
 function Automations({ rows }: { rows: Automation[] | undefined }) {
@@ -189,7 +194,6 @@ const DISPLAY_CAP = 10
 function OpportunitiesInbox({ rows }: { rows: Opportunity[] | undefined }) {
   const draft = useMutation(opsApi.draftOpportunity)
   const skip = useMutation(opsApi.skipOpportunity)
-  const [collapsed, setCollapsed] = useState(false)
   const [showAll, setShowAll] = useState(false)
   const count = rows?.length ?? 0
 
@@ -197,30 +201,28 @@ function OpportunitiesInbox({ rows }: { rows: Opportunity[] | undefined }) {
   const visible = showAll ? rows ?? [] : (rows ?? []).slice(0, DISPLAY_CAP)
 
   return (
-    <Card
-      title="Opportunities inbox"
-      count={`${count} new`}
-      icon={<Inbox size={15} />}
-      className="inbox"
-      collapsible
-      collapsed={collapsed}
-      onToggle={() => setCollapsed((v) => !v)}
-    >
+    <section className="inbox-section">
+      <header className="section-head">
+        <Lightbulb size={15} />
+        <h3>
+          Opportunities inbox <span className="card-count">· {count} new</span>
+        </h3>
+      </header>
       {rows === undefined ? (
         <EmptyLine>Loading…</EmptyLine>
       ) : rows.length === 0 ? (
         <EmptyLine>No opportunities in the inbox yet</EmptyLine>
       ) : (
-        <ul className="row-list">
+        <ul className="inbox-list">
           {visible.map((row) => (
-            <li className="inbox-row" key={row.id}>
+            <li className="inbox-card" key={row.id}>
               <span className={`type-badge type-${sourceKey(row.source)}`}>{row.source}</span>
               <p className="inbox-desc">{row.description}</p>
               <div className="inbox-actions">
-                <button className="btn btn-primary" type="button" onClick={() => draft({ id: row.id })}>
-                  <Sparkles size={13} /> {row.type === "automation" ? "Set up" : "Draft it"}
+                <button className="btn" type="button" onClick={() => draft({ id: row.id })}>
+                  {row.type === "automation" ? "Set up" : "Draft it"}
                 </button>
-                <button className="btn btn-ghost" type="button" onClick={() => skip({ id: row.id })}>
+                <button className="btn btn-quiet" type="button" onClick={() => skip({ id: row.id })}>
                   Skip
                 </button>
               </div>
@@ -235,24 +237,21 @@ function OpportunitiesInbox({ rows }: { rows: Opportunity[] | undefined }) {
           ) : null}
         </ul>
       )}
-    </Card>
+    </section>
   )
 }
 
 function ActivityFeed({ rows }: { rows: ActivityItem[] | undefined }) {
-  const [collapsed, setCollapsed] = useState(false)
   const [showAll, setShowAll] = useState(false)
   const total = rows?.length ?? 0
   const visible = showAll ? rows ?? [] : (rows ?? []).slice(0, DISPLAY_CAP)
 
   return (
-    <Card
-      title="Activity"
-      icon={<ActivityIcon size={15} />}
-      collapsible
-      collapsed={collapsed}
-      onToggle={() => setCollapsed((v) => !v)}
-    >
+    <section className="activity-section">
+      <header className="section-head">
+        <History size={15} />
+        <h3>Activity</h3>
+      </header>
       {rows === undefined ? (
         <EmptyLine>Loading…</EmptyLine>
       ) : rows.length === 0 ? (
@@ -261,27 +260,15 @@ function ActivityFeed({ rows }: { rows: ActivityItem[] | undefined }) {
         <ul className="timeline">
           {visible.map((row) => (
             <li className="timeline-row" key={row.id}>
-              <span className="timeline-icon">
-                {row.kind === "publish" || row.kind === "receipt" ? (
-                  <Check size={13} />
-                ) : (
-                  <span className="timeline-dot" />
-                )}
-              </span>
-              <div className="timeline-body">
-                <p className="timeline-title">
-                  {row.title}
-                  {row.receiptUrl ? (
-                    <>
-                      {" "}
-                      <a className="receipt-link" href={row.receiptUrl} target="_blank" rel="noreferrer">
-                        receipt
-                      </a>
-                    </>
-                  ) : null}
-                </p>
-                <p className="timeline-detail">{ellipsize(row.detail, 140)}</p>
-              </div>
+              <ActivityGlyph kind={row.kind} />
+              <p className="timeline-title" title={row.detail}>
+                {row.title}
+              </p>
+              {row.receiptUrl ? (
+                <a className="receipt-link" href={row.receiptUrl} target="_blank" rel="noreferrer">
+                  receipt
+                </a>
+              ) : null}
               <span className="timeline-time">{clockTime(row.at)}</span>
             </li>
           ))}
@@ -294,7 +281,37 @@ function ActivityFeed({ rows }: { rows: ActivityItem[] | undefined }) {
           ) : null}
         </ul>
       )}
-    </Card>
+    </section>
+  )
+}
+
+function ActivityGlyph({ kind }: { kind: string }) {
+  const k = kind.toLowerCase()
+  if (k.includes("publish") || k.includes("receipt")) {
+    return (
+      <span className="timeline-icon ok">
+        <Check size={13} />
+      </span>
+    )
+  }
+  if (k.includes("revis") || k.includes("edit") || k.includes("draft")) {
+    return (
+      <span className="timeline-icon">
+        <Pencil size={13} />
+      </span>
+    )
+  }
+  if (k.includes("sensor") || k.includes("finding")) {
+    return (
+      <span className="timeline-icon">
+        <Antenna size={13} />
+      </span>
+    )
+  }
+  return (
+    <span className="timeline-icon">
+      <span className="timeline-dot" />
+    </span>
   )
 }
 

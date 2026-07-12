@@ -120,11 +120,11 @@ export function countdown(vetoEndsAt: string | undefined, now: number): { label:
   if (!vetoEndsAt) return { label: "no window", expired: true }
   const ms = Date.parse(vetoEndsAt) - now
   if (Number.isNaN(ms)) return { label: "no window", expired: true }
-  if (ms <= 0) return { label: "0:00", expired: true }
+  if (ms <= 0) return { label: "00:00", expired: true }
   const total = Math.floor(ms / 1000)
   const m = Math.floor(total / 60)
   const s = total % 60
-  return { label: `${m}:${String(s).padStart(2, "0")}`, expired: false }
+  return { label: `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`, expired: false }
 }
 
 export function ellipsize(text: string, max = 120): string {
