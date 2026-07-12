@@ -1,34 +1,50 @@
 /* ============================================================
-   Wingbeat ops center — flat agency HQ
-   White / neutral surfaces, 0.5px hairlines, 12px radii,
-   sentence case, small status pills. No gradients, no shadows.
+   Wingbeat ops center — flat agency HQ, dark theme
+   Near-black page, one-step-lighter panels, light-on-dark
+   hairlines, 12px radii, sentence case, small status pills.
+   No gradients, no shadows.
+
+   Dark is the shipped default. The palette lives in :root as
+   variables so a light theme could be reintroduced later by
+   swapping this block (nothing below hard-codes a raw color).
    ============================================================ */
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 
-  --bg: #fafafa;
-  --surface: #ffffff;
-  --surface-2: #f6f6f7;
-  --surface-hover: #f0f0f1;
+  /* surfaces: page near-black, panels one step lighter */
+  --bg: #171717;
+  --surface: #1e1e1e;
+  --surface-2: #232323;
+  --surface-hover: #2a2a2b;
 
-  --text: #18181b;
-  --muted: #6b7280;
-  --faint: #9ca3af;
+  /* elevated selected pill (active tab) */
+  --pill-active-bg: #2c2c2e;
 
-  --line: rgba(24, 24, 27, 0.1);
-  --line-strong: rgba(24, 24, 27, 0.16);
+  /* text: near-white primary, warm muted grays below */
+  --text: #f4f4f5;
+  --muted: #a1a1aa;
+  --faint: #71717a;
 
-  --green-fg: #15803d;
-  --green-bg: #eaf6ee;
-  --amber-fg: #b45309;
-  --amber-bg: #fdf3e3;
-  --red-fg: #b91c1c;
-  --red-bg: #fbeaea;
-  --blue-fg: #1d4ed8;
-  --blue-bg: #eaf0fd;
-  --neutral-fg: #52525b;
-  --neutral-bg: #f1f1f2;
+  /* subtle light-on-dark hairlines */
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.14);
+
+  /* tinted status pills: light fg on dark tinted bg */
+  --green-fg: #4ade80;
+  --green-bg: rgba(34, 197, 94, 0.14);
+  --amber-fg: #fbbf24;
+  --amber-bg: rgba(180, 83, 9, 0.18);
+  --red-fg: #f87171;
+  --red-bg: rgba(220, 38, 38, 0.16);
+  --blue-fg: #a5b4fc; /* light blue / lavender — links & receipts */
+  --blue-bg: rgba(99, 102, 241, 0.16);
+  --purple-fg: #c4b5fd;
+  --purple-bg: rgba(139, 92, 246, 0.16);
+  --teal-fg: #5eead4;
+  --teal-bg: rgba(20, 184, 166, 0.15);
+  --neutral-fg: #a1a1aa;
+  --neutral-bg: rgba(255, 255, 255, 0.07);
 
   --radius: 12px;
   --radius-sm: 8px;
@@ -111,7 +127,7 @@ a {
   border: 0.5px solid var(--line-strong);
   border-radius: var(--radius-sm);
   background: var(--text);
-  color: #fff;
+  color: var(--bg);
 }
 
 .eyebrow {
@@ -152,6 +168,7 @@ a {
   font-size: 1.05rem;
   font-weight: 600;
   letter-spacing: -0.01em;
+  color: var(--text);
 }
 
 .ops-tabs {
@@ -178,8 +195,8 @@ a {
 }
 
 .ops-tab.active {
-  background: var(--surface-2);
-  border-color: var(--line);
+  background: var(--pill-active-bg);
+  border-color: var(--line-strong);
   color: var(--text);
 }
 
@@ -244,27 +261,31 @@ a {
   padding: 0 11px;
   border-radius: var(--radius-sm);
   border: 0.5px solid var(--line-strong);
-  background: var(--surface);
+  background: var(--surface-2);
   color: var(--text);
   font-size: 0.8rem;
 }
 
 .btn:hover {
-  background: var(--surface-2);
+  background: var(--surface-hover);
 }
 
+/* "primary" reads as an emphasized outlined button on dark:
+   brighter hairline + full near-white label, subtle fill. */
 .btn-primary {
-  background: var(--text);
-  color: #fff;
-  border-color: var(--text);
+  background: transparent;
+  color: var(--text);
+  border-color: var(--line-strong);
 }
 .btn-primary:hover {
-  background: #000;
+  background: var(--surface-hover);
+  border-color: rgba(255, 255, 255, 0.24);
 }
 
 .btn-danger {
   color: var(--red-fg);
-  border-color: rgba(185, 28, 28, 0.3);
+  border-color: rgba(248, 113, 113, 0.32);
+  background: transparent;
 }
 .btn-danger:hover {
   background: var(--red-bg);
@@ -319,6 +340,58 @@ a {
   padding: 6px 14px 12px;
 }
 
+/* collapsible card header */
+.card-head-toggle {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  transition: background 0.12s ease;
+}
+
+.card-head-toggle:hover {
+  background: var(--surface-hover);
+}
+
+.card-head-toggle[aria-expanded="false"] {
+  border-bottom: none;
+}
+
+.card-chevron {
+  color: var(--faint);
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.card-chevron.open {
+  transform: rotate(180deg);
+}
+
+/* quiet "show all / show fewer" footer */
+.show-more-row {
+  list-style: none;
+}
+
+.show-more {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 8px 2px 4px;
+  font: inherit;
+  font-size: 0.8rem;
+  color: var(--faint);
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.12s ease;
+}
+
+.show-more:hover {
+  color: var(--muted);
+}
+
 .empty-line {
   color: var(--muted);
   font-size: 0.85rem;
@@ -354,7 +427,7 @@ a {
 }
 
 .needs-you.active {
-  border: 0.5px solid rgba(180, 83, 9, 0.28);
+  border: 0.5px solid rgba(251, 191, 36, 0.24);
   border-radius: var(--radius);
   background: var(--amber-bg);
   overflow: hidden;
@@ -367,7 +440,7 @@ a {
   padding: 10px 14px;
   font-weight: 600;
   color: var(--amber-fg);
-  border-bottom: 0.5px solid rgba(180, 83, 9, 0.18);
+  border-bottom: 0.5px solid rgba(251, 191, 36, 0.18);
 }
 
 .needs-you-list {
@@ -381,7 +454,7 @@ a {
   justify-content: space-between;
   gap: 14px;
   padding: 12px 14px;
-  border-top: 0.5px solid rgba(180, 83, 9, 0.12);
+  border-top: 0.5px solid rgba(251, 191, 36, 0.14);
 }
 
 .needs-you-row:first-child {
@@ -438,6 +511,7 @@ a {
 
 .line-primary {
   font-size: 0.86rem;
+  color: var(--text);
 }
 
 .arrow {
@@ -479,27 +553,27 @@ a {
   color: var(--neutral-fg);
 }
 
-.type-codex {
-  background: #eef2ff;
-  color: #4338ca;
+/* codex logs & automation -> purple tint */
+.type-codex,
+.type-automation {
+  background: var(--purple-bg);
+  color: var(--purple-fg);
 }
+/* claude logs -> green / teal tint */
 .type-claude {
-  background: #fdf2ea;
-  color: #b45309;
+  background: var(--teal-bg);
+  color: var(--teal-fg);
 }
 .type-hermes {
-  background: #ecfdf5;
-  color: #047857;
-}
-.type-automation {
-  background: #eff6ff;
-  color: #1d4ed8;
+  background: var(--green-bg);
+  color: var(--green-fg);
 }
 
 .inbox-desc {
   flex: 1;
   min-width: 0;
   font-size: 0.85rem;
+  color: var(--text);
 }
 
 .inbox-actions {
@@ -556,6 +630,7 @@ a {
 .timeline-title {
   font-size: 0.85rem;
   font-weight: 500;
+  color: var(--text);
 }
 
 .timeline-detail {
@@ -576,6 +651,7 @@ a {
   gap: 3px;
   font-size: 0.76rem;
   text-decoration: none;
+  color: var(--blue-fg);
 }
 
 .receipt-link:hover {
@@ -658,11 +734,11 @@ a {
   border: 0.5px solid var(--line-strong);
   border-left-width: 3px;
   border-radius: var(--radius-sm);
-  background: var(--surface);
+  background: var(--surface-2);
 }
 
 .dag-node:hover {
-  background: var(--surface-2);
+  background: var(--surface-hover);
 }
 
 .dag-node.selected {
@@ -672,6 +748,7 @@ a {
 .dag-node-role {
   font-size: 0.85rem;
   font-weight: 600;
+  color: var(--text);
 }
 
 .dag-node-status {
@@ -711,6 +788,7 @@ a {
 
 .agent-detail-head h3 {
   font-size: 0.95rem;
+  color: var(--text);
 }
 
 .agent-detail-head p {
@@ -752,6 +830,7 @@ a {
 
 .agent-output p {
   font-size: 0.85rem;
+  color: var(--text);
 }
 
 .agent-event-list {
@@ -783,6 +862,7 @@ a {
 .agent-event-list strong {
   font-size: 0.82rem;
   font-weight: 600;
+  color: var(--text);
 }
 
 .agent-event-list p {
@@ -873,6 +953,7 @@ a {
 .kard-title {
   font-size: 0.82rem;
   font-weight: 600;
+  color: var(--text);
 }
 
 .kard-cat {
@@ -914,14 +995,14 @@ a {
   padding: 0 10px;
   border: 0.5px solid var(--line);
   border-radius: 999px;
-  background: var(--surface);
+  background: var(--surface-2);
   font-size: 0.76rem;
   color: var(--muted);
 }
 
 .filter-chip.active {
   background: var(--text);
-  color: #fff;
+  color: var(--bg);
   border-color: var(--text);
 }
 

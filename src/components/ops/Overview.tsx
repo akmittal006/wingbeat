@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "convex/react"
+import { useState } from "react"
 import {
   Activity as ActivityIcon,
   Antenna,
@@ -183,20 +184,35 @@ function Sensors({ rows, now }: { rows: Sensor[] | undefined; now: number }) {
   )
 }
 
+const DISPLAY_CAP = 10
+
 function OpportunitiesInbox({ rows }: { rows: Opportunity[] | undefined }) {
   const draft = useMutation(opsApi.draftOpportunity)
   const skip = useMutation(opsApi.skipOpportunity)
+  const [collapsed, setCollapsed] = useState(false)
+  const [showAll, setShowAll] = useState(false)
   const count = rows?.length ?? 0
 
+  const total = rows?.length ?? 0
+  const visible = showAll ? rows ?? [] : (rows ?? []).slice(0, DISPLAY_CAP)
+
   return (
-    <Card title="Opportunities inbox" count={`${count} new`} icon={<Inbox size={15} />} className="inbox">
+    <Card
+      title="Opportunities inbox"
+      count={`${count} new`}
+      icon={<Inbox size={15} />}
+      className="inbox"
+      collapsible
+      collapsed={collapsed}
+      onToggle={() => setCollapsed((v) => !v)}
+    >
       {rows === undefined ? (
         <EmptyLine>Loading…</EmptyLine>
       ) : rows.length === 0 ? (
         <EmptyLine>No opportunities in the inbox yet</EmptyLine>
       ) : (
         <ul className="row-list">
-          {rows.map((row) => (
+          {visible.map((row) => (
             <li className="inbox-row" key={row.id}>
               <span className={`type-badge type-${sourceKey(row.source)}`}>{row.source}</span>
               <p className="inbox-desc">{row.description}</p>
@@ -210,6 +226,13 @@ function OpportunitiesInbox({ rows }: { rows: Opportunity[] | undefined }) {
               </div>
             </li>
           ))}
+          {total > DISPLAY_CAP ? (
+            <li className="show-more-row">
+              <button className="show-more" type="button" onClick={() => setShowAll((v) => !v)}>
+                {showAll ? "Show fewer" : `Show all ${total}`}
+              </button>
+            </li>
+          ) : null}
         </ul>
       )}
     </Card>
@@ -217,15 +240,26 @@ function OpportunitiesInbox({ rows }: { rows: Opportunity[] | undefined }) {
 }
 
 function ActivityFeed({ rows }: { rows: ActivityItem[] | undefined }) {
+  const [collapsed, setCollapsed] = useState(false)
+  const [showAll, setShowAll] = useState(false)
+  const total = rows?.length ?? 0
+  const visible = showAll ? rows ?? [] : (rows ?? []).slice(0, DISPLAY_CAP)
+
   return (
-    <Card title="Activity" icon={<ActivityIcon size={15} />}>
+    <Card
+      title="Activity"
+      icon={<ActivityIcon size={15} />}
+      collapsible
+      collapsed={collapsed}
+      onToggle={() => setCollapsed((v) => !v)}
+    >
       {rows === undefined ? (
         <EmptyLine>Loading…</EmptyLine>
       ) : rows.length === 0 ? (
         <EmptyLine>No activity recorded yet</EmptyLine>
       ) : (
         <ul className="timeline">
-          {rows.map((row) => (
+          {visible.map((row) => (
             <li className="timeline-row" key={row.id}>
               <span className="timeline-icon">
                 {row.kind === "publish" || row.kind === "receipt" ? (
@@ -251,6 +285,13 @@ function ActivityFeed({ rows }: { rows: ActivityItem[] | undefined }) {
               <span className="timeline-time">{clockTime(row.at)}</span>
             </li>
           ))}
+          {total > DISPLAY_CAP ? (
+            <li className="show-more-row">
+              <button className="show-more" type="button" onClick={() => setShowAll((v) => !v)}>
+                {showAll ? "Show fewer" : `Show all ${total}`}
+              </button>
+            </li>
+          ) : null}
         </ul>
       )}
     </Card>
