@@ -12,9 +12,11 @@ import {
   Coins,
   Database,
   Eye,
+  Film,
   Gauge,
   GitBranch,
   Globe2,
+  Image,
   Layers3,
   Link,
   Radio,
@@ -211,6 +213,8 @@ function OperationsView({
 
       <ReceiptPanel receipt={receipt} />
 
+      <VisualOpportunityPanel run={run} compact />
+
       {reviewMoment ? (
         <ReviewMomentPanel run={run} />
       ) : (
@@ -304,6 +308,10 @@ function CatalogView({ run }: { run: DashboardRun }) {
         </div>
       </Panel>
 
+      <VisualOpportunityPanel run={run} />
+
+      <DemoStoryboardPanel run={run} />
+
       <Panel>
         <div className="panel-heading">
           <div>
@@ -362,20 +370,122 @@ function CatalogView({ run }: { run: DashboardRun }) {
       <Panel>
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Asset</p>
-            <h3>Brief</h3>
+            <p className="eyebrow">Visual contract</p>
+            <h3>Reusable Brief</h3>
           </div>
           <WalletCards size={18} />
         </div>
-        <div className="asset-card">
-          <div className="asset-card-top">
-            <span>W</span>
-            <strong>{run.package.adaptation.asset ? "Recorded Asset" : "No asset"}</strong>
+        {run.package.visualBrief ? (
+          <div className="asset-card">
+            <div className="asset-card-top">
+              <span>W</span>
+              <strong>{run.package.visualBrief.status}</strong>
+            </div>
+            <p>{run.package.visualBrief.instructions}</p>
+            <div className="tag-row">
+              <span>{run.package.visualBrief.tone}</span>
+              <span>{run.package.visualBrief.format}</span>
+            </div>
           </div>
-          <p>{run.package.adaptation.asset ?? "No asset recorded for this package."}</p>
-        </div>
+        ) : (
+          <EmptyState>No visual brief recorded for this package.</EmptyState>
+        )}
       </Panel>
     </section>
+  )
+}
+
+function VisualOpportunityPanel({ run, compact = false }: { run: DashboardRun; compact?: boolean }) {
+  const visual = run.package.visualOpportunity
+  const video = run.package.demoVideoOpportunity
+  const brief = run.package.visualBrief
+  const plan = run.package.demoVideoPlan
+
+  return (
+    <Panel className="visual-panel">
+      <div className="panel-heading">
+        <div>
+          <p className="eyebrow">Visual-first output</p>
+          <h3>Opportunity & Status</h3>
+        </div>
+        <Image size={18} />
+      </div>
+      {visual && video ? (
+        <div className={compact ? "visual-grid compact" : "visual-grid"}>
+          <OpportunityCard label="Visual" recommended={visual.recommended} reason={visual.reason} status={brief?.status} />
+          <OpportunityCard label="Demo video" recommended={video.recommended} reason={video.reason} status={plan?.status} />
+          {!compact && plan ? (
+            <div className="contract-card">
+              <span>{plan.rendererState}</span>
+              <p>{plan.rendererAvailable ? plan.handoffCommand ?? "Renderer available." : plan.blockedReason ?? "Renderer unavailable."}</p>
+            </div>
+          ) : null}
+        </div>
+      ) : (
+        <EmptyState>No visual or demo-video opportunity assessment recorded.</EmptyState>
+      )}
+    </Panel>
+  )
+}
+
+function OpportunityCard({
+  label,
+  recommended,
+  reason,
+  status,
+}: {
+  label: string
+  recommended: boolean
+  reason: string
+  status?: string
+}) {
+  return (
+    <article className="opportunity-card">
+      <div className="opportunity-card-top">
+        <strong>{label}</strong>
+        <span className={recommended ? "mini-status pass" : "mini-status warn"}>{recommended ? "recommended" : "not recommended"}</span>
+      </div>
+      <p>{reason}</p>
+      <span className="kv-mono">{status ?? "status missing"}</span>
+    </article>
+  )
+}
+
+function DemoStoryboardPanel({ run }: { run: DashboardRun }) {
+  const plan = run.package.demoVideoPlan
+
+  return (
+    <Panel className="storyboard-panel">
+      <div className="panel-heading">
+        <div>
+          <p className="eyebrow">Demo video contract</p>
+          <h3>{plan ? `${plan.durationSeconds}s ${plan.format}` : "No storyboard"}</h3>
+        </div>
+        <Film size={18} />
+      </div>
+      {plan ? (
+        <div className="storyboard-stack">
+          <div className="video-meta-grid">
+            <KeyValue label="Renderer" value={plan.rendererAvailable ? plan.renderer : `${plan.renderer}: ${plan.blockedReason ?? "not available"}`} />
+            <KeyValue label="Tone" value={plan.tone} />
+            <KeyValue label="Audio" value={plan.audioPosture} />
+            <KeyValue label="CTA" value={plan.outroCta} />
+          </div>
+          <div className="beat-list">
+            {plan.storyboard.map((beat) => (
+              <article className="beat-card" key={beat.id}>
+                <span>{beat.startSecond}s-{beat.endSecond}s</span>
+                <strong>{beat.label}</strong>
+                <p>{beat.visual}</p>
+                <em>{beat.readableText}</em>
+              </article>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <EmptyState>No demo-video plan recorded for this package.</EmptyState>
+      )}
+    </Panel>
   )
 }
 

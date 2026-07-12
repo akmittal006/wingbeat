@@ -1,4 +1,6 @@
 import crypto from "node:crypto"
+import fs from "node:fs"
+import path from "node:path"
 import { collectProjectContext } from "./context.mjs"
 import { generateWithHermes } from "./hermes.mjs"
 
@@ -225,6 +227,262 @@ function classifyContentMode({ context }) {
   return "build-in-public"
 }
 
+function loadXProsePlaybook(rootDir) {
+  const filePath = path.join(rootDir, "src", "data", "x-prose-playbook.json")
+  return JSON.parse(fs.readFileSync(filePath, "utf8"))
+}
+
+function selectXProseCategory({ context, playbook }) {
+  const objective = context.objective.toLowerCase()
+  const categories = Array.isArray(playbook.categories) ? playbook.categories : []
+  const byId = new Map(categories.map((category) => [category.id, category]))
+  const prefer = (id) => byId.get(id)
+
+  const selected =
+    (/video|demo/.test(objective) && prefer("demo-video-post")) ||
+    (/(open.source|repo launch|repository launch|public repo|public repository)/.test(objective) && prefer("open-source-repo-launch")) ||
+    (/waitlist|early access/.test(objective) && prefer("waitlist-early-access")) ||
+    (/launch|introduc/.test(objective) && prefer("product-introduction")) ||
+    (/feature/.test(objective) && prefer("feature-intro-launch")) ||
+    (/lesson|insight/.test(objective) && prefer("insight-lesson")) ||
+    (/milestone|proof|receipt/.test(objective) && prefer("milestone-proof")) ||
+    (/fail|failed|failure/.test(objective) && prefer("failure-learning")) ||
+    (/decision|tradeoff|behind|technical/.test(objective) && prefer("technical-decision")) ||
+    (/experiment|result/.test(objective) && prefer("experiment-result")) ||
+    (/question|feedback|community/.test(objective) && prefer("community-feedback")) ||
+    (/changelog|update/.test(objective) && prefer("changelog-update")) ||
+    prefer("daily-build-log") ||
+    categories[0]
+
+  if (!selected?.id) throw new Error("X prose playbook has no selectable categories")
+  return selected
+}
+
+function buildXProseContract({ playbook, category }) {
+  return {
+    playbookVersion: playbook.version,
+    categoryId: category.id,
+    category,
+    inputContract: playbook.inputContract,
+    generatorPrompt: playbook.generatorPrompt,
+    evaluation: playbook.evaluation,
+    globalRules: playbook.globalRules,
+  }
+}
+
+function chooseTonePreset({ context }) {
+  const objective = context.objective.toLowerCase()
+  if (/parody|yc/.test(objective)) return "yc-parody"
+  if (/chaotic|loud|ridiculous/.test(objective)) return "chaotic"
+  if (/deadpan|dry/.test(objective)) return "deadpan"
+  if (/cinematic|trailer/.test(objective)) return "cinematic"
+  if (/app store|app-store|feature card/.test(objective)) return "app-store"
+  if (/introduc|launch|feature/.test(objective)) return "polished"
+  return "default"
+}
+
+function inspectVisualSurface(context) {
+  const files = context.layers.currentJob.sourceFiles
+  const uiFiles = files.filter((file) => /src\/(App|main|components|styles)|convex\/|scripts\//.test(file)).slice(0, 12)
+  const hasOperatorConsole = files.includes("src/components/OperatorConsole.tsx")
+  const hasRuntime = files.includes("src/agency/runtime.mjs")
+  const hasConvex = files.includes("convex/powerup.ts") || files.includes("convex/schema.ts")
+  const hasExecutor = files.includes("scripts/x-execution/x-executor.mjs")
+  return {
+    uiFiles,
+    moments: [
+      hasOperatorConsole ? "Operator Console reads live Convex run state, evidence, crew, and X handoff." : undefined,
+      hasRuntime ? "Agency runtime builds source-backed package and execution handoff." : undefined,
+      hasConvex ? "Convex stores the canonical run, package, events, jobs, and receipts." : undefined,
+      hasExecutor ? "X executor exports browser tasks only after action-time confirmation." : undefined,
+    ].filter(Boolean),
+  }
+}
+
+function buildVisualPlanningRubric(context) {
+  const surface = inspectVisualSurface(context)
+  const evidenceIds = context.evidence.map((item) => item.id)
+  return [
+    ["project-job", "What does this project actually help someone do?", "Wingbeat turns product work into source-backed marketing packages and execution handoffs."],
+    ["audience", "Who needs to understand it in the first three seconds?", "Technical builders and small product teams who ship more consistently than they market."],
+    ["source-proof", "Which real sources prove the story?", context.evidence.map((item) => item.source).join(", ")],
+    ["visible-ui", "What real UI, code, or source artifact can be shown?", surface.uiFiles.join(", ") || "No UI/source files found."],
+    ["product-moments", "Which two or three product moments are concrete enough to show?", surface.moments.join(" ") || "No concrete product moments found."],
+    ["visual-identity", "What visual identity should carry the piece?", "Dense dark operator console, compact evidence cards, green pass states, amber veto states, and Convex source-of-truth labels."],
+    ["claim-boundary", "Which claims must the visual avoid?", "No live publish, growth, analytics, rendered asset, launch, or user claims without receipts or generated asset metadata."],
+    ["format", "Which format best fits reusable marketing output?", "Start with a landscape 15-25s demo plan and a reusable UI-flow visual brief; channel variants can crop later."],
+    ["cta", "What action should the viewer take?", "Reply for early access, inspect the repo, or answer one product question depending on the prose category."],
+  ].map(([id, question, answer]) => ({ id, question, answer, evidenceIds }))
+}
+
+function assessVisualOpportunity(context) {
+  const surface = inspectVisualSurface(context)
+  const recommended = surface.uiFiles.length > 0 && context.evidence.length >= 2
+  const noGoReason = recommended ? undefined : "No visual asset should be generated until real UI/source evidence exists."
+  return {
+    id: stableId("visualopp", `${context.objective}:${surface.uiFiles.join(",")}`),
+    kind: "visual",
+    recommended,
+    reason: recommended
+      ? "Real UI, code, docs, and execution state exist, so a visual can show Wingbeat instead of describing it abstractly."
+      : noGoReason,
+    noGoReason,
+    blockers: recommended ? [] : ["missing-real-ui-or-source-evidence"],
+    evidenceIds: context.evidence.map((item) => item.id),
+  }
+}
+
+function assessDemoVideoOpportunity(context) {
+  const surface = inspectVisualSurface(context)
+  const recommended = surface.moments.length >= 2
+  const noGoReason = recommended ? undefined : "No demo video should be planned without at least two specific product moments."
+  return {
+    id: stableId("videoopp", `${context.objective}:${surface.moments.join(",")}`),
+    kind: "demo-video",
+    recommended,
+    reason: recommended
+      ? "There are enough real product moments for a 15-25s hook, reveal, UI-flow, and CTA."
+      : noGoReason,
+    noGoReason,
+    blockers: recommended ? [] : ["insufficient-specific-product-moments"],
+    evidenceIds: context.evidence.map((item) => item.id),
+  }
+}
+
+function rendererBoundary(rootDir) {
+  const packageJson = JSON.parse(fs.readFileSync(path.join(rootDir, "package.json"), "utf8"))
+  const localBinary = path.join(rootDir, "node_modules", ".bin", "hyperframes")
+  const declared = Boolean(packageJson.dependencies?.hyperframes || packageJson.devDependencies?.hyperframes)
+  const available = fs.existsSync(localBinary)
+  return {
+    renderer: declared || available ? "hyperframes" : "unavailable",
+    rendererAvailable: available,
+    rendererState: available ? "available" : "unavailable",
+    handoffCommand: available ? "npx hyperframes lint && npx hyperframes render" : undefined,
+    blockedReason: available ? undefined : "Hyperframes is not installed in this worktree; persist storyboard and brief only.",
+  }
+}
+
+function buildVisualBrief({ context, tone, visualOpportunity }) {
+  const surface = inspectVisualSurface(context)
+  return {
+    id: stableId("visualbrief", `${tone}:${context.objective}`),
+    status: visualOpportunity.recommended ? "planned" : "not_applicable",
+    objective: "Create a source-backed Wingbeat marketing visual from actual operator-console, Convex, runtime, and executor evidence.",
+    format: visualOpportunity.recommended ? "ui-flow" : "none",
+    tone,
+    visualIdentity: "Dark operator console, thin zinc borders, compact evidence cards, green pass states, amber veto states, no abstract SaaS filler.",
+    sourceEvidenceIds: context.evidence.map((item) => item.id),
+    uiEvidence: surface.uiFiles,
+    instructions:
+      "Prefer actual user-flow footage, screenshots, or recreated UI from the app. Show source evidence, Convex source-of-truth state, agency crew, evaluation, and handoff state. Do not use generic clouds, funnels, dashboards, or unsupported claims.",
+    requiredText: ["Wingbeat", "Convex source of truth", "veto-ready X handoff"],
+    shareCopy: "Wingbeat turns product work into source-backed marketing assets before a channel adapter touches it.",
+  }
+}
+
+function buildDemoVideoPlan({ context, tone, demoVideoOpportunity, rootDir }) {
+  const surface = inspectVisualSurface(context)
+  const boundary = rendererBoundary(rootDir)
+  const status = demoVideoOpportunity.recommended ? (boundary.rendererAvailable ? "planned" : "blocked") : "not_applicable"
+  const evidenceIds = context.evidence.map((item) => item.id)
+  return {
+    id: stableId("videoplan", `${tone}:${context.objective}`),
+    status,
+    ...boundary,
+    rendererState: status === "blocked" ? "blocked" : boundary.rendererState,
+    tone,
+    format: "landscape",
+    durationSeconds: 20,
+    hook: "First 2-3s: show the live Convex-backed console and the rule that a draft is not a published receipt.",
+    reveal: "Reveal Wingbeat as the agency that reads repo evidence, drafts, evaluates, stores the package in Convex, and hands off to X with veto semantics.",
+    productMoments: [
+      surface.moments[0] ?? "Repo/source evidence enters the content package.",
+      surface.moments[1] ?? "Critic evaluation blocks unsupported claims.",
+      surface.moments[2] ?? "Convex stores pending execution state until a receipt exists.",
+    ],
+    outroCta: "Reply \"Wingbeat\" for early access.",
+    readableTiming: "Keep readable labels settled for at least 0.8s; sentences hold about 0.3s per word.",
+    visualIdentity: "Use actual operator dashboard footage or recreated UI, not abstract filler; dark dense UI with restrained motion.",
+    audioPosture: "Music and SFX are allowed but secondary; subtle ticks for state changes, no voiceover required.",
+    shareCopy: "A 20s source-backed demo of Wingbeat's Convex-native content package and veto-ready execution boundary.",
+    storyboard: [
+      {
+        id: "beat-hook",
+        label: "Hook",
+        startSecond: 0,
+        endSecond: 3,
+        visual: "Fast push into Operator Console run state and Convex live label.",
+        readableText: "Drafts are not receipts.",
+        evidenceIds,
+      },
+      {
+        id: "beat-reveal",
+        label: "Reveal",
+        startSecond: 3,
+        endSecond: 7,
+        visual: "Show Wingbeat name, source package, and dynamic crew selection.",
+        readableText: "Wingbeat builds the source-backed package first.",
+        evidenceIds,
+      },
+      {
+        id: "beat-moments",
+        label: "Product moments",
+        startSecond: 7,
+        endSecond: 16,
+        visual: "Cut through evidence cards, failed/revised evaluation, Convex contentPackage, and X handoff pending receipt.",
+        readableText: "Evidence -> critic -> Convex -> veto-ready handoff.",
+        evidenceIds,
+      },
+      {
+        id: "beat-outro",
+        label: "Outro",
+        startSecond: 16,
+        endSecond: 20,
+        visual: "Hold on asset/video status and CTA, with no rendered asset or public post URL.",
+        readableText: "Reply \"Wingbeat\".",
+        evidenceIds,
+      },
+    ],
+    sourceEvidenceIds: evidenceIds,
+    uiEvidence: surface.uiFiles,
+    generatedAssetIds: [],
+  }
+}
+
+function buildVisualVideoQuality({ visualOpportunity, demoVideoOpportunity, visualBrief, demoVideoPlan }) {
+  return [
+    {
+      id: stableId("vvquality", "visual-opportunity-required"),
+      status: visualOpportunity.reason ? "pass" : "fail",
+      score: visualOpportunity.reason ? 1 : 0,
+      detail: `Visual opportunity assessed: ${visualOpportunity.reason}`,
+      evidenceIds: visualOpportunity.evidenceIds,
+    },
+    {
+      id: stableId("vvquality", "demo-video-opportunity-required"),
+      status: demoVideoOpportunity.reason ? "pass" : "fail",
+      score: demoVideoOpportunity.reason ? 1 : 0,
+      detail: `Demo-video opportunity assessed: ${demoVideoOpportunity.reason}`,
+      evidenceIds: demoVideoOpportunity.evidenceIds,
+    },
+    {
+      id: stableId("vvquality", "actual-ui-over-filler"),
+      status: visualBrief.uiEvidence.length > 0 && demoVideoPlan.uiEvidence.length > 0 ? "pass" : "warn",
+      score: visualBrief.uiEvidence.length > 0 && demoVideoPlan.uiEvidence.length > 0 ? 1 : 0.5,
+      detail: "Visual contracts prefer actual UI/source footage and prohibit abstract filler.",
+      evidenceIds: visualBrief.sourceEvidenceIds,
+    },
+    {
+      id: stableId("vvquality", "honest-renderer-state"),
+      status: demoVideoPlan.status === "rendered" ? "fail" : "pass",
+      score: demoVideoPlan.status === "rendered" ? 0 : 1,
+      detail: demoVideoPlan.blockedReason ?? "Renderer boundary is available but no render is claimed.",
+      evidenceIds: demoVideoPlan.sourceEvidenceIds,
+    },
+  ]
+}
+
 function reservedXLimit(context) {
   return repositoryUrl(context) ? 257 : 280
 }
@@ -428,7 +686,7 @@ function repairXCopy({ narrative, context, mode }) {
   return buildXCopy({ narrative, context, mode })
 }
 
-function buildContentPackage({ runId, context, narrative, finalEvaluation }) {
+function buildContentPackage({ runId, context, narrative, finalEvaluation, rootDir }) {
   const whatChanged = sentenceFrom(
     narrative,
     `${displayProjectName(context)} has repository evidence ready for a source-backed build-in-public update.`,
@@ -442,6 +700,22 @@ function buildContentPackage({ runId, context, narrative, finalEvaluation }) {
       .trim() ||
     "The product promise depends on evidence collection, specialist handoffs, critic evaluation, and a vetoable execution boundary."
   const contentMode = classifyContentMode({ context })
+  const xProsePlaybook = loadXProsePlaybook(rootDir)
+  const xProseCategory = selectXProseCategory({ context, playbook: xProsePlaybook })
+  const xProseContract = buildXProseContract({ playbook: xProsePlaybook, category: xProseCategory })
+  const tone = chooseTonePreset({ context })
+  const visualPlanningRubric = buildVisualPlanningRubric(context)
+  const visualOpportunity = assessVisualOpportunity(context)
+  const demoVideoOpportunity = assessDemoVideoOpportunity(context)
+  const visualBrief = buildVisualBrief({ context, tone, visualOpportunity })
+  const demoVideoPlan = buildDemoVideoPlan({ context, tone, demoVideoOpportunity, rootDir })
+  const generatedAssets = []
+  const visualVideoQuality = buildVisualVideoQuality({
+    visualOpportunity,
+    demoVideoOpportunity,
+    visualBrief,
+    demoVideoPlan,
+  })
   let copy = buildXCopy({ narrative, context, mode: contentMode })
   let xQuality = evaluateXQuality(copy, context, contentMode)
   if (!xQuality.passed) {
@@ -455,7 +729,8 @@ function buildContentPackage({ runId, context, narrative, finalEvaluation }) {
   return {
     id: stableId("pkg", `${runId}:${narrative}`),
     project: context.project,
-    category: "build-in-public",
+    category: xProseCategory.id,
+    xProseContract,
     whatChanged,
     whyItMatters,
     audience: "Technical product builders who want consistent, evidence-backed build-in-public marketing.",
@@ -476,6 +751,26 @@ function buildContentPackage({ runId, context, narrative, finalEvaluation }) {
       "A source-backed draft is easier to trust than a generic launch blurb.",
     ],
     channelNeutralBody: narrative,
+    visualPlanningRubric,
+    visualOpportunity,
+    demoVideoOpportunity,
+    visualBrief,
+    demoVideoPlan,
+    visualVideoQuality,
+    generatedAssets,
+    executionReadyVariants: [
+      {
+        id: stableId("variant", `${runId}:x:${copy}`),
+        channel: "x",
+        status: "ready",
+        copy,
+        visualBriefId: visualBrief.id,
+        demoVideoPlanId: demoVideoPlan.id,
+        generatedAssetIds: [],
+        evidenceIds: context.evidence.map((item) => item.id),
+        xProseCategoryId: xProseCategory.id,
+      },
+    ],
     evidence: context.evidence,
     confidence: Number(((finalEvaluation.score + xQuality.score / 20) / 2).toFixed(2)),
     adaptation: {
@@ -484,7 +779,7 @@ function buildContentPackage({ runId, context, narrative, finalEvaluation }) {
       copy,
       characterCount: xCharacterCount(copy),
       rawCharacterCount: [...copy].length,
-      asset: "deterministic-card:agency-trace",
+      asset: visualBrief.status === "planned" ? `visual-brief:${visualBrief.id}` : undefined,
     },
     evaluations: [finalEvaluation, xQuality],
     xQuality,
@@ -698,6 +993,7 @@ export async function runAgency({ rootDir, trigger, objective, useHermes = true 
     context,
     narrative: revisedNarrative,
     finalEvaluation: finalEval,
+    rootDir,
   })
   const xAdapterId = stableId("agent", `${runId}:X Channel Adapter`)
   events.push(

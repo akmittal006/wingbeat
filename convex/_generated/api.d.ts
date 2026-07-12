@@ -9,6 +9,7 @@
  */
 
 import type * as powerup from "../powerup.js";
+import type * as visuals from "../visuals.js";
 
 import type {
   ApiFromModules,
@@ -18,6 +19,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   powerup: typeof powerup;
+  visuals: typeof visuals;
 }>;
 
 /**

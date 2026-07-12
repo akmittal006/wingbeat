@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server"
 import { v } from "convex/values"
+import { assertVisualVideoContract } from "./visuals"
 
 const EXECUTION_STATUSES = ["queue", "veto", "ready", "published", "blocked"] as const
 const TRANSITIONS: Record<(typeof EXECUTION_STATUSES)[number], Array<(typeof EXECUTION_STATUSES)[number]>> = {
@@ -98,6 +99,7 @@ export const recordAgencyRun = mutation({
   },
   handler: async (ctx, { run }) => {
     const createdAt = now()
+    assertVisualVideoContract(run.package)
     const existing = await ctx.db
       .query("runs")
       .withIndex("by_runId", (q) => q.eq("runId", run.id))
@@ -149,6 +151,14 @@ export const recordAgencyRun = mutation({
       category: run.package.category,
       narrative: run.package.narrative,
       package: run.package,
+      visualOpportunity: run.package.visualOpportunity,
+      demoVideoOpportunity: run.package.demoVideoOpportunity,
+      visualBrief: run.package.visualBrief,
+      demoVideoPlan: run.package.demoVideoPlan,
+      visualVideoQuality: run.package.visualVideoQuality ?? [],
+      generatedAssets: run.package.generatedAssets ?? [],
+      executionReadyVariants: run.package.executionReadyVariants ?? [],
+      xProseContract: run.package.xProseContract,
       evaluations: run.package.evaluations ?? [],
       createdAt,
       updatedAt: createdAt,
