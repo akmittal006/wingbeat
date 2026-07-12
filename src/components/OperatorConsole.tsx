@@ -175,7 +175,7 @@ function OperationsView({
           <h2>Actual Run State</h2>
         </div>
         <div className="button-row">
-          <StatusChip status={run.status} />
+          <span className="source-pill mono">{run.id}</span>
         </div>
       </div>
 
@@ -853,7 +853,7 @@ function TraceNode({
           <strong>{agent.role}</strong>
           <small>{agent.objective}</small>
         </span>
-        <AgentStatusChip status={agent.status} />
+        <span className={`trace-status agent-${agent.status}`}>{agent.status}</span>
       </button>
       {children.length > 0 && (
         <div className="trace-children">

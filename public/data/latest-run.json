@@ -1,19 +1,19 @@
 {
-  "id": "run-af062d9c",
+  "id": "run-487d614b",
   "project": "wingbeat",
   "trigger": "manual-demo",
   "status": "veto_window",
-  "startedAt": "2026-07-12T07:00:26.194Z",
-  "scheduledFor": "2026-07-12T07:01:26.256Z",
-  "vetoEndsAt": "2026-07-12T07:01:11.256Z",
+  "startedAt": "2026-07-12T07:06:19.576Z",
+  "scheduledFor": "2026-07-12T07:07:19.641Z",
+  "vetoEndsAt": "2026-07-12T07:07:04.641Z",
   "package": {
-    "id": "pkg-004d1786",
+    "id": "pkg-1ad419b7",
     "project": "wingbeat",
     "category": "build-in-public",
     "whatChanged": "Building Wingbeat, an AI Marketing Agency for indie developers.",
-    "whyItMatters": "Wingbeat helps builders turn shipping work into consistent marketing without claiming a live post before there is a receipt. This local run used product-concept, two-hour-mvp-roadmap, browser-x-executor plus git context (16fd7cc (HEAD -> main) feat: build Wingbeat self-marketing agency demo) to draft from its own codebase. Current proof 9933ea17ac: README.md, docs/browser-x-executor.md, package.json, public/data/latest-run.json, scripts/x-execution/x-executor.mjs.",
+    "whyItMatters": "Wingbeat helps builders turn shipping work into consistent marketing without claiming a live post before there is a receipt. This local run used product-concept, two-hour-mvp-roadmap, browser-x-executor plus git context (7b8e045 (HEAD -> main, origin/main) feat: make Wingbeat dogfood-ready for X) to draft from its own codebase. Current proof 9933ea17ac: public/data/latest-run.json, src/agency/context.mjs, src/agency/runtime.mjs, src/components/OperatorConsole.tsx, src/styles.css.",
     "audience": "Technical product builders who want consistent, evidence-backed build-in-public marketing.",
-    "narrative": "Building Wingbeat, an AI Marketing Agency for indie developers. Wingbeat helps builders turn shipping work into consistent marketing without claiming a live post before there is a receipt. This local run used product-concept, two-hour-mvp-roadmap, browser-x-executor plus git context (16fd7cc (HEAD -> main) feat: build Wingbeat self-marketing agency demo) to draft from its own codebase. Current proof 9933ea17ac: README.md, docs/browser-x-executor.md, package.json, public/data/latest-run.json, scripts/x-execution/x-executor.mjs.",
+    "narrative": "Building Wingbeat, an AI Marketing Agency for indie developers. Wingbeat helps builders turn shipping work into consistent marketing without claiming a live post before there is a receipt. This local run used product-concept, two-hour-mvp-roadmap, browser-x-executor plus git context (7b8e045 (HEAD -> main, origin/main) feat: make Wingbeat dogfood-ready for X) to draft from its own codebase. Current proof 9933ea17ac: public/data/latest-run.json, src/agency/context.mjs, src/agency/runtime.mjs, src/components/OperatorConsole.tsx, src/styles.css.",
     "supportedClaims": [
       "Wingbeat is defined as a dynamic AI marketing agency for Hermes.",
       "The MVP roadmap calls for dynamic crew selection, parallel specialists, revision, context layers, trace, cost, latency, and a UI-consumable run.",
@@ -29,7 +29,7 @@
       "Wingbeat is turning marketing into inspectable infrastructure.",
       "Today the agency stopped being a diagram and started producing runs."
     ],
-    "channelNeutralBody": "Building Wingbeat, an AI Marketing Agency for indie developers. Wingbeat helps builders turn shipping work into consistent marketing without claiming a live post before there is a receipt. This local run used product-concept, two-hour-mvp-roadmap, browser-x-executor plus git context (16fd7cc (HEAD -> main) feat: build Wingbeat self-marketing agency demo) to draft from its own codebase. Current proof 9933ea17ac: README.md, docs/browser-x-executor.md, package.json, public/data/latest-run.json, scripts/x-execution/x-executor.mjs.",
+    "channelNeutralBody": "Building Wingbeat, an AI Marketing Agency for indie developers. Wingbeat helps builders turn shipping work into consistent marketing without claiming a live post before there is a receipt. This local run used product-concept, two-hour-mvp-roadmap, browser-x-executor plus git context (7b8e045 (HEAD -> main, origin/main) feat: make Wingbeat dogfood-ready for X) to draft from its own codebase. Current proof 9933ea17ac: public/data/latest-run.json, src/agency/context.mjs, src/agency/runtime.mjs, src/components/OperatorConsole.tsx, src/styles.css.",
     "evidence": [
       {
         "id": "evidence-doc-1",
@@ -54,13 +54,14 @@
     "adaptation": {
       "channel": "x",
       "mode": "introduction",
-      "copy": "Building Wingbeat, an AI Marketing Agency for indie developers.\nIt helps builders ship more and post consistently.\nHandles: code -> stories / proof -> reusable posts / draft -> veto-ready X.\nWeek 1: shipped repo-backed X draft loop.\nWant early access? Reply \"Wingbeat\".",
-      "characterCount": 269,
+      "copy": "Building Wingbeat, an AI Marketing Agency for indie developers.\nHelps builders ship and post consistently.\nHandles: code -> stories / proof -> posts / draft -> veto-ready X.\nWeek 1: shipped repo-backed X draft loop.\nWant early access? Reply \"Wingbeat\".\nhttps://github.com/akmittal006/wingbeat",
+      "characterCount": 276,
+      "rawCharacterCount": 292,
       "asset": "deterministic-card:agency-trace"
     },
     "evaluations": [
       {
-        "id": "eval-ef6248d8",
+        "id": "eval-faa7c439",
         "name": "source-backed-build-in-public-gate",
         "passed": true,
         "score": 0.96,
@@ -74,14 +75,14 @@
           "wingbeat",
           "product",
           "concept",
-          "execution",
           "two-hour",
           "agency",
-          "roadmap"
+          "roadmap",
+          "two-hour-mvp-roadmap"
         ]
       },
       {
-        "id": "xquality-e5770f8c",
+        "id": "xquality-149de0c7",
         "name": "introduction-x-quality-gate",
         "mode": "introduction",
         "passed": true,
@@ -132,13 +133,14 @@
             "score": 2
           }
         ],
-        "characterCount": 269,
+        "characterCount": 276,
+        "rawCharacterCount": 292,
         "hashtagCount": 0,
-        "reservedLinkCharacters": 0
+        "reservedLinkCharacters": 23
       }
     ],
     "xQuality": {
-      "id": "xquality-e5770f8c",
+      "id": "xquality-149de0c7",
       "name": "introduction-x-quality-gate",
       "mode": "introduction",
       "passed": true,
@@ -189,9 +191,10 @@
           "score": 2
         }
       ],
-      "characterCount": 269,
+      "characterCount": 276,
+      "rawCharacterCount": 292,
       "hashtagCount": 0,
-      "reservedLinkCharacters": 0
+      "reservedLinkCharacters": 23
     },
     "contextReferences": [
       {
@@ -207,8 +210,8 @@
         "layer": "project_history",
         "source": "git log/status",
         "label": "Recent repository movement",
-        "digest": "5ebea7dbd3",
-        "excerpt": "16fd7cc (HEAD -> main) feat: build Wingbeat self-marketing agency demo\n10f6c74 docs: tighten two-hour MVP execution plan\n97dadb4 docs: define Wingbeat agency MVP architecture M README.md\n M docs/browser-x-executor.md\n M package.json\n M public/data/latest-run.json\n M scripts/x-execution/x-executor.mjs\n M src/App.tsx\n M src/agency/hermes.mjs\n M src/agency/runtime.mjs\n M src/components/OperatorConsole.tsx\n M src/components/dashboard-data.ts\n M src/data/seed.ts\n M src/lib/publish.ts\n M src/styles.css\n M src/types.ts\n??"
+        "digest": "44baffe511",
+        "excerpt": "7b8e045 (HEAD -> main, origin/main) feat: make Wingbeat dogfood-ready for X\n16fd7cc feat: build Wingbeat self-marketing agency demo\n10f6c74 docs: tighten two-hour MVP execution plan\n97dadb4 docs: define Wingbeat agency MVP architecture M public/data/latest-run.json\n M src/agency/context.mjs\n M src/agency/runtime.mjs\n M src/components/OperatorConsole.tsx\n M src/styles.css"
       },
       {
         "id": "ctx-brand-policy",
@@ -229,7 +232,7 @@
     ],
     "executionHistory": [
       {
-        "id": "exec-fad0da5e",
+        "id": "exec-57d07d8e",
         "channel": "x",
         "status": "handoff_ready",
         "detail": "Runtime produced X copy and veto-window metadata; browser executor owns live posting."
@@ -238,294 +241,295 @@
   },
   "agents": [
     {
-      "id": "agent-edb57709",
+      "id": "agent-e99f9877",
       "role": "Agency Manager",
       "objective": "Market the Wingbeat repository itself with a build-in-public story.",
       "status": "passed",
-      "startedAt": "2026-07-12T07:00:26.194Z",
-      "finishedAt": "2026-07-12T07:00:26.256Z",
-      "latencyMs": 62,
-      "tokens": 2139,
-      "costUsd": 0.008556,
-      "output": "Selected 9 roles, produced package pkg-004d1786 from evaluated narrative, and prepared X handoff xjob-b3cd7e97."
+      "startedAt": "2026-07-12T07:06:19.576Z",
+      "finishedAt": "2026-07-12T07:06:19.641Z",
+      "latencyMs": 65,
+      "tokens": 2140,
+      "costUsd": 0.00856,
+      "output": "Selected 9 roles, produced package pkg-1ad419b7 from evaluated narrative, and prepared X handoff xjob-65b0a95d."
     },
     {
-      "id": "agent-07161f66",
-      "parentId": "agent-edb57709",
+      "id": "agent-747685e1",
+      "parentId": "agent-e99f9877",
       "role": "Project Intelligence",
       "objective": "Summarize the repo-backed facts and implementation surface.",
       "status": "passed",
-      "startedAt": "2026-07-12T07:00:26.230Z",
-      "finishedAt": "2026-07-12T07:00:26.245Z",
+      "startedAt": "2026-07-12T07:06:19.615Z",
+      "finishedAt": "2026-07-12T07:06:19.630Z",
       "latencyMs": 15,
-      "tokens": 100,
-      "costUsd": 0.0004,
-      "output": "Wingbeat is a Hermes dynamic marketing agency. Current repo has docs for concept and MVP roadmap, a Vite UI shell, and a safe X execution boundary. Dirty files: README.md, docs/browser-x-executor.md, package.json, public/data/latest-run.json, scripts/x-execution/x-executor.mjs, src/App.tsx, src/agency/hermes.mjs, src/agency/runtime.mjs."
+      "tokens": 88,
+      "costUsd": 0.000352,
+      "output": "Wingbeat is a Hermes dynamic marketing agency. Current repo has docs for concept and MVP roadmap, a Vite UI shell, and a safe X execution boundary. Dirty files: public/data/latest-run.json, src/agency/context.mjs, src/agency/runtime.mjs, src/components/OperatorConsole.tsx, src/styles.css."
     },
     {
-      "id": "agent-53a97ce1",
-      "parentId": "agent-edb57709",
+      "id": "agent-1f90eaf1",
+      "parentId": "agent-e99f9877",
       "role": "Story Detector",
       "objective": "Find the strongest build-in-public story supported by project evidence.",
       "status": "passed",
-      "startedAt": "2026-07-12T07:00:26.230Z",
-      "finishedAt": "2026-07-12T07:00:26.242Z",
-      "latencyMs": 12,
+      "startedAt": "2026-07-12T07:06:19.615Z",
+      "finishedAt": "2026-07-12T07:06:19.625Z",
+      "latencyMs": 10,
       "tokens": 63,
       "costUsd": 0.000252,
       "output": "Strongest story: the system is moving from static product concept to an agency runtime that can inspect itself, assemble specialists, evaluate drafts, and hand off to execution."
     },
     {
-      "id": "agent-bd7139e3",
-      "parentId": "agent-edb57709",
+      "id": "agent-17e77aad",
+      "parentId": "agent-e99f9877",
       "role": "Creative Director",
       "objective": "Set visual direction and reusable asset brief.",
       "status": "passed",
-      "startedAt": "2026-07-12T07:00:26.230Z",
-      "finishedAt": "2026-07-12T07:00:26.243Z",
-      "latencyMs": 13,
+      "startedAt": "2026-07-12T07:06:19.615Z",
+      "finishedAt": "2026-07-12T07:06:19.627Z",
+      "latencyMs": 12,
       "tokens": 54,
       "costUsd": 0.000216,
       "output": "Asset brief: compact operations-card visual showing Manager -> specialists -> critic -> X handoff, using neutral dark surfaces with green pass and orange veto accents."
     },
     {
-      "id": "agent-c38d063d",
-      "parentId": "agent-edb57709",
+      "id": "agent-ad925cc8",
+      "parentId": "agent-e99f9877",
       "role": "Technical Fact-Checker",
       "objective": "Handle conditional technical fact-checker needs for this run.",
       "status": "passed",
-      "startedAt": "2026-07-12T07:00:26.245Z",
-      "finishedAt": "2026-07-12T07:00:26.255Z",
-      "latencyMs": 10,
+      "startedAt": "2026-07-12T07:06:19.630Z",
+      "finishedAt": "2026-07-12T07:06:19.639Z",
+      "latencyMs": 9,
       "tokens": 50,
       "costUsd": 0.0002,
       "output": "Fact-check: claims must stay within docs and runtime output. Live publishing and analytics are out of scope unless receipts are present."
     },
     {
-      "id": "agent-1b78ede8",
-      "parentId": "agent-edb57709",
+      "id": "agent-47f7fec0",
+      "parentId": "agent-e99f9877",
       "role": "Product Mockup Specialist",
       "objective": "Handle conditional product mockup specialist needs for this run.",
       "status": "passed",
-      "startedAt": "2026-07-12T07:00:26.245Z",
-      "finishedAt": "2026-07-12T07:00:26.255Z",
-      "latencyMs": 10,
+      "startedAt": "2026-07-12T07:06:19.630Z",
+      "finishedAt": "2026-07-12T07:06:19.639Z",
+      "latencyMs": 9,
       "tokens": 45,
       "costUsd": 0.00018,
       "output": "Mockup path: use a deterministic agency-trace card brief rather than live image generation for the two-hour MVP."
     },
     {
-      "id": "agent-c4fce0a7",
-      "parentId": "agent-edb57709",
+      "id": "agent-49b551e8",
+      "parentId": "agent-e99f9877",
       "role": "Execution Safety Planner",
       "objective": "Handle conditional execution safety planner needs for this run.",
       "status": "passed",
-      "startedAt": "2026-07-12T07:00:26.245Z",
-      "finishedAt": "2026-07-12T07:00:26.255Z",
-      "latencyMs": 10,
+      "startedAt": "2026-07-12T07:06:19.630Z",
+      "finishedAt": "2026-07-12T07:06:19.639Z",
+      "latencyMs": 9,
       "tokens": 41,
       "costUsd": 0.000164,
       "output": "Execution plan: keep live X publishing behind the existing veto-window browser executor boundary."
     },
     {
-      "id": "agent-0d176953",
-      "parentId": "agent-edb57709",
+      "id": "agent-518923b2",
+      "parentId": "agent-e99f9877",
       "role": "Content Strategist",
       "objective": "Select audience, angle, and channel objective.",
       "status": "passed",
-      "startedAt": "2026-07-12T07:00:26.256Z",
-      "finishedAt": "2026-07-12T07:00:26.256Z",
+      "startedAt": "2026-07-12T07:06:19.641Z",
+      "finishedAt": "2026-07-12T07:06:19.641Z",
       "latencyMs": 0,
       "tokens": 55,
       "costUsd": 0.00022,
       "output": "Audience: Technical product builders who want consistent, evidence-backed build-in-public marketing.. Angle: Wingbeat is turning marketing into inspectable infrastructure."
     },
     {
-      "id": "agent-1c2db063",
-      "parentId": "agent-edb57709",
+      "id": "agent-0f657e2b",
+      "parentId": "agent-e99f9877",
       "role": "Editor / Critic",
       "objective": "Check accuracy, specificity, repetition, and brand fit.",
       "status": "passed",
-      "startedAt": "2026-07-12T07:00:26.256Z",
-      "finishedAt": "2026-07-12T07:00:26.256Z",
+      "startedAt": "2026-07-12T07:06:19.641Z",
+      "finishedAt": "2026-07-12T07:06:19.641Z",
       "latencyMs": 0,
       "tokens": 31,
       "costUsd": 0.000124,
       "output": "Gate passed after first draft: source-backed, specific, veto-aware"
     },
     {
-      "id": "agent-363d72e5",
-      "parentId": "agent-edb57709",
+      "id": "agent-04c8c41d",
+      "parentId": "agent-e99f9877",
       "role": "X Channel Adapter",
       "objective": "Convert canonical package into an X-native payload.",
       "status": "passed",
-      "startedAt": "2026-07-12T07:00:26.256Z",
-      "finishedAt": "2026-07-12T07:00:26.256Z",
+      "startedAt": "2026-07-12T07:06:19.641Z",
+      "finishedAt": "2026-07-12T07:06:19.641Z",
       "latencyMs": 0,
-      "tokens": 81,
-      "costUsd": 0.000324,
-      "output": "Building Wingbeat, an AI Marketing Agency for indie developers.\nIt helps builders ship more and post consistently.\nHandles: code -> stories / proof -> reusable posts / draft -> veto-ready X.\nWeek 1: shipped repo-backed X draft loop.\nWant early access? Reply \"Wingbeat\"."
+      "tokens": 86,
+      "costUsd": 0.000344,
+      "output": "Building Wingbeat, an AI Marketing Agency for indie developers.\nHelps builders ship and post consistently.\nHandles: code -> stories / proof -> posts / draft -> veto-ready X.\nWeek 1: shipped repo-backed X draft loop.\nWant early access? Reply \"Wingbeat\".\nhttps://github.com/akmittal006/wingbeat"
     }
   ],
   "events": [
     {
-      "id": "evt-0bdd3a0d",
-      "runId": "run-af062d9c",
-      "agentId": "agent-edb57709",
-      "at": "2026-07-12T07:00:26.230Z",
+      "id": "evt-8e153672",
+      "runId": "run-487d614b",
+      "agentId": "agent-e99f9877",
+      "at": "2026-07-12T07:06:19.615Z",
       "type": "spawn",
       "title": "Agency manager started",
       "detail": "Inspecting docs, git, current job, and brand policy."
     },
     {
-      "id": "evt-6dbc80f0",
-      "runId": "run-af062d9c",
-      "agentId": "agent-edb57709",
-      "at": "2026-07-12T07:00:26.230Z",
+      "id": "evt-3473a67e",
+      "runId": "run-487d614b",
+      "agentId": "agent-e99f9877",
+      "at": "2026-07-12T07:06:19.615Z",
       "type": "tool",
       "title": "Conditional crew selected",
       "detail": "Project Intelligence, Story Detector, Creative Director, Content Strategist, Technical Fact-Checker, Product Mockup Specialist, Execution Safety Planner, Editor / Critic, X Channel Adapter"
     },
     {
-      "id": "evt-ce357f71",
-      "runId": "run-af062d9c",
-      "agentId": "agent-edb57709",
-      "at": "2026-07-12T07:00:26.230Z",
+      "id": "evt-f0bd3844",
+      "runId": "run-487d614b",
+      "agentId": "agent-e99f9877",
+      "at": "2026-07-12T07:06:19.615Z",
       "type": "handoff",
       "title": "Three-layer context envelope prepared",
       "detail": "current_job, project_history, brand_policy"
     },
     {
-      "id": "evt-f1184487",
-      "runId": "run-af062d9c",
-      "agentId": "agent-07161f66",
-      "at": "2026-07-12T07:00:26.245Z",
+      "id": "evt-06c95629",
+      "runId": "run-487d614b",
+      "agentId": "agent-747685e1",
+      "at": "2026-07-12T07:06:19.630Z",
       "type": "spawn",
       "title": "Project Intelligence completed",
-      "detail": "Wingbeat is a Hermes dynamic marketing agency. Current repo has docs for concept and MVP roadmap, a Vite UI shell, and a safe X execution boundary. Dirty files: README.md, docs/browser-x-executor.md, package.json, public/data/latest-run.json, scripts/x-execution/x-executor.mjs, src/App.tsx, src/agency/hermes.mjs, src/agency/runtime.mjs."
+      "detail": "Wingbeat is a Hermes dynamic marketing agency. Current repo has docs for concept and MVP roadmap, a Vite UI shell, and a safe X execution boundary. Dirty files: public/data/latest-run.json, src/agency/context.mjs, src/agency/runtime.mjs, src/components/OperatorConsole.tsx, src/styles.css."
     },
     {
-      "id": "evt-95601da6",
-      "runId": "run-af062d9c",
-      "agentId": "agent-53a97ce1",
-      "at": "2026-07-12T07:00:26.245Z",
+      "id": "evt-f9e87dab",
+      "runId": "run-487d614b",
+      "agentId": "agent-1f90eaf1",
+      "at": "2026-07-12T07:06:19.630Z",
       "type": "spawn",
       "title": "Story Detector completed",
       "detail": "Strongest story: the system is moving from static product concept to an agency runtime that can inspect itself, assemble specialists, evaluate drafts, and hand off to execution."
     },
     {
-      "id": "evt-83f3f875",
-      "runId": "run-af062d9c",
-      "agentId": "agent-bd7139e3",
-      "at": "2026-07-12T07:00:26.245Z",
+      "id": "evt-1cecf90a",
+      "runId": "run-487d614b",
+      "agentId": "agent-17e77aad",
+      "at": "2026-07-12T07:06:19.630Z",
       "type": "spawn",
       "title": "Creative Director completed",
       "detail": "Asset brief: compact operations-card visual showing Manager -> specialists -> critic -> X handoff, using neutral dark surfaces with green pass and orange veto accents."
     },
     {
-      "id": "evt-02215254",
-      "runId": "run-af062d9c",
-      "agentId": "agent-c38d063d",
-      "at": "2026-07-12T07:00:26.255Z",
+      "id": "evt-97bc2fd5",
+      "runId": "run-487d614b",
+      "agentId": "agent-ad925cc8",
+      "at": "2026-07-12T07:06:19.639Z",
       "type": "spawn",
       "title": "Technical Fact-Checker spawned conditionally",
       "detail": "Fact-check: claims must stay within docs and runtime output. Live publishing and analytics are out of scope unless receipts are present."
     },
     {
-      "id": "evt-a9e7aa63",
-      "runId": "run-af062d9c",
-      "agentId": "agent-1b78ede8",
-      "at": "2026-07-12T07:00:26.255Z",
+      "id": "evt-6ef55af0",
+      "runId": "run-487d614b",
+      "agentId": "agent-47f7fec0",
+      "at": "2026-07-12T07:06:19.639Z",
       "type": "spawn",
       "title": "Product Mockup Specialist spawned conditionally",
       "detail": "Mockup path: use a deterministic agency-trace card brief rather than live image generation for the two-hour MVP."
     },
     {
-      "id": "evt-08afbdd8",
-      "runId": "run-af062d9c",
-      "agentId": "agent-c4fce0a7",
-      "at": "2026-07-12T07:00:26.255Z",
+      "id": "evt-3f1f524b",
+      "runId": "run-487d614b",
+      "agentId": "agent-49b551e8",
+      "at": "2026-07-12T07:06:19.639Z",
       "type": "spawn",
       "title": "Execution Safety Planner spawned conditionally",
       "detail": "Execution plan: keep live X publishing behind the existing veto-window browser executor boundary."
     },
     {
-      "id": "evt-2682f18e",
-      "runId": "run-af062d9c",
-      "agentId": "agent-edb57709",
-      "at": "2026-07-12T07:00:26.255Z",
+      "id": "evt-72b74c14",
+      "runId": "run-487d614b",
+      "agentId": "agent-e99f9877",
+      "at": "2026-07-12T07:06:19.640Z",
       "type": "tool",
       "title": "First draft delegated",
       "detail": "deterministic-fallback fallback; latency 0ms"
     },
     {
-      "id": "evt-304c6c32",
-      "runId": "run-af062d9c",
-      "agentId": "agent-1c2db063",
-      "at": "2026-07-12T07:00:26.255Z",
+      "id": "evt-1c991792",
+      "runId": "run-487d614b",
+      "agentId": "agent-0f657e2b",
+      "at": "2026-07-12T07:06:19.640Z",
       "type": "evaluation",
       "title": "First draft evaluated",
       "detail": "passed at 0.96: source-backed, specific, veto-aware"
     },
     {
-      "id": "evt-cdaf7d79",
-      "runId": "run-af062d9c",
-      "agentId": "agent-1c2db063",
-      "at": "2026-07-12T07:00:26.255Z",
+      "id": "evt-8d946fa8",
+      "runId": "run-487d614b",
+      "agentId": "agent-0f657e2b",
+      "at": "2026-07-12T07:06:19.640Z",
       "type": "evaluation",
       "title": "Final draft accepted without revision",
       "detail": "passed at 0.96: source-backed, specific, veto-aware"
     },
     {
-      "id": "evt-51df58b8",
-      "runId": "run-af062d9c",
-      "agentId": "agent-363d72e5",
-      "at": "2026-07-12T07:00:26.256Z",
+      "id": "evt-6df39574",
+      "runId": "run-487d614b",
+      "agentId": "agent-04c8c41d",
+      "at": "2026-07-12T07:06:19.641Z",
       "type": "evaluation",
       "title": "X quality gate evaluated",
       "detail": "passed 20/20; all criteria met"
     },
     {
-      "id": "evt-d5cac94f",
-      "runId": "run-af062d9c",
-      "agentId": "agent-0d176953",
-      "at": "2026-07-12T07:00:26.256Z",
+      "id": "evt-84a2c393",
+      "runId": "run-487d614b",
+      "agentId": "agent-518923b2",
+      "at": "2026-07-12T07:06:19.641Z",
       "type": "handoff",
       "title": "Content Strategist handoff",
       "detail": "Audience: Technical product builders who want consistent, evidence-backed build-in-public marketing.. Angle: Wingbeat is turning marketing into inspectable infrastructure."
     },
     {
-      "id": "evt-a2f5f1e9",
-      "runId": "run-af062d9c",
-      "agentId": "agent-1c2db063",
-      "at": "2026-07-12T07:00:26.256Z",
+      "id": "evt-1a2f1cc2",
+      "runId": "run-487d614b",
+      "agentId": "agent-0f657e2b",
+      "at": "2026-07-12T07:06:19.641Z",
       "type": "handoff",
       "title": "Editor / Critic handoff",
       "detail": "Gate passed after first draft: source-backed, specific, veto-aware"
     },
     {
-      "id": "evt-7e521578",
-      "runId": "run-af062d9c",
-      "agentId": "agent-363d72e5",
-      "at": "2026-07-12T07:00:26.256Z",
+      "id": "evt-2eb241f5",
+      "runId": "run-487d614b",
+      "agentId": "agent-04c8c41d",
+      "at": "2026-07-12T07:06:19.641Z",
       "type": "handoff",
       "title": "X Channel Adapter handoff",
-      "detail": "Building Wingbeat, an AI Marketing Agency for indie developers.\nIt helps builders ship more and post consistently.\nHandles: code -> stories / proof -> reusable posts / draft -> veto-ready X.\nWeek 1: shipped repo-backed X draft loop.\nWant early access? Reply \"Wingbeat\"."
+      "detail": "Building Wingbeat, an AI Marketing Agency for indie developers.\nHelps builders ship and post consistently.\nHandles: code -> stories / proof -> posts / draft -> veto-ready X.\nWeek 1: shipped repo-backed X draft loop.\nWant early access? Reply \"Wingbeat\".\nhttps://github.com/akmittal006/wingbeat"
     },
     {
-      "id": "evt-8ab18e8c",
-      "runId": "run-af062d9c",
-      "agentId": "agent-363d72e5",
-      "at": "2026-07-12T07:00:26.256Z",
+      "id": "evt-fb0291e0",
+      "runId": "run-487d614b",
+      "agentId": "agent-04c8c41d",
+      "at": "2026-07-12T07:06:19.641Z",
       "type": "publish",
       "title": "Execution handoff prepared",
-      "detail": "node scripts/x-execution/x-executor.mjs prepare --run-id run-af062d9c --copy-file <copy-file> --veto-seconds 45"
+      "detail": "node scripts/x-execution/x-executor.mjs prepare --run-id run-487d614b --copy-file <copy-file> --veto-seconds 45"
     }
   ],
   "contextEnvelope": {
     "currentJob": {
       "objective": "Market the Wingbeat repository itself with a build-in-public story.",
       "trigger": "manual-demo",
+      "repositoryUrl": "https://github.com/akmittal006/wingbeat",
       "sourceFiles": [
         ".claude/launch.json",
         ".claude/settings.local.json",
@@ -587,34 +591,17 @@
         "vite.config.ts"
       ],
       "dirtyFiles": [
-        "README.md",
-        "docs/browser-x-executor.md",
-        "package.json",
         "public/data/latest-run.json",
-        "scripts/x-execution/x-executor.mjs",
-        "src/App.tsx",
-        "src/agency/hermes.mjs",
+        "src/agency/context.mjs",
         "src/agency/runtime.mjs",
         "src/components/OperatorConsole.tsx",
-        "src/components/dashboard-data.ts",
-        "src/data/seed.ts",
-        "src/lib/publish.ts",
-        "src/styles.css",
-        "src/types.ts",
-        ".claude/",
-        ".github/",
-        "CHANGELOG.md",
-        "CODE_OF_CONDUCT.md",
-        "CONTRIBUTING.md",
-        "LICENSE",
-        "SECURITY.md",
-        "docs/architecture.md"
+        "src/styles.css"
       ]
     },
     "projectHistory": {
-      "recentCommits": "16fd7cc (HEAD -> main) feat: build Wingbeat self-marketing agency demo\n10f6c74 docs: tighten two-hour MVP execution plan\n97dadb4 docs: define Wingbeat agency MVP architecture",
-      "workingTree": "M README.md\n M docs/browser-x-executor.md\n M package.json\n M public/data/latest-run.json\n M scripts/x-execution/x-executor.mjs\n M src/App.tsx\n M src/agency/hermes.mjs\n M src/agency/runtime.mjs\n M src/components/OperatorConsole.tsx\n M src/components/dashboard-data.ts\n M src/data/seed.ts\n M src/lib/publish.ts\n M src/styles.css\n M src/types.ts\n?? .claude/\n?? .github/\n?? CHANGELOG.md\n?? CODE_OF_CONDUCT.md\n?? CONTRIBUTING.md\n?? LICENSE\n?? SECURITY.md\n?? docs/architecture.md",
-      "diffStat": "README.md                          |  152 +++-\n docs/browser-x-executor.md         |    7 +-\n package.json                       |   12 +\n public/data/latest-run.json        |  655 ++++++++++++-----\n scripts/x-execution/x-executor.mjs |  211 +++++-\n src/App.tsx                        |   15 +-\n src/agency/hermes.mjs              |   13 +-\n src/agency/runtime.mjs             |  432 ++++++++++-\n src/components/OperatorConsole.tsx |  582 ++++++++++-----\n src/components/dashboard-data.ts   |  395 ++++------\n src/data/seed.ts                   |  732 ++++++++----------\n src/lib/publish.ts                 |    4 +\n src/styles.css                     | 1428 +++++++++++++++++++++++-------------\n src/types.ts                       |   63 +-\n 14 files changed, 3007 insertions(+), 1694 deletions(-)",
+      "recentCommits": "7b8e045 (HEAD -> main, origin/main) feat: make Wingbeat dogfood-ready for X\n16fd7cc feat: build Wingbeat self-marketing agency demo\n10f6c74 docs: tighten two-hour MVP execution plan\n97dadb4 docs: define Wingbeat agency MVP architecture",
+      "workingTree": "M public/data/latest-run.json\n M src/agency/context.mjs\n M src/agency/runtime.mjs\n M src/components/OperatorConsole.tsx\n M src/styles.css",
+      "diffStat": "public/data/latest-run.json        | 399 ++++++++++++++++++-------------------\n src/agency/context.mjs             |  14 ++\n src/agency/runtime.mjs             |  37 ++--\n src/components/OperatorConsole.tsx |   4 +-\n src/styles.css                     |  27 +++\n 5 files changed, 264 insertions(+), 217 deletions(-)",
       "docs": [
         {
           "id": "evidence-doc-1",
@@ -665,8 +652,8 @@
       "layer": "project_history",
       "source": "git log/status",
       "label": "Recent repository movement",
-      "digest": "5ebea7dbd3",
-      "excerpt": "16fd7cc (HEAD -> main) feat: build Wingbeat self-marketing agency demo\n10f6c74 docs: tighten two-hour MVP execution plan\n97dadb4 docs: define Wingbeat agency MVP architecture M README.md\n M docs/browser-x-executor.md\n M package.json\n M public/data/latest-run.json\n M scripts/x-execution/x-executor.mjs\n M src/App.tsx\n M src/agency/hermes.mjs\n M src/agency/runtime.mjs\n M src/components/OperatorConsole.tsx\n M src/components/dashboard-data.ts\n M src/data/seed.ts\n M src/lib/publish.ts\n M src/styles.css\n M src/types.ts\n??"
+      "digest": "44baffe511",
+      "excerpt": "7b8e045 (HEAD -> main, origin/main) feat: make Wingbeat dogfood-ready for X\n16fd7cc feat: build Wingbeat self-marketing agency demo\n10f6c74 docs: tighten two-hour MVP execution plan\n97dadb4 docs: define Wingbeat agency MVP architecture M public/data/latest-run.json\n M src/agency/context.mjs\n M src/agency/runtime.mjs\n M src/components/OperatorConsole.tsx\n M src/styles.css"
     },
     {
       "id": "ctx-brand-policy",
@@ -702,7 +689,7 @@
     "draft": {
       "provider": "deterministic-fallback",
       "status": "fallback",
-      "text": "Building Wingbeat, an AI Marketing Agency for indie developers. Wingbeat helps builders turn shipping work into consistent marketing without claiming a live post before there is a receipt. This local run used product-concept, two-hour-mvp-roadmap, browser-x-executor plus git context (16fd7cc (HEAD -> main) feat: build Wingbeat self-marketing agency demo) to draft from its own codebase. Current proof 9933ea17ac: README.md, docs/browser-x-executor.md, package.json, public/data/latest-run.json, scripts/x-execution/x-executor.mjs.",
+      "text": "Building Wingbeat, an AI Marketing Agency for indie developers. Wingbeat helps builders turn shipping work into consistent marketing without claiming a live post before there is a receipt. This local run used product-concept, two-hour-mvp-roadmap, browser-x-executor plus git context (7b8e045 (HEAD -> main, origin/main) feat: make Wingbeat dogfood-ready for X) to draft from its own codebase. Current proof 9933ea17ac: public/data/latest-run.json, src/agency/context.mjs, src/agency/runtime.mjs, src/components/OperatorConsole.tsx, src/styles.css.",
       "usage": {
         "promptTokens": 0,
         "completionTokens": 0,
@@ -713,9 +700,9 @@
   },
   "evaluation": {
     "firstDraft": {
-      "text": "Building Wingbeat, an AI Marketing Agency for indie developers. Wingbeat helps builders turn shipping work into consistent marketing without claiming a live post before there is a receipt. This local run used product-concept, two-hour-mvp-roadmap, browser-x-executor plus git context (16fd7cc (HEAD -> main) feat: build Wingbeat self-marketing agency demo) to draft from its own codebase. Current proof 9933ea17ac: README.md, docs/browser-x-executor.md, package.json, public/data/latest-run.json, scripts/x-execution/x-executor.mjs.",
+      "text": "Building Wingbeat, an AI Marketing Agency for indie developers. Wingbeat helps builders turn shipping work into consistent marketing without claiming a live post before there is a receipt. This local run used product-concept, two-hour-mvp-roadmap, browser-x-executor plus git context (7b8e045 (HEAD -> main, origin/main) feat: make Wingbeat dogfood-ready for X) to draft from its own codebase. Current proof 9933ea17ac: public/data/latest-run.json, src/agency/context.mjs, src/agency/runtime.mjs, src/components/OperatorConsole.tsx, src/styles.css.",
       "result": {
-        "id": "eval-ef6248d8",
+        "id": "eval-faa7c439",
         "name": "source-backed-build-in-public-gate",
         "passed": true,
         "score": 0.96,
@@ -729,17 +716,17 @@
           "wingbeat",
           "product",
           "concept",
-          "execution",
           "two-hour",
           "agency",
-          "roadmap"
+          "roadmap",
+          "two-hour-mvp-roadmap"
         ]
       }
     },
     "finalDraft": {
-      "text": "Building Wingbeat, an AI Marketing Agency for indie developers. Wingbeat helps builders turn shipping work into consistent marketing without claiming a live post before there is a receipt. This local run used product-concept, two-hour-mvp-roadmap, browser-x-executor plus git context (16fd7cc (HEAD -> main) feat: build Wingbeat self-marketing agency demo) to draft from its own codebase. Current proof 9933ea17ac: README.md, docs/browser-x-executor.md, package.json, public/data/latest-run.json, scripts/x-execution/x-executor.mjs.",
+      "text": "Building Wingbeat, an AI Marketing Agency for indie developers. Wingbeat helps builders turn shipping work into consistent marketing without claiming a live post before there is a receipt. This local run used product-concept, two-hour-mvp-roadmap, browser-x-executor plus git context (7b8e045 (HEAD -> main, origin/main) feat: make Wingbeat dogfood-ready for X) to draft from its own codebase. Current proof 9933ea17ac: public/data/latest-run.json, src/agency/context.mjs, src/agency/runtime.mjs, src/components/OperatorConsole.tsx, src/styles.css.",
       "result": {
-        "id": "eval-ef6248d8",
+        "id": "eval-faa7c439",
         "name": "source-backed-build-in-public-gate",
         "passed": true,
         "score": 0.96,
@@ -753,15 +740,15 @@
           "wingbeat",
           "product",
           "concept",
-          "execution",
           "two-hour",
           "agency",
-          "roadmap"
+          "roadmap",
+          "two-hour-mvp-roadmap"
         ]
       }
     },
     "xQuality": {
-      "id": "xquality-e5770f8c",
+      "id": "xquality-149de0c7",
       "name": "introduction-x-quality-gate",
       "mode": "introduction",
       "passed": true,
@@ -812,30 +799,31 @@
           "score": 2
         }
       ],
-      "characterCount": 269,
+      "characterCount": 276,
+      "rawCharacterCount": 292,
       "hashtagCount": 0,
-      "reservedLinkCharacters": 0
+      "reservedLinkCharacters": 23
     }
   },
   "executionJob": {
-    "id": "xjob-b3cd7e97",
-    "runId": "run-af062d9c",
+    "id": "xjob-65b0a95d",
+    "runId": "run-487d614b",
     "channel": "x",
     "status": "veto_window",
-    "scheduledFor": "2026-07-12T07:01:26.256Z",
-    "vetoEndsAt": "2026-07-12T07:01:11.256Z",
+    "scheduledFor": "2026-07-12T07:07:19.641Z",
+    "vetoEndsAt": "2026-07-12T07:07:04.641Z",
     "payload": {
-      "copy": "Building Wingbeat, an AI Marketing Agency for indie developers.\nIt helps builders ship more and post consistently.\nHandles: code -> stories / proof -> reusable posts / draft -> veto-ready X.\nWeek 1: shipped repo-backed X draft loop.\nWant early access? Reply \"Wingbeat\".",
+      "copy": "Building Wingbeat, an AI Marketing Agency for indie developers.\nHelps builders ship and post consistently.\nHandles: code -> stories / proof -> posts / draft -> veto-ready X.\nWeek 1: shipped repo-backed X draft loop.\nWant early access? Reply \"Wingbeat\".\nhttps://github.com/akmittal006/wingbeat",
       "asset": "deterministic-card:agency-trace"
     },
     "handoff": {
       "executor": "scripts/x-execution/x-executor.mjs",
-      "commandPreview": "node scripts/x-execution/x-executor.mjs prepare --run-id run-af062d9c --copy-file <copy-file> --veto-seconds 45"
+      "commandPreview": "node scripts/x-execution/x-executor.mjs prepare --run-id run-487d614b --copy-file <copy-file> --veto-seconds 45"
     }
   },
   "metrics": {
-    "totalLatencyMs": 62,
-    "totalEstimatedCostUsd": 0.010636,
+    "totalLatencyMs": 65,
+    "totalEstimatedCostUsd": 0.010612,
     "agentCount": 10,
     "traceEventCount": 17
   }

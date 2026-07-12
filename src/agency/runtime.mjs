@@ -183,6 +183,10 @@ function truncateForX(text, limit = 280) {
   return `${sliced.trim()}…`
 }
 
+function xCharacterCount(text) {
+  return [...text.replace(/https?:\/\/\S+/g, "xxxxxxxxxxxxxxxxxxxxxxx")].length
+}
+
 function evidenceSourceLabel(context) {
   const primary = context.evidence.find((item) => item.source === "docs/product-concept.md") ?? context.evidence[0]
   return primary?.label ?? "repo docs"
@@ -201,6 +205,12 @@ function classifyContentMode({ context }) {
 
 function reservedXLimit(context) {
   return repositoryUrl(context) ? 257 : 280
+}
+
+function appendRepositoryUrl(copy, context) {
+  const url = repositoryUrl(context)
+  if (!url) return copy
+  return `${truncateForX(copy, reservedXLimit(context))}\n${url}`
 }
 
 function hashtagCount(copy) {
@@ -231,14 +241,14 @@ function introProof(context) {
 }
 
 function buildIntroductionCopy({ context }) {
-  const list = "code -> stories / proof -> reusable posts / draft -> veto-ready X"
-  const copy =
+  const list = "code -> stories / proof -> posts / draft -> veto-ready X"
+  const copyWithoutLink =
     `Building Wingbeat, an AI Marketing Agency for indie developers.\n` +
-    `It helps builders ship more and post consistently.\n` +
+    `Helps builders ship and post consistently.\n` +
     `Handles: ${list}.\n` +
     `Week 1: shipped repo-backed X draft loop.\n` +
     `Want early access? Reply "Wingbeat".`
-  return truncateForX(copy, reservedXLimit(context))
+  return appendRepositoryUrl(copyWithoutLink, context)
 }
 
 function buildBuildInPublicCopy({ narrative, context }) {
@@ -258,9 +268,9 @@ function buildXCopy({ narrative, context, mode }) {
 
 function evaluateIntroductionXQuality(copy, context) {
   const lower = copy.toLowerCase()
-  const chars = [...copy].length
+  const chars = xCharacterCount(copy)
   const hashtags = hashtagCount(copy)
-  const limit = reservedXLimit(context)
+  const limit = 280
   const autoRejectFindings = []
 
   if (!/^(building|introducing) wingbeat/i.test(copy)) autoRejectFindings.push("missing-direct-intro-first-line")
@@ -294,7 +304,7 @@ function evaluateIntroductionXQuality(copy, context) {
     },
     {
       name: "grounded-capabilities",
-      score: scoreCriterion(/code -> stories/.test(lower) && /draft -> veto-ready x/.test(lower)),
+      score: scoreCriterion(/code -> stories/.test(lower) && /proof -> (reusable )?posts/.test(lower) && /draft -> veto-ready x/.test(lower)),
     },
     {
       name: "shipped-proof",
@@ -302,7 +312,7 @@ function evaluateIntroductionXQuality(copy, context) {
     },
     {
       name: "evidence-integrity",
-      score: scoreCriterion(!/(public repo|launched|published|live post|posted itself)/.test(lower)),
+      score: scoreCriterion(!/(launched|published|live post|posted itself)/.test(lower) && (!/github\.com/.test(lower) || Boolean(repositoryUrl(context)))),
     },
     {
       name: "native-voice",
@@ -318,7 +328,7 @@ function evaluateIntroductionXQuality(copy, context) {
     },
     {
       name: "compression",
-      score: scoreCriterion(chars <= limit && hashtags <= 1, chars <= 280 && hashtags <= 1),
+      score: scoreCriterion(chars <= limit && hashtags <= 1),
     },
   ]
 
@@ -338,6 +348,7 @@ function evaluateIntroductionXQuality(copy, context) {
     failedCriteria,
     rubric,
     characterCount: chars,
+    rawCharacterCount: [...copy].length,
     hashtagCount: hashtags,
     reservedLinkCharacters: repositoryUrl(context) ? 23 : 0,
   }
@@ -345,9 +356,9 @@ function evaluateIntroductionXQuality(copy, context) {
 
 function evaluateBuildInPublicXQuality(copy, context) {
   const lower = copy.toLowerCase()
-  const chars = [...copy].length
+  const chars = xCharacterCount(copy)
   const hashtags = hashtagCount(copy)
-  const limit = reservedXLimit(context)
+  const limit = 280
   const autoRejectFindings = []
   if (!/wingbeat/.test(lower) || !/ai marketing team/.test(lower)) autoRejectFindings.push("wingbeat-unexplained")
   if (/(launched|published|posted itself|live post|public repo)/.test(lower) && !/receipt/.test(lower)) {
@@ -380,6 +391,7 @@ function evaluateBuildInPublicXQuality(copy, context) {
     failedCriteria,
     rubric,
     characterCount: chars,
+    rawCharacterCount: [...copy].length,
     hashtagCount: hashtags,
     reservedLinkCharacters: repositoryUrl(context) ? 23 : 0,
   }
@@ -448,7 +460,8 @@ function buildContentPackage({ runId, context, narrative, finalEvaluation }) {
       channel: "x",
       mode: contentMode,
       copy,
-      characterCount: [...copy].length,
+      characterCount: xCharacterCount(copy),
+      rawCharacterCount: [...copy].length,
       asset: "deterministic-card:agency-trace",
     },
     evaluations: [finalEvaluation, xQuality],

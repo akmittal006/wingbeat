@@ -69,6 +69,17 @@ function readPackageName(rootDir) {
   }
 }
 
+function normalizeRepositoryUrl(remoteUrl) {
+  const value = remoteUrl.trim()
+  if (!value) return undefined
+  const sshMatch = value.match(/^git@([^:]+):(.+?)(?:\.git)?$/)
+  if (sshMatch) return `https://${sshMatch[1]}/${sshMatch[2]}`
+  if (value.startsWith("http://") || value.startsWith("https://")) {
+    return value.replace(/\.git$/, "")
+  }
+  return undefined
+}
+
 function docEvidence(rootDir) {
   return DOCS.map((relativePath, index) => {
     const absolutePath = path.join(rootDir, relativePath)
@@ -130,6 +141,7 @@ export function collectProjectContext({ rootDir, trigger, objective }) {
   const gitLog = git(rootDir, ["log", "--oneline", "--decorate", "-8"])
   const gitStatus = git(rootDir, ["status", "--short"])
   const diffStat = git(rootDir, ["diff", "--stat"])
+  const repositoryUrl = normalizeRepositoryUrl(git(rootDir, ["remote", "get-url", "origin"]))
   const sourceFiles = walkFiles(rootDir)
 
   const contextReferences = buildContextReferences({
@@ -149,6 +161,7 @@ export function collectProjectContext({ rootDir, trigger, objective }) {
       currentJob: {
         objective,
         trigger,
+        repositoryUrl,
         sourceFiles: sourceFiles.filter((file) => !file.startsWith("node_modules/")).slice(0, 60),
         dirtyFiles: gitStatus
           .split(/\r?\n/)
@@ -173,6 +186,7 @@ export function collectProjectContext({ rootDir, trigger, objective }) {
         ],
       },
     },
+    repositoryUrl,
     contextReferences,
     evidence: docs.map(({ id, source, label, detail }) => ({ id, source, label, detail })),
   }
