@@ -2,6 +2,8 @@
 
 Status: Working execution roadmap.
 
+Revision note: tightened after external feasibility review to protect the minute-45 real-post milestone and remove unsupported score claims.
+
 ## Recommended approach
 
 For a two-hour MVP, build the whole agency spine but only one real job: detecting, creating, evaluating, notifying, and publishing an X build-in-public post.
@@ -24,8 +26,9 @@ At minute 120, a judge can:
 6. Allow the countdown to expire.
 7. Open the real published X post.
 8. Inspect the complete trace, costs, evaluation, memory, and receipt.
-9. Compare the successful run with an earlier failed run.
-10. Create a new specialist role from the UI.
+9. Inspect at least three independently verified real executions.
+
+Passing-versus-failing run comparison and role creation are stretch proof, not requirements for the core live path.
 
 ## Architecture
 
@@ -65,7 +68,7 @@ flowchart LR
     E --> UI["Shadcn Operations Dashboard"]
 ```
 
-The manager should dynamically select roles. For a text-only post, it skips Asset Builder. If a story needs a product mockup, it creates a temporary Product Mockup Specialist. This visible decision is the strongest L5 agent-organization demonstration.
+The manager should dynamically select roles. For a text-only post, it skips Asset Builder. For a bug-postmortem story, it may create a Technical Fact-Checker. If a story needs a product mockup, it creates a temporary Product Mockup Specialist that uses a deterministic branded-card renderer owned by Lane C. Dynamic spawning is the scoring feature; live generative-image or tool-building work is not required.
 
 ## Parallel workstreams
 
@@ -119,16 +122,21 @@ Required observability:
 - Inputs and outputs per step.
 - Tokens, estimated cost, and latency.
 - Agent/task filters.
-- Passing-versus-failing run comparison.
-- One real failure alert.
-- Search across runs.
 - Live X receipt.
+
+Stretch in this order:
+
+1. Search across runs.
+2. Passing-versus-failing run comparison using a preserved real failure.
+3. One alert that actually fires.
 
 Use Convex as the state and event backend if available. This creates a genuine +25 partner power-up.
 
-### Lane C: Shadcn dashboard
+### Lane C: Shadcn dashboard, deterministic assets, and deployment
 
-Build only four screens.
+Use shared TypeScript types from Lane B so seeded and live data cannot drift. Use shadcn defaults from the first component rather than scheduling a late styling pass.
+
+Build only three required screens and one optional screen.
 
 #### 1. Operations
 
@@ -140,7 +148,7 @@ Build only four screens.
 - Agent trace tree.
 - Current agent organization.
 - Step drawer containing evidence, output, evaluation, latency, and cost.
-- Compare-run action.
+- Compare-run action only if the core path is already stable.
 
 #### 3. Catalog
 
@@ -150,15 +158,22 @@ Build only four screens.
 - X adaptation and asset.
 - Reuse status.
 
-#### 4. Agency
+#### 4. Agency, optional
 
 - Role registry.
-- Simple Create Role form:
+- Pause, retry, and inspect actions for the L3 management target.
+- Stretch Create Role form:
   - Name.
   - Job.
   - Tools.
   - Guardrails.
-- Ability to start one job with the newly created role.
+- Stretch ability to start one job with the newly created role.
+
+Also owned by Lane C:
+
+- Deterministic branded-card renderer: project name, palette, stat or diff snippet, and template primitives to PNG.
+- Deploy the dashboard to Cloudflare Pages by minute 100.
+- Put the renderer on a Cloudflare Worker only if that does not delay real execution.
 
 CRM becomes one compact audience panel inside Catalog for this MVP, not a separate CRM product.
 
@@ -173,7 +188,7 @@ Build:
 - Default publish on silence.
 - Live-post verification.
 - Publish receipt.
-- Offline recovery represented by an overdue job replayed on startup.
+- `overdue` status support only; restart replay is deferred.
 
 This is the highest-risk lane and must start immediately.
 
@@ -209,7 +224,27 @@ The X agent may add an adaptation but cannot mutate the underlying evidence or s
 
 ## 120-minute schedule
 
-### Minutes 0–10: Contracts and skeleton
+### Before the clock, only where rules permit
+
+Pre-bake non-product scaffolding only if event rules allow it:
+
+- Repository and shadcn scaffold.
+- Shared schema draft.
+- Convex project.
+- X and Telegram credentials.
+
+Fresh product behavior and the actual agency workflow must still be built during the allowed window.
+
+### Minutes 0–10: Kill external risk
+
+- Publish one real post through the chosen X integration.
+- Fetch and verify the live post identifier.
+- Complete one Telegram round-trip.
+- Confirm the X write budget for rehearsals and judging.
+
+If this fails, stop and resolve it before building dashboards.
+
+### Minutes 10–20: Freeze contracts and skeleton
 
 All lanes agree on:
 
@@ -220,18 +255,29 @@ All lanes agree on:
 - One X account and Telegram recipient.
 - Exact demo happy path.
 
-Create the Vite/React/shadcn dashboard, Convex project, and Hermes skill skeleton.
+Create or finalize the Vite/React/shadcn dashboard, Convex project, and Hermes skill skeleton. Lane B owns shared TypeScript types and generates Lane C's seed data from those types.
 
-### Minutes 10–45: Parallel construction
+### Minutes 20–45: First vertical slice in parallel
 
 - Lane A builds the manager, role selection, and parallel delegation.
-- Lane B builds persistence, tracing, evaluations, and seed runs.
-- Lane C builds Operations and Run Detail using seeded data.
-- Lane D gets one hard-coded Telegram-to-X execution working.
+- Lane B builds persistence, the instrumented event wrapper, and typed seed data.
+- Lane C builds the minimum Operations view with shadcn defaults.
+- Lane D connects a hard-coded package to Telegram, X, verification, and receipt.
 
-Do not wait for polished content generation before proving real posting.
+Connect the shortest possible path:
 
-### Minutes 45–70: Connect the spine
+```text
+Real project event
+→ Minimal manager plan
+→ ContentPackage
+→ Telegram 45–60 second veto
+→ X
+→ Verified PublishReceipt
+```
+
+**By minute 40–45, one ugly but real post must complete end to end.** This milestone cannot slip. Do not wait for polished generation, dynamic visuals, or a complete dashboard.
+
+### Minutes 45–75: Expand the agency spine
 
 Connect:
 
@@ -247,24 +293,21 @@ Project event
 → PublishReceipt
 ```
 
-By minute 70, one ugly but real post must complete end to end.
-
-### Minutes 70–90: Scoring features
-
 Add:
 
 - A draft that deliberately fails evaluation.
 - Manager revision request.
 - Passing second version.
-- Dynamic Product Mockup Specialist spawned only for a visual story.
+- Conditional Technical Fact-Checker or Product Mockup Specialist.
+- Deterministic branded-card renderer explicitly owned by Lane C.
 - Per-step cost and latency.
-- Failed-run alert.
-- Passing-versus-failing run comparison.
-- Role-creation form.
+- Named evaluation set and runtime publish gate.
+- Failure-to-evaluation-case capture.
+- Preserve one genuinely broken early end-to-end run for optional diff proof.
 
-These features directly raise organization, observability, evaluation, memory, and management scores.
+These features directly raise organization, observability, evaluation, and memory scores. Do not claim a release-gate level from a runtime publish gate.
 
-### Minutes 90–105: Three repeated runs
+### Minutes 75–105: Staggered proof runs and deployment
 
 Execute three different real project events:
 
@@ -272,11 +315,20 @@ Execute three different real project events:
 2. A bug/failure-and-lesson story.
 3. A visual product-progress story requiring the dynamically spawned Product Mockup Specialist.
 
+Use a configurable 45–60 second veto window for rehearsal. Start the runs concurrently but stagger them by several minutes rather than running them serially. Runs two and three may finish in the background while the UI and deployment work continues. Receipts matter more than watching each run.
+
 Publish all three to the real X account. If posting volume is inappropriate, use one main post plus two real replies or thread posts. Each execution must have an independent trace and receipt.
 
-### Minutes 105–120: Polish and rehearse
+During the same block:
 
-Apply the shadcn look:
+- Lane C deploys the dashboard to Cloudflare Pages by minute 100.
+- Lane B adds cross-run search first.
+- Add run diff and a fired alert only if the three executions are already secure.
+- Add the role-creation form only after every higher-weight proof is stable.
+
+### Minutes 105–120: Freeze, verify, and rehearse
+
+Do not redesign or restyle the application in this block. It should already use shadcn defaults. Only verify status colors:
 
 - Neutral dark surfaces.
 - Compact cards.
@@ -287,19 +339,24 @@ Apply the shadcn look:
 - Monospace metadata.
 - Agent trace tree as the visual centerpiece.
 
-Then rehearse the exact three-minute proof.
+Then:
+
+1. Confirm all live URLs and receipts.
+2. Confirm at least three independent executions and calculate the success rate honestly.
+3. Rehearse the two-minute live path and one-minute proof twice.
+4. Keep run diff and role creation out of the live path; show them only in proof or Q&A if finished.
 
 ## Score target
 
 | Criterion | Target | Proof |
 |---|---:|---|
 | Real output | L5 | Three autonomous live X executions |
-| Agent organization | L5 attempt | Runtime-spawned Product Mockup Specialist and precise escalation |
-| Observability | L5 attempt | Trace tree, costs, search, alert, and run diff |
-| Evaluation | L4, stretch L5 | Automated publish gate; failure becomes a new evaluation case |
+| Agent organization | L4 solid; L5 credible | Conditional crew selection, runtime-spawned specialist, revision, and precise escalation |
+| Observability | L4; L5 stretch | Historical trace tree, costs, filters, and receipts; search, diff, and fired alert are stretch |
+| Evaluation | L3 real; L5 mechanics | Named evaluation set and gate; failure becomes a versioned evaluation case. Claim L4 only with a real blocked prompt release |
 | Memory | L5 | Three-layer context passed through every handoff |
 | Cost and latency | L3–L4 | Measured live; do not fake sub-minute performance |
-| Management UI | L4, stretch L5 | Non-engineer creates and runs a specialist role |
+| Management UI | L3 | Non-engineer can inspect, pause, and retry with documentation; role creation is optional stretch |
 
 ## Ruthless scope cuts
 
@@ -313,11 +370,14 @@ Do not build during these two hours:
 - Complex authentication or organizations.
 - A general workflow builder.
 - Full offline scheduling infrastructure.
+- Restart replay for overdue jobs.
 - Dodo or ElevenLabs integrations.
 - Pixel-perfect secondary pages.
+- Live generative-image tooling.
+- Late-stage visual redesign.
 
 Prioritize genuine Convex and Cloudflare integrations for +50 points. Add Linkup only if live search materially helps project or audience research.
 
 ## Defining MVP moment
 
-> The manager discovers that the visual story requires a capability it does not currently have, spawns a new specialist, produces the asset, rejects weak copy, publishes after the veto window, and shows the entire process in the trace.
+> A real project event enters Wingbeat, the manager assembles a task-specific crew and conditionally spawns a specialist, a weak draft is rejected and revised, a deterministic branded asset is produced when needed, the veto window expires, the real X post is verified, and the entire process appears in the trace alongside at least two other independent receipts.
