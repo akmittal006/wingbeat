@@ -134,4 +134,33 @@ export default defineSchema({
   })
     .index("by_run_layer", ["runId", "layer"])
     .index("by_referenceId", ["referenceId"]),
+
+  // --- Ops center tables (appended; see convex/ops.ts) ---
+  automations: defineTable({
+    name: v.string(),
+    channel: v.string(),
+    trigger: v.string(),
+    enabled: v.boolean(),
+    nextRunAt: v.optional(v.string()),
+    createdAt: v.string(),
+    updatedAt: v.string(),
+  }).index("by_name", ["name"]),
+
+  sensors: defineTable({
+    source: v.string(),
+    lastSyncedAt: v.string(),
+    findingsCount: v.number(),
+    createdAt: v.string(),
+    updatedAt: v.string(),
+  }).index("by_source", ["source"]),
+
+  opportunities: defineTable({
+    type: v.union(v.literal("content"), v.literal("automation")),
+    source: v.string(),
+    description: v.string(),
+    evidenceRef: v.optional(v.string()),
+    status: v.union(v.literal("new"), v.literal("drafting"), v.literal("skipped")),
+    createdAt: v.string(),
+    updatedAt: v.string(),
+  }).index("by_status", ["status"]),
 })

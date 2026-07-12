@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as ops from "../ops.js";
 import type * as powerup from "../powerup.js";
 import type * as visuals from "../visuals.js";
 
@@ -18,6 +19,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  ops: typeof ops;
   powerup: typeof powerup;
   visuals: typeof visuals;
 }>;
