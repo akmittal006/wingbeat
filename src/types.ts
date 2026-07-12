@@ -10,6 +10,9 @@ export type RunStatus =
   | "published"
   | "blocked"
   | "failed"
+  | "queue"
+  | "veto"
+  | "ready"
 
 export type ExecutionJobStatus =
   | "draft"
@@ -21,6 +24,9 @@ export type ExecutionJobStatus =
   | "blocked"
   | "failed"
   | "overdue"
+  | "queue"
+  | "veto"
+  | "ready"
 
 export type AgentStatus =
   | "queued"

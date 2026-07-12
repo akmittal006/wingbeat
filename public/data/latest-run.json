@@ -2,10 +2,10 @@
   "id": "run-487d614b",
   "project": "wingbeat",
   "trigger": "manual-demo",
-  "status": "veto_window",
+  "status": "veto",
   "startedAt": "2026-07-12T07:06:19.576Z",
   "scheduledFor": "2026-07-12T07:07:19.641Z",
-  "vetoEndsAt": "2026-07-12T07:07:04.641Z",
+  "vetoEndsAt": "2026-07-12T07:17:31.768Z",
   "package": {
     "id": "pkg-1ad419b7",
     "project": "wingbeat",
@@ -234,8 +234,8 @@
       {
         "id": "exec-57d07d8e",
         "channel": "x",
-        "status": "handoff_ready",
-        "detail": "Runtime produced X copy and veto-window metadata; browser executor owns live posting."
+        "status": "veto",
+        "detail": "Browser executor job run-487d614b-8aef6f is veto."
       }
     ]
   },
@@ -806,20 +806,35 @@
     }
   },
   "executionJob": {
-    "id": "xjob-65b0a95d",
+    "id": "run-487d614b-8aef6f",
     "runId": "run-487d614b",
     "channel": "x",
-    "status": "veto_window",
+    "status": "veto",
     "scheduledFor": "2026-07-12T07:07:19.641Z",
-    "vetoEndsAt": "2026-07-12T07:07:04.641Z",
+    "vetoEndsAt": "2026-07-12T07:17:31.768Z",
     "payload": {
       "copy": "Building Wingbeat, an AI Marketing Agency for indie developers.\nHelps builders ship and post consistently.\nHandles: code -> stories / proof -> posts / draft -> veto-ready X.\nWeek 1: shipped repo-backed X draft loop.\nWant early access? Reply \"Wingbeat\".\nhttps://github.com/akmittal006/wingbeat",
       "asset": "deterministic-card:agency-trace"
     },
     "handoff": {
       "executor": "scripts/x-execution/x-executor.mjs",
-      "commandPreview": "node scripts/x-execution/x-executor.mjs prepare --run-id run-487d614b --copy-file <copy-file> --veto-seconds 45"
-    }
+      "commandPreview": "node scripts/x-execution/x-executor.mjs prepare --run-id run-487d614b --copy-file <copy-file> --veto-seconds 45",
+      "jobStatePath": "/Users/ankurmittal/Documents/wingbeat/scripts/x-execution/jobs/run-487d614b-8aef6f.json"
+    },
+    "sourceOfTruth": "scripts/x-execution",
+    "updatedAt": "2026-07-12T07:07:31.769Z",
+    "statusHistory": [
+      {
+        "status": "queue",
+        "at": "2026-07-12T07:07:31.768Z",
+        "detail": "Payload prepared and queued."
+      },
+      {
+        "status": "veto",
+        "at": "2026-07-12T07:07:31.769Z",
+        "detail": "Veto window opened for 600 seconds."
+      }
+    ]
   },
   "metrics": {
     "totalLatencyMs": 65,

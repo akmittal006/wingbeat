@@ -1001,6 +1001,14 @@ function statusIcon(status: RunStatus) {
       return CircleAlert
     case "overdue":
       return Clock3
+    case "queue":
+      return Clock3
+    case "veto":
+      return Timer
+    case "ready":
+      return Send
+    default:
+      return Activity
   }
 }
 
@@ -1024,6 +1032,14 @@ function executionStatusIcon(status: ExecutionJobStatus) {
       return CircleAlert
     case "overdue":
       return Clock3
+    case "queue":
+      return Clock3
+    case "veto":
+      return Timer
+    case "ready":
+      return Send
+    default:
+      return Activity
   }
 }
 
@@ -1039,6 +1055,8 @@ function agentStatusIcon(status: AgentStatus) {
       return RefreshCcw
     case "failed":
       return CircleAlert
+    default:
+      return Activity
   }
 }
 
