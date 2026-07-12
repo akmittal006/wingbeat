@@ -1,0 +1,587 @@
+{
+  "id": "run-d577a164",
+  "project": "wingbeat",
+  "trigger": "manual-demo",
+  "status": "veto_window",
+  "startedAt": "2026-07-12T06:29:59.994Z",
+  "scheduledFor": "2026-07-12T06:31:00.052Z",
+  "vetoEndsAt": "2026-07-12T06:30:45.052Z",
+  "package": {
+    "id": "pkg-30294f44",
+    "project": "wingbeat",
+    "category": "build-in-public",
+    "whatChanged": "Wingbeat now has a dynamic agency runtime that inspects the repo, selects a conditional crew, and produces a UI-consumable run package.",
+    "whyItMatters": "The product promise depends on visible marketing infrastructure: evidence collection, specialist handoffs, critic revision, and a vetoable execution boundary before channel-specific publishing.",
+    "audience": "Technical product builders who want consistent, evidence-backed build-in-public marketing.",
+    "narrative": "Today Wingbeat crossed from product concept into an inspectable agency runtime. The manager reads the repo, assembles specialists only when the work calls for them, and turns evidence from docs and git into a reusable content package before any X-specific copy exists. That matters because the product promise is not another posting prompt; it is marketing infrastructure that can explain its work, revise weak drafts, and hand execution to a vetoable publishing boundary. Current implementation surface: docs/product-concept.md, .gitignore, docs/browser-x-executor.md, docs/fable-advisor/, index.html.",
+    "supportedClaims": [
+      "Wingbeat is defined as a dynamic AI marketing agency for Hermes.",
+      "The MVP roadmap calls for dynamic crew selection, parallel specialists, revision, context layers, trace, cost, latency, and a UI-consumable run.",
+      "The first complete channel loop is X, with veto-window semantics before publishing."
+    ],
+    "prohibitedClaims": [
+      "Do not claim a live X post was published unless an external execution receipt exists.",
+      "Do not claim performance analytics or learning from X results in this runtime-only lane.",
+      "Do not claim generic audience reach beyond technical product builders."
+    ],
+    "hooks": [
+      "The post is the last step, not the product.",
+      "Wingbeat is turning marketing into inspectable infrastructure.",
+      "Today the agency stopped being a diagram and started producing runs."
+    ],
+    "channelNeutralBody": "Today Wingbeat crossed from product concept into an inspectable agency runtime. The manager reads the repo, assembles specialists only when the work calls for them, and turns evidence from docs and git into a reusable content package before any X-specific copy exists. That matters because the product promise is not another posting prompt; it is marketing infrastructure that can explain its work, revise weak drafts, and hand execution to a vetoable publishing boundary. Current implementation surface: docs/product-concept.md, .gitignore, docs/browser-x-executor.md, docs/fable-advisor/, index.html.",
+    "evidence": [
+      {
+        "id": "evidence-doc-1",
+        "source": "docs/product-concept.md",
+        "label": "product-concept.md",
+        "detail": "# Wingbeat: Living Product Concept Status: Working document. This records decisions as they are made and should be updated throughout product design. Execution companion: [Two-hour AI agency MVP roadmap](./two-hour-mvp-roadmap.md) External review: [Fable architecture review notes](./fable-architecture-review-notes.md) ## One-line definition"
+      },
+      {
+        "id": "evidence-doc-2",
+        "source": "docs/two-hour-mvp-roadmap.md",
+        "label": "two-hour-mvp-roadmap.md",
+        "detail": "# Wingbeat: Two-Hour AI Agency MVP Roadmap Status: Working execution roadmap. Revision note: tightened after external feasibility review to protect the minute-45 real-post milestone and remove unsupported score claims. ## Recommended approach For a two-hour MVP, build the whole agency spine but only one real job: detecting, creating, evaluating, notifying, and publishing an X build-in-public post."
+      },
+      {
+        "id": "evidence-doc-3",
+        "source": "docs/browser-x-executor.md",
+        "label": "browser-x-executor.md",
+        "detail": "# Browser X Executor This is Wingbeat's safe non-OAuth execution boundary for the first X loop. The boundary deliberately does not create OAuth tokens, read browser profiles, or expose cookies. It prepares a post payload and optional local asset, waits through the veto window, exports a browser task only after action-time confirmation, and records a receipt after the live post is verified. ## State Model Jobs live as JSON files under `scripts/x-execution/jobs/` by default. Set `WB_X_EXECUTION_DIR=/path/to/state` to use another state directory for tests or local rehearsals."
+      }
+    ],
+    "confidence": 0.92,
+    "adaptation": {
+      "channel": "x",
+      "copy": "Today Wingbeat got its agency spine: repo inspection, conditional specialists, source-backed content, critic revision, and an X handoff with a veto window.\n\nThe principle: marketing output should emerge from inspectable infrastructure—not a posting prompt.\n\n#BuildInPublic",
+      "asset": "deterministic-card:agency-trace"
+    },
+    "evaluations": [
+      {
+        "id": "eval-1175c9ad",
+        "name": "source-backed-build-in-public-gate",
+        "passed": true,
+        "score": 0.92,
+        "findings": [
+          "Specific, source-backed, and suitable for revision into X copy."
+        ]
+      }
+    ],
+    "contextReferences": [
+      {
+        "id": "ctx-current-job",
+        "layer": "current_job",
+        "source": "cli",
+        "label": "Current agency objective",
+        "digest": "f8ce2a590f",
+        "excerpt": "Market the Wingbeat repository itself with a build-in-public story."
+      },
+      {
+        "id": "ctx-project-history",
+        "layer": "project_history",
+        "source": "git log/status",
+        "label": "Recent repository movement",
+        "digest": "21964ef797",
+        "excerpt": "10f6c74 (HEAD -> main) docs: tighten two-hour MVP execution plan\n97dadb4 docs: define Wingbeat agency MVP architecture M docs/product-concept.md\n?? .gitignore\n?? docs/browser-x-executor.md\n?? docs/fable-advisor/\n?? index.html\n?? package.json\n?? pnpm-lock.yaml\n?? public/\n?? scripts/\n?? src/\n?? tsconfig.app.json\n?? tsconfig.json\n?? tsconfig.node.json\n?? vite.config.ts"
+      },
+      {
+        "id": "ctx-brand-policy",
+        "layer": "brand_policy",
+        "source": "docs/product-concept.md",
+        "label": "Wingbeat product laws and publishing policy",
+        "digest": "9264429687",
+        "excerpt": "Break down every barrier preventing consistent marketing. Content must be source-backed, channel-independent, and published only through a vetoable execution contract."
+      },
+      {
+        "id": "ctx-workspace-shape",
+        "layer": "current_job",
+        "source": "workspace file scan",
+        "label": "Implementation surface",
+        "digest": "0f751f4116",
+        "excerpt": ".claude/settings.local.json, .gitignore, docs/browser-x-executor.md, docs/claude-architecture-review-brief.md, docs/fable-advisor/README.md, docs/fable-advisor/updates/0001-initial-build.md, docs/fable-advisor/updates/0002-integrated-demo.md, docs/fable-architecture-review-notes.md, docs/product-concept.md, docs/two-hour-mvp-roadmap.md, index.html, package.json, pnpm-lock.yaml, public/data/latest-run.json, scripts/run-agency.mjs, scripts/x-execution/.gitignore, scripts/x-execution/jobs/run-b0895243-d47065.json, scripts/x-execution/x-executor.mjs, src/App.tsx, src/agency/context.mjs, src/agency/hermes.mjs, src/agency/persistence.mjs, src/agency/runtime.mjs, src/components/OperatorConsole.tsx"
+      }
+    ],
+    "executionHistory": [
+      {
+        "id": "exec-4de29fe8",
+        "channel": "x",
+        "status": "handoff_ready",
+        "detail": "Runtime produced X copy and veto-window metadata; browser executor owns live posting."
+      }
+    ]
+  },
+  "agents": [
+    {
+      "id": "agent-412c23b1",
+      "role": "Agency Manager",
+      "objective": "Market the Wingbeat repository itself with a build-in-public story.",
+      "status": "passed",
+      "startedAt": "2026-07-12T06:29:59.994Z",
+      "finishedAt": "2026-07-12T06:30:00.052Z",
+      "latencyMs": 58,
+      "tokens": 1744,
+      "costUsd": 0.006976,
+      "output": "Selected 8 roles, rejected a weak draft, revised into package pkg-30294f44, and prepared X handoff xjob-c21fd930."
+    },
+    {
+      "id": "agent-85959329",
+      "parentId": "agent-412c23b1",
+      "role": "Project Intelligence",
+      "objective": "Summarize the repo-backed facts and implementation surface.",
+      "status": "passed",
+      "startedAt": "2026-07-12T06:30:00.027Z",
+      "finishedAt": "2026-07-12T06:30:00.043Z",
+      "latencyMs": 16,
+      "tokens": 90,
+      "costUsd": 0.00036,
+      "output": "Wingbeat is a Hermes dynamic marketing agency. Current repo has docs for concept and MVP roadmap, a Vite UI shell, and a safe X execution boundary. Dirty files: docs/product-concept.md, .gitignore, docs/browser-x-executor.md, docs/fable-advisor/, index.html, package.json, pnpm-lock.yaml, public/."
+    },
+    {
+      "id": "agent-6bc9166b",
+      "parentId": "agent-412c23b1",
+      "role": "Story Detector",
+      "objective": "Find the strongest build-in-public story supported by project evidence.",
+      "status": "passed",
+      "startedAt": "2026-07-12T06:30:00.027Z",
+      "finishedAt": "2026-07-12T06:30:00.038Z",
+      "latencyMs": 11,
+      "tokens": 63,
+      "costUsd": 0.000252,
+      "output": "Strongest story: the system is moving from static product concept to an agency runtime that can inspect itself, assemble specialists, revise weak output, and hand off to execution."
+    },
+    {
+      "id": "agent-c7f46e4d",
+      "parentId": "agent-412c23b1",
+      "role": "Creative Director",
+      "objective": "Set visual direction and reusable asset brief.",
+      "status": "passed",
+      "startedAt": "2026-07-12T06:30:00.027Z",
+      "finishedAt": "2026-07-12T06:30:00.040Z",
+      "latencyMs": 13,
+      "tokens": 54,
+      "costUsd": 0.000216,
+      "output": "Asset brief: compact operations-card visual showing Manager -> specialists -> critic -> X handoff, using neutral dark surfaces with green pass and orange veto accents."
+    },
+    {
+      "id": "agent-82cd1b38",
+      "parentId": "agent-412c23b1",
+      "role": "Product Mockup Specialist",
+      "objective": "Handle conditional product mockup specialist needs for this run.",
+      "status": "passed",
+      "startedAt": "2026-07-12T06:30:00.043Z",
+      "finishedAt": "2026-07-12T06:30:00.051Z",
+      "latencyMs": 8,
+      "tokens": 45,
+      "costUsd": 0.00018,
+      "output": "Mockup path: use a deterministic agency-trace card brief rather than live image generation for the two-hour MVP."
+    },
+    {
+      "id": "agent-5b0bfe89",
+      "parentId": "agent-412c23b1",
+      "role": "Execution Safety Planner",
+      "objective": "Handle conditional execution safety planner needs for this run.",
+      "status": "passed",
+      "startedAt": "2026-07-12T06:30:00.043Z",
+      "finishedAt": "2026-07-12T06:30:00.052Z",
+      "latencyMs": 9,
+      "tokens": 41,
+      "costUsd": 0.000164,
+      "output": "Execution plan: keep live X publishing behind the existing veto-window browser executor boundary."
+    },
+    {
+      "id": "agent-1a600bc0",
+      "parentId": "agent-412c23b1",
+      "role": "Content Strategist",
+      "objective": "Select audience, angle, and channel objective.",
+      "status": "passed",
+      "startedAt": "2026-07-12T06:30:00.052Z",
+      "finishedAt": "2026-07-12T06:30:00.052Z",
+      "latencyMs": 0,
+      "tokens": 55,
+      "costUsd": 0.00022,
+      "output": "Audience: Technical product builders who want consistent, evidence-backed build-in-public marketing.. Angle: Wingbeat is turning marketing into inspectable infrastructure."
+    },
+    {
+      "id": "agent-9ac6b0f7",
+      "parentId": "agent-412c23b1",
+      "role": "Editor / Critic",
+      "objective": "Check accuracy, specificity, repetition, and brand fit.",
+      "status": "passed",
+      "startedAt": "2026-07-12T06:30:00.052Z",
+      "finishedAt": "2026-07-12T06:30:00.052Z",
+      "latencyMs": 0,
+      "tokens": 33,
+      "costUsd": 0.000132,
+      "output": "Gate passed: Specific, source-backed, and suitable for revision into X copy."
+    },
+    {
+      "id": "agent-e4a6f8d7",
+      "parentId": "agent-412c23b1",
+      "role": "X Channel Adapter",
+      "objective": "Convert canonical package into an X-native payload.",
+      "status": "passed",
+      "startedAt": "2026-07-12T06:30:00.052Z",
+      "finishedAt": "2026-07-12T06:30:00.052Z",
+      "latencyMs": 0,
+      "tokens": 81,
+      "costUsd": 0.000324,
+      "output": "Today Wingbeat got its agency spine: repo inspection, conditional specialists, source-backed content, critic revision, and an X handoff with a veto window.\n\nThe principle: marketing output should emerge from inspectable infrastructure—not a posting prompt.\n\n#BuildInPublic"
+    }
+  ],
+  "events": [
+    {
+      "id": "evt-ddaba26f",
+      "runId": "run-d577a164",
+      "agentId": "agent-412c23b1",
+      "at": "2026-07-12T06:30:00.027Z",
+      "type": "spawn",
+      "title": "Agency manager started",
+      "detail": "Inspecting docs, git, current job, and brand policy."
+    },
+    {
+      "id": "evt-aef036c2",
+      "runId": "run-d577a164",
+      "agentId": "agent-412c23b1",
+      "at": "2026-07-12T06:30:00.027Z",
+      "type": "tool",
+      "title": "Conditional crew selected",
+      "detail": "Project Intelligence, Story Detector, Creative Director, Content Strategist, Product Mockup Specialist, Execution Safety Planner, Editor / Critic, X Channel Adapter"
+    },
+    {
+      "id": "evt-bab5b9cc",
+      "runId": "run-d577a164",
+      "agentId": "agent-412c23b1",
+      "at": "2026-07-12T06:30:00.027Z",
+      "type": "handoff",
+      "title": "Three-layer context envelope prepared",
+      "detail": "current_job, project_history, brand_policy"
+    },
+    {
+      "id": "evt-81d14920",
+      "runId": "run-d577a164",
+      "agentId": "agent-85959329",
+      "at": "2026-07-12T06:30:00.043Z",
+      "type": "spawn",
+      "title": "Project Intelligence completed",
+      "detail": "Wingbeat is a Hermes dynamic marketing agency. Current repo has docs for concept and MVP roadmap, a Vite UI shell, and a safe X execution boundary. Dirty files: docs/product-concept.md, .gitignore, docs/browser-x-executor.md, docs/fable-advisor/, index.html, package.json, pnpm-lock.yaml, public/."
+    },
+    {
+      "id": "evt-c500c4df",
+      "runId": "run-d577a164",
+      "agentId": "agent-6bc9166b",
+      "at": "2026-07-12T06:30:00.043Z",
+      "type": "spawn",
+      "title": "Story Detector completed",
+      "detail": "Strongest story: the system is moving from static product concept to an agency runtime that can inspect itself, assemble specialists, revise weak output, and hand off to execution."
+    },
+    {
+      "id": "evt-6bc70117",
+      "runId": "run-d577a164",
+      "agentId": "agent-c7f46e4d",
+      "at": "2026-07-12T06:30:00.043Z",
+      "type": "spawn",
+      "title": "Creative Director completed",
+      "detail": "Asset brief: compact operations-card visual showing Manager -> specialists -> critic -> X handoff, using neutral dark surfaces with green pass and orange veto accents."
+    },
+    {
+      "id": "evt-bb600f4e",
+      "runId": "run-d577a164",
+      "agentId": "agent-82cd1b38",
+      "at": "2026-07-12T06:30:00.052Z",
+      "type": "spawn",
+      "title": "Product Mockup Specialist spawned conditionally",
+      "detail": "Mockup path: use a deterministic agency-trace card brief rather than live image generation for the two-hour MVP."
+    },
+    {
+      "id": "evt-00dfc77c",
+      "runId": "run-d577a164",
+      "agentId": "agent-5b0bfe89",
+      "at": "2026-07-12T06:30:00.052Z",
+      "type": "spawn",
+      "title": "Execution Safety Planner spawned conditionally",
+      "detail": "Execution plan: keep live X publishing behind the existing veto-window browser executor boundary."
+    },
+    {
+      "id": "evt-b9ce0495",
+      "runId": "run-d577a164",
+      "agentId": "agent-412c23b1",
+      "at": "2026-07-12T06:30:00.052Z",
+      "type": "tool",
+      "title": "Narrative generated",
+      "detail": "deterministic-fallback fallback; latency 0ms"
+    },
+    {
+      "id": "evt-4cc0cc60",
+      "runId": "run-d577a164",
+      "agentId": "agent-412c23b1",
+      "at": "2026-07-12T06:30:00.052Z",
+      "type": "evaluation",
+      "title": "Weak draft evaluated",
+      "detail": "failed at 0.26"
+    },
+    {
+      "id": "evt-5ca57e03",
+      "runId": "run-d577a164",
+      "agentId": "agent-412c23b1",
+      "at": "2026-07-12T06:30:00.052Z",
+      "type": "revision",
+      "title": "Manager revision requested",
+      "detail": "Overbroad audience claim. Publishing claim lacks veto-boundary context. Autonomy claim lacks observability or inspection detail."
+    },
+    {
+      "id": "evt-0fa11d47",
+      "runId": "run-d577a164",
+      "agentId": "agent-412c23b1",
+      "at": "2026-07-12T06:30:00.052Z",
+      "type": "evaluation",
+      "title": "Revised package evaluated",
+      "detail": "passed at 0.92"
+    },
+    {
+      "id": "evt-fef572f3",
+      "runId": "run-d577a164",
+      "agentId": "agent-1a600bc0",
+      "at": "2026-07-12T06:30:00.052Z",
+      "type": "handoff",
+      "title": "Content Strategist handoff",
+      "detail": "Audience: Technical product builders who want consistent, evidence-backed build-in-public marketing.. Angle: Wingbeat is turning marketing into inspectable infrastructure."
+    },
+    {
+      "id": "evt-540cb512",
+      "runId": "run-d577a164",
+      "agentId": "agent-9ac6b0f7",
+      "at": "2026-07-12T06:30:00.052Z",
+      "type": "handoff",
+      "title": "Editor / Critic handoff",
+      "detail": "Gate passed: Specific, source-backed, and suitable for revision into X copy."
+    },
+    {
+      "id": "evt-d5c5d7ef",
+      "runId": "run-d577a164",
+      "agentId": "agent-e4a6f8d7",
+      "at": "2026-07-12T06:30:00.052Z",
+      "type": "handoff",
+      "title": "X Channel Adapter handoff",
+      "detail": "Today Wingbeat got its agency spine: repo inspection, conditional specialists, source-backed content, critic revision, and an X handoff with a veto window.\n\nThe principle: marketing output should emerge from inspectable infrastructure—not a posting prompt.\n\n#BuildInPublic"
+    },
+    {
+      "id": "evt-c9bd9d60",
+      "runId": "run-d577a164",
+      "agentId": "agent-e4a6f8d7",
+      "at": "2026-07-12T06:30:00.052Z",
+      "type": "publish",
+      "title": "Execution handoff prepared",
+      "detail": "node scripts/x-execution/x-executor.mjs prepare --run-id run-d577a164 --copy-file <copy-file> --veto-seconds 45"
+    }
+  ],
+  "contextEnvelope": {
+    "currentJob": {
+      "objective": "Market the Wingbeat repository itself with a build-in-public story.",
+      "trigger": "manual-demo",
+      "sourceFiles": [
+        ".claude/settings.local.json",
+        ".gitignore",
+        "docs/browser-x-executor.md",
+        "docs/claude-architecture-review-brief.md",
+        "docs/fable-advisor/README.md",
+        "docs/fable-advisor/updates/0001-initial-build.md",
+        "docs/fable-advisor/updates/0002-integrated-demo.md",
+        "docs/fable-architecture-review-notes.md",
+        "docs/product-concept.md",
+        "docs/two-hour-mvp-roadmap.md",
+        "index.html",
+        "package.json",
+        "pnpm-lock.yaml",
+        "public/data/latest-run.json",
+        "scripts/run-agency.mjs",
+        "scripts/x-execution/.gitignore",
+        "scripts/x-execution/jobs/run-b0895243-d47065.json",
+        "scripts/x-execution/x-executor.mjs",
+        "src/App.tsx",
+        "src/agency/context.mjs",
+        "src/agency/hermes.mjs",
+        "src/agency/persistence.mjs",
+        "src/agency/runtime.mjs",
+        "src/components/OperatorConsole.tsx",
+        "src/components/dashboard-data.ts",
+        "src/data/latest-run.ts",
+        "src/data/seed.ts",
+        "src/lib/evaluation.ts",
+        "src/lib/global.d.ts",
+        "src/lib/memory.ts",
+        "src/lib/publish.ts",
+        "src/lib/status.ts",
+        "src/lib/trace.ts",
+        "src/main.tsx",
+        "src/styles.css",
+        "src/types.ts",
+        "tsconfig.app.json",
+        "tsconfig.app.tsbuildinfo",
+        "tsconfig.json",
+        "tsconfig.node.json",
+        "tsconfig.node.tsbuildinfo",
+        "vite.config.ts"
+      ],
+      "dirtyFiles": [
+        "docs/product-concept.md",
+        ".gitignore",
+        "docs/browser-x-executor.md",
+        "docs/fable-advisor/",
+        "index.html",
+        "package.json",
+        "pnpm-lock.yaml",
+        "public/",
+        "scripts/",
+        "src/",
+        "tsconfig.app.json",
+        "tsconfig.json",
+        "tsconfig.node.json",
+        "vite.config.ts"
+      ]
+    },
+    "projectHistory": {
+      "recentCommits": "10f6c74 (HEAD -> main) docs: tighten two-hour MVP execution plan\n97dadb4 docs: define Wingbeat agency MVP architecture",
+      "workingTree": "M docs/product-concept.md\n?? .gitignore\n?? docs/browser-x-executor.md\n?? docs/fable-advisor/\n?? index.html\n?? package.json\n?? pnpm-lock.yaml\n?? public/\n?? scripts/\n?? src/\n?? tsconfig.app.json\n?? tsconfig.json\n?? tsconfig.node.json\n?? vite.config.ts",
+      "diffStat": "docs/product-concept.md | 2 ++\n 1 file changed, 2 insertions(+)",
+      "docs": [
+        {
+          "id": "evidence-doc-1",
+          "source": "docs/product-concept.md",
+          "label": "product-concept.md",
+          "detail": "# Wingbeat: Living Product Concept Status: Working document. This records decisions as they are made and should be updated throughout product design. Execution companion: [Two-hour AI agency MVP roadmap](./two-hour-mvp-roadmap.md) External review: [Fable architecture review notes](./fable-architecture-review-notes.md) ## One-line definition",
+          "digest": "9264429687"
+        },
+        {
+          "id": "evidence-doc-2",
+          "source": "docs/two-hour-mvp-roadmap.md",
+          "label": "two-hour-mvp-roadmap.md",
+          "detail": "# Wingbeat: Two-Hour AI Agency MVP Roadmap Status: Working execution roadmap. Revision note: tightened after external feasibility review to protect the minute-45 real-post milestone and remove unsupported score claims. ## Recommended approach For a two-hour MVP, build the whole agency spine but only one real job: detecting, creating, evaluating, notifying, and publishing an X build-in-public post.",
+          "digest": "ffe4d5a0c9"
+        },
+        {
+          "id": "evidence-doc-3",
+          "source": "docs/browser-x-executor.md",
+          "label": "browser-x-executor.md",
+          "detail": "# Browser X Executor This is Wingbeat's safe non-OAuth execution boundary for the first X loop. The boundary deliberately does not create OAuth tokens, read browser profiles, or expose cookies. It prepares a post payload and optional local asset, waits through the veto window, exports a browser task only after action-time confirmation, and records a receipt after the live post is verified. ## State Model Jobs live as JSON files under `scripts/x-execution/jobs/` by default. Set `WB_X_EXECUTION_DIR=/path/to/state` to use another state directory for tests or local rehearsals.",
+          "digest": "584345c11d"
+        }
+      ]
+    },
+    "brandPolicy": {
+      "motto": "Break down every barrier preventing you from marketing consistently.",
+      "firstChannel": "x",
+      "contentCategory": "build-in-public",
+      "guardrails": [
+        "Use only project-backed claims.",
+        "Create a channel-independent canonical package before channel adaptation.",
+        "Show the dynamic agency organization and handoffs.",
+        "Preserve veto-window execution semantics."
+      ]
+    }
+  },
+  "contextReferences": [
+    {
+      "id": "ctx-current-job",
+      "layer": "current_job",
+      "source": "cli",
+      "label": "Current agency objective",
+      "digest": "f8ce2a590f",
+      "excerpt": "Market the Wingbeat repository itself with a build-in-public story."
+    },
+    {
+      "id": "ctx-project-history",
+      "layer": "project_history",
+      "source": "git log/status",
+      "label": "Recent repository movement",
+      "digest": "21964ef797",
+      "excerpt": "10f6c74 (HEAD -> main) docs: tighten two-hour MVP execution plan\n97dadb4 docs: define Wingbeat agency MVP architecture M docs/product-concept.md\n?? .gitignore\n?? docs/browser-x-executor.md\n?? docs/fable-advisor/\n?? index.html\n?? package.json\n?? pnpm-lock.yaml\n?? public/\n?? scripts/\n?? src/\n?? tsconfig.app.json\n?? tsconfig.json\n?? tsconfig.node.json\n?? vite.config.ts"
+    },
+    {
+      "id": "ctx-brand-policy",
+      "layer": "brand_policy",
+      "source": "docs/product-concept.md",
+      "label": "Wingbeat product laws and publishing policy",
+      "digest": "9264429687",
+      "excerpt": "Break down every barrier preventing consistent marketing. Content must be source-backed, channel-independent, and published only through a vetoable execution contract."
+    },
+    {
+      "id": "ctx-workspace-shape",
+      "layer": "current_job",
+      "source": "workspace file scan",
+      "label": "Implementation surface",
+      "digest": "0f751f4116",
+      "excerpt": ".claude/settings.local.json, .gitignore, docs/browser-x-executor.md, docs/claude-architecture-review-brief.md, docs/fable-advisor/README.md, docs/fable-advisor/updates/0001-initial-build.md, docs/fable-advisor/updates/0002-integrated-demo.md, docs/fable-architecture-review-notes.md, docs/product-concept.md, docs/two-hour-mvp-roadmap.md, index.html, package.json, pnpm-lock.yaml, public/data/latest-run.json, scripts/run-agency.mjs, scripts/x-execution/.gitignore, scripts/x-execution/jobs/run-b0895243-d47065.json, scripts/x-execution/x-executor.mjs, src/App.tsx, src/agency/context.mjs, src/agency/hermes.mjs, src/agency/persistence.mjs, src/agency/runtime.mjs, src/components/OperatorConsole.tsx"
+    }
+  ],
+  "selectedCrew": [
+    "Project Intelligence",
+    "Story Detector",
+    "Creative Director",
+    "Content Strategist",
+    "Product Mockup Specialist",
+    "Execution Safety Planner",
+    "Editor / Critic",
+    "X Channel Adapter"
+  ],
+  "generation": {
+    "provider": "deterministic-fallback",
+    "status": "fallback",
+    "text": "Today Wingbeat crossed from product concept into an inspectable agency runtime. The manager reads the repo, assembles specialists only when the work calls for them, and turns evidence from docs and git into a reusable content package before any X-specific copy exists. That matters because the product promise is not another posting prompt; it is marketing infrastructure that can explain its work, revise weak drafts, and hand execution to a vetoable publishing boundary. Current implementation surface: docs/product-concept.md, .gitignore, docs/browser-x-executor.md, docs/fable-advisor/, index.html.",
+    "usage": {
+      "promptTokens": 0,
+      "completionTokens": 0,
+      "estimatedCostUsd": 0,
+      "latencyMs": 0
+    }
+  },
+  "evaluation": {
+    "weakDraft": {
+      "text": "We made Wingbeat better today. It has agents, content, and publishing, and it will help everyone market everything automatically.",
+      "result": {
+        "id": "eval-f740c669",
+        "name": "source-backed-build-in-public-gate",
+        "passed": false,
+        "score": 0.26,
+        "findings": [
+          "Overbroad audience claim.",
+          "Publishing claim lacks veto-boundary context.",
+          "Autonomy claim lacks observability or inspection detail."
+        ]
+      }
+    },
+    "revisedDraft": {
+      "text": "Today Wingbeat crossed from product concept into an inspectable agency runtime. The manager reads the repo, assembles specialists only when the work calls for them, and turns evidence from docs and git into a reusable content package before any X-specific copy exists. That matters because the product promise is not another posting prompt; it is marketing infrastructure that can explain its work, revise weak drafts, and hand execution to a vetoable publishing boundary. Current implementation surface: docs/product-concept.md, .gitignore, docs/browser-x-executor.md, docs/fable-advisor/, index.html.",
+      "result": {
+        "id": "eval-1175c9ad",
+        "name": "source-backed-build-in-public-gate",
+        "passed": true,
+        "score": 0.92,
+        "findings": [
+          "Specific, source-backed, and suitable for revision into X copy."
+        ]
+      }
+    }
+  },
+  "executionJob": {
+    "id": "xjob-c21fd930",
+    "runId": "run-d577a164",
+    "channel": "x",
+    "status": "veto_window",
+    "scheduledFor": "2026-07-12T06:31:00.052Z",
+    "vetoEndsAt": "2026-07-12T06:30:45.052Z",
+    "payload": {
+      "copy": "Today Wingbeat got its agency spine: repo inspection, conditional specialists, source-backed content, critic revision, and an X handoff with a veto window.\n\nThe principle: marketing output should emerge from inspectable infrastructure—not a posting prompt.\n\n#BuildInPublic",
+      "asset": "deterministic-card:agency-trace"
+    },
+    "handoff": {
+      "executor": "scripts/x-execution/x-executor.mjs",
+      "commandPreview": "node scripts/x-execution/x-executor.mjs prepare --run-id run-d577a164 --copy-file <copy-file> --veto-seconds 45"
+    }
+  },
+  "metrics": {
+    "totalLatencyMs": 58,
+    "totalEstimatedCostUsd": 0.008824,
+    "agentCount": 9,
+    "traceEventCount": 16
+  }
+}

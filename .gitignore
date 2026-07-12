@@ -1,0 +1,10 @@
+node_modules/
+.pnpm-store/
+dist/
+.DS_Store
+*.log
+*.tsbuildinfo
+
+# Local execution state and browser receipts
+scripts/x-execution/state/
+src/agency/runs/
