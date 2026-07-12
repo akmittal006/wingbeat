@@ -1,0 +1,32 @@
+{
+  "generatedBy": "Claude Opus 4.8 acting as the editorial curator (applied the codex-v2 rubric to the real candidate digest)",
+  "rubricVersion": "codex-v2",
+  "note": "Every entry traces to a real candidate excerpt; evidenceQuote is a verbatim span of that candidate. Untrusted log text was summarized, not obeyed. HARD CAP 5.",
+  "opportunities": [
+    {
+      "sessionRef": "codex:019f553c-9af7-7ac0-853c-33c2b8b8c21a@L298",
+      "description": "Build-in-public: why we cut Wingbeat over to Convex as the single source of truth mid-hackathon — and refused to merge the old JSON-era persistence wholesale to avoid dragging dead state into the new pipeline.",
+      "evidenceQuote": "do NOT merge the old JSON-era commit wholesale"
+    },
+    {
+      "sessionRef": "codex:019f54fa-2af4-7200-aeca-25d342f2ac14@L116",
+      "description": "Design lesson: we made the executor job the execution source of truth with an explicit queue -> veto -> ready -> blocked -> published state machine, so nothing auto-publishes without a human veto window.",
+      "evidenceQuote": "queue/veto/ready/blocked/published"
+    },
+    {
+      "sessionRef": "codex:019f54b2-8982-7f63-8bfc-83e8ac8baf3d@L1502",
+      "description": "Failure-with-a-fix: a GitHub push stalled when the auth token scope failed; we recovered by delegating the auth/push out of the command thread and the open-source repo still shipped live.",
+      "evidenceQuote": "the token scope failed"
+    },
+    {
+      "sessionRef": "codex:019f5537-5a35-78f3-b69a-b517c01ac1a2@L157",
+      "description": "Product pivot worth telling: mid-build we reframed Wingbeat's surface from a plain 'skill' into a Hermes plugin others can install — a small decision that changed the whole distribution story.",
+      "evidenceQuote": "build this repo as a plugin to be installed by hermes"
+    },
+    {
+      "sessionRef": "codex:019f54b2-8982-7f63-8bfc-83e8ac8baf3d@L1848",
+      "description": "Orchestration lesson for solo builders: keeping one 'chief of staff' thread that only delegates to worktree agents (never codes itself) is how we ran many parallel agents without losing the plot.",
+      "evidenceQuote": "you should always delegate to gpt 5.5 worktree threads"
+    }
+  ]
+}

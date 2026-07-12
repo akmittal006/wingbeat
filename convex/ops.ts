@@ -182,6 +182,32 @@ export const skipOpportunity = mutation({
   },
 })
 
+// Authorized cleanup: hard-delete opportunity rows for a given source (and
+// optionally only certain statuses). Introduced to purge the ~456 junk rows a
+// previous "parse every session into a row" sensor flooded the inbox with. It
+// is intentionally narrow — it never deletes across sources in one call — so it
+// cannot be used to wipe the table blindly. Returns the number of rows deleted.
+export const purgeOpportunities = mutation({
+  args: {
+    source: v.string(),
+    statuses: v.optional(
+      v.array(v.union(v.literal("new"), v.literal("drafting"), v.literal("skipped"))),
+    ),
+  },
+  handler: async (ctx, { source, statuses }) => {
+    const rows = await ctx.db.query("opportunities").collect()
+    const statusSet = statuses && statuses.length > 0 ? new Set(statuses) : null
+    let deleted = 0
+    for (const row of rows) {
+      if (row.source !== source) continue
+      if (statusSet && !statusSet.has(row.status)) continue
+      await ctx.db.delete(row._id)
+      deleted += 1
+    }
+    return { deleted, source, statuses: statuses ?? null }
+  },
+})
+
 // ----------------------------------------------------------------------------
 // Pipeline + Catalog: runs, packages, receipts
 // ----------------------------------------------------------------------------
