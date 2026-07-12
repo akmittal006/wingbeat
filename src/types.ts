@@ -10,6 +10,9 @@ export type RunStatus =
   | "published"
   | "blocked"
   | "failed"
+  | "queue"
+  | "veto"
+  | "ready"
 
 export type ExecutionJobStatus =
   | "draft"
@@ -21,6 +24,9 @@ export type ExecutionJobStatus =
   | "blocked"
   | "failed"
   | "overdue"
+  | "queue"
+  | "veto"
+  | "ready"
 
 export type AgentStatus =
   | "queued"
@@ -48,7 +54,7 @@ export type MemoryLayer = "current_job" | "project_history" | "brand_policy"
 
 export type PublishReceiptStatus = "verified" | "pending" | "failed"
 
-export type RunDataOrigin = "runtime" | "fixture"
+export type RunDataOrigin = "runtime"
 
 export type ExecutionPhase = "draft_evaluated" | "revision_passed" | "handoff_ready" | "receipt_verified"
 
@@ -390,7 +396,6 @@ export interface AgencyRun {
   trigger: string
   status: RunStatus
   dataOrigin?: RunDataOrigin
-  fixtureLabel?: string
   startedAt: string
   finishedAt?: string
   scheduledFor?: string

@@ -8,6 +8,9 @@ export const RUN_STATUS_LABELS: Record<RunStatus, string> = {
   published: "Published",
   blocked: "Blocked",
   failed: "Failed",
+  queue: "Queued",
+  veto: "Veto window",
+  ready: "Ready to publish",
 }
 
 export const RUN_STATUS_TONE: Record<RunStatus, "neutral" | "blue" | "green" | "orange" | "red"> = {
@@ -18,6 +21,9 @@ export const RUN_STATUS_TONE: Record<RunStatus, "neutral" | "blue" | "green" | "
   published: "green",
   blocked: "red",
   failed: "red",
+  queue: "blue",
+  veto: "orange",
+  ready: "blue",
 }
 
 const runTransitions: Record<RunStatus, RunStatus[]> = {
@@ -28,6 +34,9 @@ const runTransitions: Record<RunStatus, RunStatus[]> = {
   published: [],
   blocked: ["running"],
   failed: ["running"],
+  queue: ["veto", "blocked"],
+  veto: ["ready", "blocked"],
+  ready: ["published", "blocked"],
 }
 
 const executionJobTransitions: Record<ExecutionJobStatus, ExecutionJobStatus[]> = {
@@ -40,6 +49,9 @@ const executionJobTransitions: Record<ExecutionJobStatus, ExecutionJobStatus[]> 
   blocked: ["scheduled"],
   failed: ["scheduled"],
   overdue: ["notifying", "publishing", "blocked", "failed"],
+  queue: ["veto", "blocked"],
+  veto: ["ready", "blocked"],
+  ready: ["published", "blocked"],
 }
 
 export function canTransitionRun(from: RunStatus, to: RunStatus): boolean {

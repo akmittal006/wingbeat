@@ -8,7 +8,7 @@ Date: 2026-07-12
 - Strict TypeScript passes.
 - Vite production build passes: 1,775 transformed modules.
 - Local operator console is live and visually verified in Chrome.
-- The console loads live runtime data instead of fallback fixtures.
+- The console loads live runtime data from Convex.
 - Wingbeat ran against its own repository and produced a 9-agent, 16-event trace.
 - Dynamic crew included Product Mockup Specialist, Execution Safety Planner, and Technical Fact-Checker based on repository signals.
 - Weak-draft failure, revision, and passing evaluation are recorded.

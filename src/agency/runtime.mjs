@@ -198,8 +198,9 @@ function repositoryUrl(context) {
 
 function classifyContentMode({ context }) {
   const objective = context.objective.toLowerCase()
-  const hasRunHistory = context.layers.currentJob.dirtyFiles.some((file) => file.startsWith("src/agency/runs/"))
-  if (objective.includes("introduc") || objective.includes("launch") || !hasRunHistory) return "introduction"
+  if (objective.includes("introduc") || objective.includes("launch") || objective.includes("prove convex")) {
+    return "introduction"
+  }
   return "build-in-public"
 }
 
@@ -480,14 +481,12 @@ function buildContentPackage({ runId, context, narrative, finalEvaluation }) {
 
 function executionJob(runId, contentPackage) {
   const scheduledFor = new Date(Date.now() + 60_000).toISOString()
-  const vetoEndsAt = new Date(Date.now() + 45_000).toISOString()
   return {
     id: stableId("xjob", `${runId}:${contentPackage.id}`),
     runId,
     channel: "x",
-    status: "veto_window",
+    status: "queue",
     scheduledFor,
-    vetoEndsAt,
     payload: {
       copy: contentPackage.adaptation.copy,
       asset: contentPackage.adaptation.asset,
@@ -495,7 +494,7 @@ function executionJob(runId, contentPackage) {
     handoff: {
       executor: "scripts/x-execution/x-executor.mjs",
       commandPreview:
-        `node scripts/x-execution/x-executor.mjs prepare --run-id ${runId} --copy-file <copy-file> --veto-seconds 45`,
+        `node scripts/x-execution/x-executor.mjs prepare --run-id ${runId} --veto-seconds 45`,
     },
   }
 }
@@ -758,10 +757,9 @@ export async function runAgency({ rootDir, trigger, objective, useHermes = true 
     id: runId,
     project: context.project,
     trigger,
-    status: "veto_window",
+    status: "queue",
     startedAt,
     scheduledFor: xJob.scheduledFor,
-    vetoEndsAt: xJob.vetoEndsAt,
     package: contentPackage,
     agents,
     events,

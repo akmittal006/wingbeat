@@ -28,10 +28,10 @@ Wingbeat is an early prototype, not a production service.
 What works locally today:
 
 - Repository and product-document inspection.
-- A file-backed agency run with a visible agent trace.
-- A deterministic offline demo path.
+- A Convex-backed agency run with a visible agent trace.
+- A deterministic generation path that still requires Convex persistence.
 - A React operator console for runs, evidence, evaluation, and execution state.
-- A file-backed X job state machine with queue, veto, ready, blocked, and published states.
+- A Convex-backed X job state machine with queue, veto, ready, blocked, and published states.
 - A browser handoff that does not read cookies or create OAuth credentials.
 
 What is still being hardened:
@@ -49,11 +49,13 @@ Requirements:
 
 - Node.js 20.19+ or 22.12+
 - pnpm 11.7+
+- A configured Convex deployment exposed as `CONVEX_URL` for scripts and `VITE_CONVEX_URL` for the dashboard
 
 ```bash
 git clone <your-fork-or-repository-url>
 cd wingbeat
 pnpm install --frozen-lockfile
+pnpm convex:dev
 pnpm agency:demo
 pnpm dev
 ```
@@ -76,7 +78,7 @@ pnpm x:self-test
 pnpm build
 ```
 
-`agency:run` may send repository-derived context to the model provider configured through Hermes. Review your provider and repository privacy requirements before using it.
+`agency:run` may send repository-derived context to the model provider configured through Hermes. Review your provider and repository privacy requirements before using it. `agency:demo` avoids Hermes, but it still writes real run state to Convex. If Convex is unavailable, Wingbeat fails visibly instead of using local JSON.
 
 ## Demo flow
 
@@ -98,12 +100,13 @@ _Operator console screenshot coming soon. We do not use a mockup here because th
 
 Wingbeat has four small boundaries:
 
-- `src/agency/` gathers context, calls Hermes or the deterministic fallback, coordinates the agency run, and persists it.
+- `src/agency/` gathers context, calls Hermes or deterministic generation, coordinates the agency run, and persists it.
 - `src/lib/` contains shared evaluation, trace, status, memory, and receipt helpers.
-- `src/components/` renders the local operator console from persisted run data.
-- `scripts/x-execution/` owns the file-backed execution state machine and safe browser handoff.
+- `convex/` stores projects, runs, ordered events, content packages, execution jobs, verified receipts, and memory records.
+- `src/components/` renders the operator console from reactive Convex queries.
+- `scripts/x-execution/` owns the Convex-backed execution state machine and safe browser handoff.
 
-The persisted run JSON is the contract between generation, execution, and the UI. Execution state and a verified receipt must flow back into that run before the console presents a post as published.
+Convex is the contract between generation, execution, and the UI. Execution state and a verified receipt must flow through validated Convex mutations before the console presents a post as published.
 
 For design details and trust boundaries, read [docs/architecture.md](./docs/architecture.md). The longer-term direction lives in the [product concept](./docs/product-concept.md).
 

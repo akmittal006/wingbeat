@@ -10,7 +10,7 @@ Produce an impressive Wingbeat demo: the agency inspects its own repository, cre
 
 - React, Vite, and TypeScript scaffold created.
 - Dark shadcn-style operator console is being implemented.
-- Shared types, realistic successful/failed run fixtures, trace helpers, evaluation helpers, memory references, and publish receipt model are being implemented.
+- Shared types, Convex-backed run records, trace helpers, evaluation helpers, memory references, and publish receipt model are being implemented.
 - Browser-backed X executor is complete and its state-machine self-test passes.
 - X executor states: queue → veto → ready → published or blocked.
 - Chrome has an existing authenticated X home tab.

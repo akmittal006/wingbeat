@@ -51,7 +51,7 @@ interface OperatorConsoleProps {
   onViewChange: (view: ViewKey) => void
   selectedAgentId: string
   onSelectAgent: (agentId: string) => void
-  dataSource: "remote" | "fallback"
+  dataSource: "convex"
 }
 
 const navItems: Array<{ key: ViewKey; label: string; icon: typeof Activity }> = [
@@ -91,7 +91,7 @@ export function OperatorConsole({
             <span>Search runs, agents, evidence</span>
           </div>
           <StatusChip status={run.status} />
-          <span className="source-pill">{dataSource === "remote" ? "Live data" : "Fallback: no run"}</span>
+          <span className="source-pill">Convex live</span>
         </div>
       </header>
 
@@ -1001,6 +1001,14 @@ function statusIcon(status: RunStatus) {
       return CircleAlert
     case "overdue":
       return Clock3
+    case "queue":
+      return Clock3
+    case "veto":
+      return Timer
+    case "ready":
+      return Send
+    default:
+      return Activity
   }
 }
 
@@ -1024,6 +1032,14 @@ function executionStatusIcon(status: ExecutionJobStatus) {
       return CircleAlert
     case "overdue":
       return Clock3
+    case "queue":
+      return Clock3
+    case "veto":
+      return Timer
+    case "ready":
+      return Send
+    default:
+      return Activity
   }
 }
 
@@ -1039,6 +1055,8 @@ function agentStatusIcon(status: AgentStatus) {
       return RefreshCcw
     case "failed":
       return CircleAlert
+    default:
+      return Activity
   }
 }
 

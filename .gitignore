@@ -5,8 +5,6 @@ dist/
 *.log
 *.tsbuildinfo
 .claude/settings.local.json
-.github/workflows/ci.yml
 
-# Local execution state and browser receipts
-scripts/x-execution/state/
-src/agency/runs/
+.env
+.env.local

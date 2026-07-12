@@ -9,7 +9,7 @@ const DOCS = [
   "docs/browser-x-executor.md",
 ]
 
-const IGNORED_DIRS = new Set([".git", "node_modules", ".pnpm-store", "dist", "src/agency/runs"])
+const IGNORED_DIRS = new Set([".git", "node_modules", ".pnpm-store", "dist"])
 
 function readIfExists(filePath) {
   try {
