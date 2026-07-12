@@ -17,7 +17,7 @@
   --surface: #1e1e1e;
   --surface-2: #232323;
   --surface-hover: #2a2a2b;
-  --utility-surface: #181918;
+  --utility-surface: #202120;
 
   /* elevated selected pill (active tab) */
   --pill-active-bg: #38383b;
@@ -416,7 +416,7 @@ a {
 
 .utility-card {
   background: var(--utility-surface);
-  border-color: transparent;
+  border-color: var(--line-strong);
 }
 
 /* needs you strip */
