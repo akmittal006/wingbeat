@@ -130,7 +130,7 @@ function NeedsYou({
 function Automations({ rows }: { rows: Automation[] | undefined }) {
   const live = (rows ?? []).filter((row) => row.enabled).length
   return (
-    <Card title="Automations" count={`${live} live`} icon={<Repeat size={15} />}>
+    <Card title="Automations" count={`${live} live`} icon={<Repeat size={15} />} className="utility-card">
       {rows === undefined ? (
         <EmptyLine>Loading…</EmptyLine>
       ) : rows.length === 0 ? (
@@ -160,7 +160,7 @@ function Automations({ rows }: { rows: Automation[] | undefined }) {
 function Sensors({ rows, now }: { rows: Sensor[] | undefined; now: number }) {
   const syncing = rows?.length ?? 0
   return (
-    <Card title="Context sensors" count={`${syncing} syncing`} icon={<Antenna size={15} />}>
+    <Card title="Context sensors" count={`${syncing} syncing`} icon={<Antenna size={15} />} className="utility-card">
       {rows === undefined ? (
         <EmptyLine>Loading…</EmptyLine>
       ) : rows.length === 0 ? (
