@@ -6,6 +6,18 @@ It reads a software project, gathers evidence from the repository, assembles a t
 
 > Break down every barrier preventing you from marketing consistently.
 
+## How it works
+
+![Wingbeat architecture](./docs/assets/agency-architecture.svg)
+
+Repository evidence feeds an agent crew that produces a content package, which is executed through a human-vetoed X job and confirmed by a verified receipt, with every step persisted in Convex.
+
+### The agent organization
+
+![Wingbeat agent organization](./docs/assets/agent-org.svg)
+
+A standing six-role crew is triggered through the Hermes plugin, alongside conditional specialists the agency manager spawns from repository signals.
+
 ## Run Wingbeat from Hermes
 
 Wingbeat ships as a Hermes plugin. The plugin adds a `hermes wingbeat` command and a namespaced `wingbeat:agency` skill.
