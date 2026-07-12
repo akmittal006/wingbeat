@@ -340,6 +340,58 @@ a {
   padding: 6px 14px 12px;
 }
 
+/* collapsible card header */
+.card-head-toggle {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  transition: background 0.12s ease;
+}
+
+.card-head-toggle:hover {
+  background: var(--surface-hover);
+}
+
+.card-head-toggle[aria-expanded="false"] {
+  border-bottom: none;
+}
+
+.card-chevron {
+  color: var(--faint);
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.card-chevron.open {
+  transform: rotate(180deg);
+}
+
+/* quiet "show all / show fewer" footer */
+.show-more-row {
+  list-style: none;
+}
+
+.show-more {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 8px 2px 4px;
+  font: inherit;
+  font-size: 0.8rem;
+  color: var(--faint);
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.12s ease;
+}
+
+.show-more:hover {
+  color: var(--muted);
+}
+
 .empty-line {
   color: var(--muted);
   font-size: 0.85rem;

@@ -1,3 +1,4 @@
+import { ChevronDown } from "lucide-react"
 import { useEffect, useState, type ReactNode } from "react"
 
 export function useNow(intervalMs = 1000): number {
@@ -38,25 +39,49 @@ export function Card({
   icon,
   children,
   className = "",
+  collapsible = false,
+  collapsed = false,
+  onToggle,
 }: {
   title: string
   count?: ReactNode
   icon?: ReactNode
   children: ReactNode
   className?: string
+  collapsible?: boolean
+  collapsed?: boolean
+  onToggle?: () => void
 }) {
+  const heading = (
+    <>
+      <div className="card-head-left">
+        {icon}
+        <h3>
+          {title}
+          {count !== undefined ? <span className="card-count"> · {count}</span> : null}
+        </h3>
+      </div>
+      {collapsible ? (
+        <ChevronDown size={16} className={`card-chevron${collapsed ? "" : " open"}`} />
+      ) : null}
+    </>
+  )
+
   return (
     <section className={`card ${className}`}>
-      <header className="card-head">
-        <div className="card-head-left">
-          {icon}
-          <h3>
-            {title}
-            {count !== undefined ? <span className="card-count"> · {count}</span> : null}
-          </h3>
-        </div>
-      </header>
-      <div className="card-body">{children}</div>
+      {collapsible ? (
+        <button
+          type="button"
+          className="card-head card-head-toggle"
+          aria-expanded={!collapsed}
+          onClick={onToggle}
+        >
+          {heading}
+        </button>
+      ) : (
+        <header className="card-head">{heading}</header>
+      )}
+      {collapsed ? null : <div className="card-body">{children}</div>}
     </section>
   )
 }
