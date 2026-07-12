@@ -1,6 +1,6 @@
 export type Channel = "x" | "reddit"
 
-export type ContentCategory = "build-in-public" | "product-update" | "educational"
+export type ContentCategory = string
 
 export type RunStatus =
   | "running"
@@ -113,10 +113,130 @@ export interface Claim {
 export interface AssetBrief {
   id: string
   objective: string
-  format: "none" | "branded-card" | "screenshot" | "demo-video"
+  format: "none" | "branded-card" | "screenshot" | "demo-video" | "ui-flow" | "short-demo-video"
   instructions: string
   palette: string[]
   requiredText: string[]
+}
+
+export type VisualTonePreset =
+  | "default"
+  | "polished"
+  | "yc-parody"
+  | "chaotic"
+  | "deadpan"
+  | "cinematic"
+  | "app-store"
+
+export type MarketingAssetStatus = "not_applicable" | "planned" | "blocked" | "ready" | "rendered"
+
+export interface ProjectVisualPlanningAnswer {
+  id: string
+  question: string
+  answer: string
+  evidenceIds: string[]
+}
+
+export interface MarketingOpportunityAssessment {
+  id: string
+  kind: "visual" | "demo-video"
+  recommended: boolean
+  reason: string
+  noGoReason?: string
+  blockers: string[]
+  evidenceIds: string[]
+}
+
+export interface VisualBrief {
+  id: string
+  status: MarketingAssetStatus
+  objective: string
+  format: "screenshot" | "ui-flow" | "branded-card" | "none"
+  tone: VisualTonePreset
+  visualIdentity: string
+  sourceEvidenceIds: string[]
+  uiEvidence: string[]
+  instructions: string
+  requiredText: string[]
+  shareCopy: string
+}
+
+export interface DemoVideoBeat {
+  id: string
+  label: string
+  startSecond: number
+  endSecond: number
+  visual: string
+  readableText: string
+  evidenceIds: string[]
+}
+
+export interface GeneratedMarketingAsset {
+  id: string
+  kind: "image" | "video"
+  status: "ready" | "rendered"
+  url: string
+  digest: string
+  source: "hyperframes" | "external" | "manual"
+  createdAt: string
+  evidenceIds: string[]
+}
+
+export interface DemoVideoPlan {
+  id: string
+  status: MarketingAssetStatus
+  renderer: "hyperframes" | "external" | "manual" | "unavailable"
+  rendererAvailable: boolean
+  rendererState: "available" | "unavailable" | "blocked" | "ready" | "rendered" | "error"
+  rendererError?: string
+  handoffCommand?: string
+  tone: VisualTonePreset
+  format: "landscape" | "vertical" | "square"
+  durationSeconds: number
+  hook: string
+  reveal: string
+  productMoments: string[]
+  outroCta: string
+  readableTiming: string
+  visualIdentity: string
+  audioPosture: string
+  shareCopy: string
+  storyboard: DemoVideoBeat[]
+  sourceEvidenceIds: string[]
+  uiEvidence: string[]
+  generatedAssetIds: string[]
+  blockedReason?: string
+}
+
+export interface VisualVideoQualityEvaluation {
+  id: string
+  status: EvalCheckStatus
+  score: number
+  detail: string
+  evidenceIds: string[]
+}
+
+export interface ExecutionReadyVariant {
+  id: string
+  channel: Channel
+  status: "draft" | "ready" | "blocked"
+  copy: string
+  visualBriefId?: string
+  demoVideoPlanId?: string
+  generatedAssetIds: string[]
+  evidenceIds: string[]
+  xProseCategoryId?: string
+  blocker?: string
+}
+
+export interface XProseContract {
+  playbookVersion: string
+  categoryId: string
+  category: unknown
+  inputContract: unknown
+  generatorPrompt: unknown
+  evaluation: unknown
+  globalRules: unknown
 }
 
 export interface Asset {
@@ -196,6 +316,15 @@ export interface ContentPackage {
   hooks: string[]
   channelNeutralBody: string
   assetBrief?: AssetBrief
+  visualPlanningRubric?: ProjectVisualPlanningAnswer[]
+  visualOpportunity?: MarketingOpportunityAssessment
+  demoVideoOpportunity?: MarketingOpportunityAssessment
+  visualBrief?: VisualBrief
+  demoVideoPlan?: DemoVideoPlan
+  visualVideoQuality?: VisualVideoQualityEvaluation[]
+  generatedAssets?: GeneratedMarketingAsset[]
+  executionReadyVariants?: ExecutionReadyVariant[]
+  xProseContract?: XProseContract
   assets: Asset[]
   confidence: number
   evaluations: EvalResult[]
@@ -220,6 +349,15 @@ export interface DashboardContentPackage {
   prohibitedClaims: string[]
   hooks: string[]
   channelNeutralBody: string
+  visualPlanningRubric?: ProjectVisualPlanningAnswer[]
+  visualOpportunity?: MarketingOpportunityAssessment
+  demoVideoOpportunity?: MarketingOpportunityAssessment
+  visualBrief?: VisualBrief
+  demoVideoPlan?: DemoVideoPlan
+  visualVideoQuality?: VisualVideoQualityEvaluation[]
+  generatedAssets?: GeneratedMarketingAsset[]
+  executionReadyVariants?: ExecutionReadyVariant[]
+  xProseContract?: XProseContract
   evidence: Evidence[]
   confidence: number
   adaptation: {
