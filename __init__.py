@@ -7,6 +7,7 @@ import json
 import shutil
 import subprocess
 import sys
+import re
 from pathlib import Path
 
 
@@ -103,6 +104,42 @@ def _top_opportunity() -> None:
     raise SystemExit(completed.returncode)
 
 
+def _automate(args) -> None:
+    builder = PLUGIN_DIR / "scripts" / "automation-builder.mjs"
+    compiled = subprocess.run(
+        [_node_executable(), str(builder), "compile", args.request],
+        cwd=str(PLUGIN_DIR), capture_output=True, text=True,
+    )
+    if compiled.returncode != 0:
+        print(compiled.stderr or compiled.stdout, file=sys.stderr)
+        raise SystemExit(compiled.returncode)
+    workflow = json.loads(compiled.stdout)
+    prompt = (
+        "Execute this Wingbeat automation using the wingbeat:automation-manager skill. "
+        "Follow the declared steps exactly and require all safety conditions. WORKFLOW_JSON="
+        + json.dumps(workflow)
+    )
+    cron = subprocess.run(
+        ["hermes", "cron", "create", workflow["schedule"], prompt,
+         "--name", workflow["name"], "--deliver", "local",
+         "--skill", "wingbeat:automation-manager", "--workdir", str(PLUGIN_DIR)],
+        cwd=str(PLUGIN_DIR), capture_output=True, text=True,
+    )
+    if cron.returncode != 0:
+        print(cron.stderr or cron.stdout, file=sys.stderr)
+        raise SystemExit(cron.returncode)
+    cron_output = (cron.stdout + "\n" + cron.stderr).strip()
+    match = re.search(r"(?:id|job)[=: ]+([A-Za-z0-9_-]+)", cron_output, re.IGNORECASE)
+    cron_id = match.group(1) if match else workflow["name"]
+    registered = subprocess.run(
+        [_node_executable(), str(builder), "register", json.dumps(workflow), cron_id],
+        cwd=str(PLUGIN_DIR),
+    )
+    if cron_output:
+        print(cron_output)
+    raise SystemExit(registered.returncode)
+
+
 def _wingbeat_cli(args) -> None:
     command = getattr(args, "wingbeat_command", None)
     if command == "run":
@@ -113,6 +150,9 @@ def _wingbeat_cli(args) -> None:
         return
     if command == "top-opportunity":
         _top_opportunity()
+        return
+    if command == "automate":
+        _automate(args)
         return
 
     print("Usage: hermes wingbeat {run,post-x}")
@@ -154,6 +194,9 @@ def _setup_cli(subparser) -> None:
         help="Return the first new opportunity from the live Convex inbox",
     )
     top_opportunity.set_defaults(func=_wingbeat_cli)
+    automate = subcommands.add_parser("automate", help="Build and install a general-purpose Wingbeat automation")
+    automate.add_argument("request", help="Natural-language automation goal including its schedule")
+    automate.set_defaults(func=_wingbeat_cli)
 
 
 def _slash_help(raw_args: str) -> str:
@@ -179,6 +222,14 @@ def register(ctx) -> None:
             "agency",
             skill_md,
             "Run Wingbeat against the current project and keep generated marketing source-backed.",
+        )
+
+    automation_skill = PLUGIN_DIR / "skills" / "automation-manager" / "SKILL.md"
+    if automation_skill.exists():
+        ctx.register_skill(
+            "automation-manager",
+            automation_skill,
+            "Design, install, execute, and monitor general-purpose Wingbeat automations.",
         )
 
     ctx.register_command(

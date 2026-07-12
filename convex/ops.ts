@@ -21,6 +21,9 @@ export const listAutomations = query({
       trigger: row.trigger,
       enabled: row.enabled,
       nextRunAt: row.nextRunAt,
+      cronId: row.cronId,
+      workflow: row.workflow,
+      runtimeStatus: row.runtimeStatus,
     }))
   },
 })
@@ -32,8 +35,11 @@ export const upsertAutomation = mutation({
     trigger: v.string(),
     enabled: v.optional(v.boolean()),
     nextRunAt: v.optional(v.string()),
+    cronId: v.optional(v.string()),
+    workflow: v.optional(v.any()),
+    runtimeStatus: v.optional(v.string()),
   },
-  handler: async (ctx, { name, channel, trigger, enabled, nextRunAt }) => {
+  handler: async (ctx, { name, channel, trigger, enabled, nextRunAt, cronId, workflow, runtimeStatus }) => {
     const at = now()
     const existing = await ctx.db
       .query("automations")
@@ -45,6 +51,9 @@ export const upsertAutomation = mutation({
         trigger,
         enabled: enabled ?? existing.enabled,
         nextRunAt,
+        cronId,
+        workflow,
+        runtimeStatus,
         updatedAt: at,
       })
       return existing._id as string
@@ -55,6 +64,9 @@ export const upsertAutomation = mutation({
       trigger,
       enabled: enabled ?? true,
       nextRunAt,
+      cronId,
+      workflow,
+      runtimeStatus,
       createdAt: at,
       updatedAt: at,
     })
