@@ -1,0 +1,1385 @@
+{
+  "schemaVersion": "1.1.0",
+  "version": "2026-07-12-grok-reviewed",
+  "channel": "x",
+  "owner": "x-prose-research-playbook",
+  "purpose": "Machine-readable X prose category, prompt, and evaluation contract for Wingbeat channel adapters and visual-first pipelines.",
+  "research": {
+    "method": [
+      "Read Wingbeat local product, architecture, executor, type, and seed-data evidence.",
+      "Applied the social skill's X platform limits, post-template, and reverse-engineering references.",
+      "Inspected visible public X search/timeline examples in the user's signed-in Chrome session without inspecting cookies, storage, auth headers, passwords, or browser profile data.",
+      "Grok prompt was prepared but not submitted because action-time confirmation was required and was not received before artifact creation.",
+      "Submitted a bounded Wingbeat prose brief to Grok in the user-approved signed-in x.com Chrome session and incorporated accepted critique themes."
+    ],
+    "sources": [
+      {
+        "label": "Vercel Dockerfile announcement",
+        "url": "https://x.com/vercel/status/2071951027302224262",
+        "observation": "Direct capability lead plus concrete code-shaped proof."
+      },
+      {
+        "label": "Linear coding sessions",
+        "url": "https://x.com/linear/status/2065143118417088981",
+        "observation": "Introduces a named feature with concrete agent actions."
+      },
+      {
+        "label": "Guillermo Rauch Eve intro",
+        "url": "https://x.com/rauchg/status/2067183015214584307",
+        "observation": "Founder intro uses analogy, product name, and simple first mental model."
+      },
+      {
+        "label": "Vercel Lovable update",
+        "url": "https://x.com/rauchg/status/2075614779658690849",
+        "observation": "Progress/update starts with what users can now do."
+      },
+      {
+        "label": "eve positioning",
+        "url": "https://x.com/evedev_/status/2072806286857568574",
+        "observation": "Short analogy plus concrete folder structure."
+      },
+      {
+        "label": "shadcn principle",
+        "url": "https://x.com/shadcn/status/2074910600451223751",
+        "observation": "Concrete repeated-work principle."
+      },
+      {
+        "label": "Linear changelog",
+        "url": "https://x.com/linear/status/2072708036620161239",
+        "observation": "New/change surface plus practical user action."
+      },
+      {
+        "label": "Anchored early access",
+        "url": "https://x.com/Anchored_Notes/status/2075730802977988735",
+        "observation": "Early-access framing: after building, access state, shape-product CTA."
+      },
+      {
+        "label": "Brydon Parker product search intro",
+        "url": "https://x.com/parker_brydon/status/2071624746500850126",
+        "observation": "Question hook followed by product inventory and how-it-works."
+      }
+    ]
+  },
+  "globalRules": {
+    "voice": "Direct founder-builder prose. Prefer Building/Introducing Wingbeat, concrete capability, first shipped loop, and a narrow CTA.",
+    "standardMaxCharacters": 280,
+    "premiumMaxCharacters": 25000,
+    "hashtagMax": 1,
+    "defaultHashtagPosture": "Usually none. Use #BuildInPublic only for true build logs.",
+    "mustExplainProductForColdAudience": true,
+    "forbiddenPhrases": [
+      "excited to announce",
+      "game-changing",
+      "revolutionary",
+      "transform your marketing",
+      "10x",
+      "supercharge",
+      "the future of marketing is here",
+      "seamless",
+      "robust",
+      "cutting-edge",
+      "leverage"
+    ],
+    "forbiddenClaimsWithoutEvidence": [
+      "published",
+      "live",
+      "launched",
+      "official launch",
+      "production-ready",
+      "users love",
+      "people asked",
+      "customers",
+      "waitlist size",
+      "revenue",
+      "impressions",
+      "viral",
+      "raised funding",
+      "fastest",
+      "best",
+      "first",
+      "thousands",
+      "millions"
+    ],
+    "autoRejectRules": [
+      "Claim not present in supportedClaims or evidence.",
+      "Live/published claim without verified receipt evidence.",
+      "Launch/public access claim without access evidence.",
+      "Wingbeat named for cold audience without explaining what it does.",
+      "Raw commit summary or file list.",
+      "Fake metric, user, customer, social proof, waitlist, funding, release, or publication claim.",
+      "CTA appears before concrete value.",
+      "More than one hashtag.",
+      "Architecture jargon outweighs user-visible outcome."
+    ]
+  },
+  "inputContract": {
+    "required": [
+      "category",
+      "audience",
+      "whatChanged",
+      "whyItMatters",
+      "evidence",
+      "supportedClaims",
+      "prohibitedClaims",
+      "currentProductStatus",
+      "desiredAction",
+      "confidence"
+    ],
+    "optional": [
+      "assetBrief",
+      "assetIds",
+      "link",
+      "parentPost",
+      "threadContext",
+      "tonePreference"
+    ]
+  },
+  "generatorPrompt": {
+    "system": "You are Wingbeat's X channel adapter. Write native X prose from source-backed content packages. Preserve evidence boundaries. Never invent metrics, users, launch state, publication state, or social proof.",
+    "template": "Category: {{category}}\nAudience: {{audience}}\nWhat changed: {{whatChanged}}\nWhy it matters: {{whyItMatters}}\nSupported claims: {{supportedClaims}}\nProhibited claims: {{prohibitedClaims}}\nEvidence: {{evidence}}\nAsset context: {{assetBrief}}\nDesired action: {{desiredAction}}\nProduct status: {{currentProductStatus}}\n\nReturn variants for the category: short, standard, premiumLong, and videoCaption when relevant. Include rejection reasons for variants that lack evidence."
+  },
+  "evaluation": {
+    "deterministicChecks": [
+      "known-category",
+      "standard-length",
+      "short-length",
+      "premium-length",
+      "hashtag-count",
+      "forbidden-phrase",
+      "unsupported-publish-claim",
+      "unsupported-launch-claim",
+      "unsupported-metric",
+      "generic-saas",
+      "unexplained-product",
+      "raw-commit-summary",
+      "cta-before-value",
+      "link-position",
+      "video-without-asset"
+    ],
+    "modelEval": {
+      "threshold": 0.82,
+      "dimensions": {
+        "evidenceFit": 0.25,
+        "categoryFit": 0.15,
+        "specificity": 0.15,
+        "xNativeness": 0.15,
+        "hookRhythm": 0.1,
+        "ctaMediaFit": 0.1,
+        "safetyBrand": 0.1
+      },
+      "hardPassRequirements": [
+        "evidenceFit == 1",
+        "safetyBrand == 1",
+        "all deterministic checks pass"
+      ],
+      "returnSchema": {
+        "pass": "boolean",
+        "score": "number",
+        "dimensionScores": "object",
+        "deterministicFailures": "string[]",
+        "unsupportedClaims": "string[]",
+        "claimEvidenceMap": "array",
+        "rewriteInstructions": "string"
+      }
+    }
+  },
+  "categories": [
+    {
+      "id": "daily-build-log",
+      "audienceIntent": "Follow real progress, learn from decisions, and judge credibility.",
+      "evidenceRequired": [
+        "sourceEvent",
+        "productImplication",
+        "nextStepOrOpenQuestion"
+      ],
+      "useWhen": "Meaningful work happened today but it is not a launch.",
+      "avoidWhen": "The only fact is edited files or private context.",
+      "emotionalPosture": "Honest, close to the work, lightly reflective.",
+      "hookFamilies": [
+        "Today I built...",
+        "Today Wingbeat learned...",
+        "I changed X because...",
+        "The useful part was not X. It was Y."
+      ],
+      "beatSheet": [
+        "moment",
+        "concrete work",
+        "why it mattered",
+        "next constraint"
+      ],
+      "lengthBands": {
+        "short": [
+          80,
+          150
+        ],
+        "standard": [
+          160,
+          280
+        ],
+        "premium": [
+          450,
+          1200
+        ]
+      },
+      "lineBreakRhythm": "Short hook, blank line, one or two explanation lines, optional final line.",
+      "ctaPatterns": [
+        "none",
+        "Would you trust this before publish?"
+      ],
+      "mediaPlacement": "Screenshot or trace after the claim; no link unless public artifact exists.",
+      "hashtagPosture": "Optional #BuildInPublic.",
+      "forbiddenLanguage": [
+        "day X of building without substance",
+        "raw commit summaries",
+        "grind"
+      ],
+      "autoReject": [
+        "no source event",
+        "no user-visible meaning",
+        "published claim without receipt"
+      ],
+      "examples": {
+        "short": "Wingbeat now keeps the rejected draft and critic trace instead of overwriting them.\n\nThe next run can see exactly which claim was blocked.",
+        "standard": "Today the run object started carrying the full evaluation history, not just the final draft.\n\nIf a claim fails evidence review, that failure stays attached. No silent regeneration.",
+        "premiumLong": "Today I changed the part of Wingbeat that decides what survives a failed draft.\n\nBefore, the useful artifact was easy to lose: the critic said no, the system revised, and the final post looked clean.\n\nNow the rejected draft, the failing claim, and the critic note stay with the run. That makes the next attempt smarter and makes the console more honest.",
+        "videoCaption": "Watch the critic reject a confident draft, then keep the failed claim attached to the run.",
+        "altShort": "Small build note: failed copy is now evidence too.\n\nWingbeat keeps the rejection reason so the same claim does not sneak back into the next draft.",
+        "altStandard": "Built today: persistent critic history.\n\nThe final X draft is no longer the only artifact that matters. Wingbeat stores what failed, why it failed, and which claim needs different evidence."
+      },
+      "evidenceGate": "Use for real progress only; do not re-explain Wingbeat unless the target audience is cold and this is the first post in a sequence.",
+      "exampleCount": 6
+    },
+    {
+      "id": "product-introduction",
+      "audienceIntent": "Understand what Wingbeat is and whether it is for them.",
+      "evidenceRequired": [
+        "productDefinition",
+        "targetAudience",
+        "firstShippedLoop",
+        "currentStatus"
+      ],
+      "useWhen": "Introducing Wingbeat or a major repositioning to a cold audience.",
+      "avoidWhen": "Only a minor internal change happened.",
+      "emotionalPosture": "Clear, confident, builder-direct.",
+      "hookFamilies": [
+        "Building Wingbeat:",
+        "Introducing Wingbeat.",
+        "Wingbeat is...",
+        "I'm building X for Y."
+      ],
+      "beatSheet": [
+        "name",
+        "audience",
+        "capability",
+        "first shipped loop",
+        "access or feedback"
+      ],
+      "lengthBands": {
+        "short": [
+          120,
+          180
+        ],
+        "standard": [
+          200,
+          280
+        ],
+        "premium": [
+          600,
+          1500
+        ]
+      },
+      "lineBreakRhythm": "Name/capability lead, blank line, capability lines, CTA.",
+      "ctaPatterns": [
+        "Follow along",
+        "Ask for early access",
+        "Tell me what project you'd point it at"
+      ],
+      "mediaPlacement": "Demo/dashboard visual after line one; link at end.",
+      "hashtagPosture": "None.",
+      "forbiddenLanguage": [
+        "unexplained Wingbeat",
+        "generic AI marketing agency",
+        "motto-only"
+      ],
+      "autoReject": [
+        "no audience",
+        "no concrete first loop",
+        "hosted service implied without evidence"
+      ],
+      "examples": {
+        "short": "Building Wingbeat: an AI marketing agency for developers who ship real work, then forget to turn it into public stories.",
+        "standard": "Introducing Wingbeat.\n\nIt reads a software project, finds the story inside real work, checks what the post is allowed to claim, and prepares X copy behind a publish boundary.\n\nFirst loop: build-in-public posts for technical builders.",
+        "premiumLong": "A feature ships. A trade-off is chosen. A bug teaches something.\n\nThen the work stays in the repo because writing the update is its own task.\n\nWingbeat is my attempt to automate that loop without letting the agent make things up: inspect the project, choose a story, validate claims, draft for X, and stop before publishing until the handoff is approved and verifiable.",
+        "videoCaption": "Building Wingbeat: from real project work to checked X copy, with publish kept behind a visible gate.",
+        "altShort": "Wingbeat turns project work into source-checked X posts for developers building in public.",
+        "altStandard": "Building Wingbeat for the awkward gap between shipping and telling people.\n\nThe first version watches project evidence, drafts a builder-native X post, critiques unsupported claims, and prepares a safe browser handoff."
+      },
+      "evidenceGate": "Use only when the audience needs the core product explained; this is the home for the direct Building/Introducing voice.",
+      "exampleCount": 6
+    },
+    {
+      "id": "product-launch",
+      "audienceIntent": "Decide whether to try, share, or watch the product now.",
+      "evidenceRequired": [
+        "publicAvailability",
+        "link",
+        "supportedCapability",
+        "limitations"
+      ],
+      "useWhen": "A real public launch or usable release exists.",
+      "avoidWhen": "Only a local prototype, private demo, or no stable access path exists.",
+      "emotionalPosture": "Direct, concrete, proud but not inflated.",
+      "hookFamilies": [
+        "Wingbeat is live",
+        "Launching Wingbeat",
+        "You can now...",
+        "The first public loop is ready"
+      ],
+      "beatSheet": [
+        "launch state",
+        "who it is for",
+        "what works now",
+        "limitation",
+        "CTA"
+      ],
+      "lengthBands": {
+        "short": [
+          120,
+          180
+        ],
+        "standard": [
+          200,
+          280
+        ],
+        "premium": [
+          700,
+          1800
+        ]
+      },
+      "lineBreakRhythm": "Launch line, blank line, capability bullets or compact sentences.",
+      "ctaPatterns": [
+        "try it",
+        "inspect repo",
+        "request access",
+        "reply with project"
+      ],
+      "mediaPlacement": "Product/repo link at end; demo video preferred.",
+      "hashtagPosture": "None.",
+      "forbiddenLanguage": [
+        "official launch without evidence",
+        "fake users",
+        "fake press",
+        "fake waitlist size"
+      ],
+      "autoReject": [
+        "no public URL",
+        "no access path",
+        "no limitation"
+      ],
+      "examples": {
+        "short": "Wingbeat is open to try: point it at a project, review the source-checked X draft, and approve the browser handoff only when the claim trail looks right.",
+        "standard": "Wingbeat is now available for technical builders who want build-in-public posts from real project work.\n\nIt reads evidence, drafts the X post, flags unsupported claims, and requires a verified receipt before anything is marked published.",
+        "premiumLong": "Launching Wingbeat today with one narrow promise: turn real software work into honest X posts.\n\nThe first public loop reads project evidence, finds one story, drafts copy for X, checks risky claims, and keeps publishing behind an explicit handoff.\n\nIt is not a generic scheduler. It is a trust boundary around automated marketing.",
+        "videoCaption": "Launch demo: project evidence becomes an X draft, then waits for approval before publish.",
+        "altShort": "Wingbeat is live for builders who need public updates from real repo work, not invented launch copy.",
+        "altStandard": "You can now try Wingbeat on an active project.\n\nBest fit: you ship often, your repo has the real story, and you want X posts that preserve what is known, unknown, and not safe to claim."
+      },
+      "evidenceGate": "Disabled unless public access evidence exists. If access is only local/private, use product-introduction, demo-video-post, or milestone-proof instead.",
+      "exampleCount": 6,
+      "requiresExplicitAvailabilityEvidence": true
+    },
+    {
+      "id": "feature-intro-launch",
+      "audienceIntent": "Understand a new capability and why it matters.",
+      "evidenceRequired": [
+        "featureName",
+        "userVisibleBehavior",
+        "beforeAfter",
+        "availability"
+      ],
+      "useWhen": "A feature changes what the user can do.",
+      "avoidWhen": "The change is internal cleanup with no user-facing effect.",
+      "emotionalPosture": "Crisp, useful, capability-led.",
+      "hookFamilies": [
+        "New:",
+        "You can now...",
+        "Wingbeat now...",
+        "I added X so Y"
+      ],
+      "beatSheet": [
+        "feature",
+        "capability",
+        "why",
+        "proof or visual",
+        "CTA"
+      ],
+      "lengthBands": {
+        "short": [
+          80,
+          140
+        ],
+        "standard": [
+          160,
+          280
+        ],
+        "premium": [
+          500,
+          1200
+        ]
+      },
+      "lineBreakRhythm": "One-line feature, blank line, one consequence, optional detail.",
+      "ctaPatterns": [
+        "try the feature",
+        "inspect example",
+        "reply with edge case"
+      ],
+      "mediaPlacement": "Visual immediately after hook for visual features; link at end.",
+      "hashtagPosture": "None.",
+      "forbiddenLanguage": [
+        "internal class names as feature names",
+        "minor improvements",
+        "better UX"
+      ],
+      "autoReject": [
+        "feature not visible",
+        "no before/after"
+      ],
+      "examples": {
+        "short": "New in Wingbeat: a run cannot become published just because copy exists. It needs the receipt field filled by the executor.",
+        "standard": "Wingbeat now treats publishing as separate states instead of one success flag.\n\nA run can be queued, vetoed, ready for handoff, blocked, or published only after a receipt exists.",
+        "premiumLong": "New in Wingbeat: the publish path is no longer a vague success state.\n\nA draft can pass review and still stop before posting. A browser handoff can be ready and still remain outside the final state until the receipt is recorded.\n\nThat distinction is small in the UI and huge for trust.",
+        "videoCaption": "The run reaches ready, then stops. No receipt, no published state.",
+        "altShort": "Feature shipped: Wingbeat now shows which gate stopped a post instead of collapsing everything into done.",
+        "altStandard": "I added explicit publish gates to Wingbeat.\n\nThe operator can now tell whether a post is waiting on review, handoff, block, or receipt instead of guessing from a generic status."
+      },
+      "evidenceGate": "Use when a concrete capability changed for the operator or reader; translate internal states into visible outcomes.",
+      "exampleCount": 6
+    },
+    {
+      "id": "insight-lesson",
+      "audienceIntent": "Learn something useful from the build.",
+      "evidenceRequired": [
+        "incidentOrDecision",
+        "lesson",
+        "broaderImplication"
+      ],
+      "useWhen": "A build decision reveals a transferable principle.",
+      "avoidWhen": "The lesson is generic or disconnected from a product story.",
+      "emotionalPosture": "Reflective, earned, not preachy.",
+      "hookFamilies": [
+        "I was wrong about...",
+        "The lesson:",
+        "The hard part wasn't...",
+        "A small product rule I trust more now:"
+      ],
+      "beatSheet": [
+        "belief",
+        "event",
+        "correction",
+        "practical takeaway"
+      ],
+      "lengthBands": {
+        "short": [
+          100,
+          160
+        ],
+        "standard": [
+          180,
+          280
+        ],
+        "premium": [
+          500,
+          1400
+        ]
+      },
+      "lineBreakRhythm": "Short claim, blank line, story lines, landing line.",
+      "ctaPatterns": [
+        "Where would this break?",
+        "How do you handle this?"
+      ],
+      "mediaPlacement": "Optional trace screenshot if it proves the lesson.",
+      "hashtagPosture": "None.",
+      "forbiddenLanguage": [
+        "abstract maxims without evidence",
+        "guru tone",
+        "universal claims"
+      ],
+      "autoReject": [
+        "no story",
+        "no product consequence"
+      ],
+      "examples": {
+        "short": "The hard part is not making an agent write a post.\n\nThe hard part is making it know which sentence it is not allowed to write.",
+        "standard": "Wingbeat taught me a product rule I trust more now:\n\nMarketing automation should fail on unsupported claims before it fails on style.\n\nBad tone is fixable. False confidence is dangerous.",
+        "premiumLong": "The more I work on Wingbeat, the less I care about whether the first draft sounds polished.\n\nA polished draft can still be wrong in the only way that matters: it can imply a launch, receipt, user, or result that does not exist.\n\nSo the prose system has to treat evidence fit as the first creative constraint, not a compliance pass at the end.",
+        "videoCaption": "The critic blocks the completion claim because the receipt is missing. That is the product lesson.",
+        "altShort": "Tone was never the real failure mode.\n\nThe real failure mode is confident copy one source ahead of the truth.",
+        "altStandard": "A useful marketing agent needs a boring habit: every strong sentence should know its source.\n\nIf the source is missing, the sentence should disappear instead of getting softened into vague copy."
+      },
+      "evidenceGate": "Requires a transferable rule that came from a concrete Wingbeat event; do not use for failure stories unless the lesson is broader than the failure.",
+      "exampleCount": 6
+    },
+    {
+      "id": "milestone-proof",
+      "audienceIntent": "See credible progress or proof without hype.",
+      "evidenceRequired": [
+        "milestone",
+        "proofArtifact",
+        "limitation"
+      ],
+      "useWhen": "A meaningful artifact or threshold exists.",
+      "avoidWhen": "Finished a task is the only proof.",
+      "emotionalPosture": "Grounded satisfaction.",
+      "hookFamilies": [
+        "Milestone:",
+        "First time Wingbeat...",
+        "It now...",
+        "Proof point:"
+      ],
+      "beatSheet": [
+        "milestone",
+        "proof",
+        "why it matters",
+        "remaining limitation"
+      ],
+      "lengthBands": {
+        "short": [
+          80,
+          150
+        ],
+        "standard": [
+          160,
+          280
+        ],
+        "premium": [
+          450,
+          1000
+        ]
+      },
+      "lineBreakRhythm": "Proof first, context second.",
+      "ctaPatterns": [
+        "inspect",
+        "try",
+        "ask what proof would convince you"
+      ],
+      "mediaPlacement": "Proof artifact central; screenshot/demo/link when public.",
+      "hashtagPosture": "Optional build-in-public only.",
+      "forbiddenLanguage": [
+        "milestone inflation",
+        "production-ready without evidence"
+      ],
+      "autoReject": [
+        "no proof artifact",
+        "no limitation"
+      ],
+      "examples": {
+        "short": "One persisted run object now feeds the agency trace, X job states, and console.",
+        "standard": "The agency run, X job, and console now read from one persisted object.\n\nA veto or receipt update appears in all three without separate copies.",
+        "premiumLong": "Milestone: Wingbeat now has one place where the run story exists.\n\nThe evidence, draft history, X adaptation, execution state, and receipt status travel together.\n\nThat means the console can show the actual run instead of a stitched-together version that only looks coherent after manual syncing.",
+        "videoCaption": "One run object updates the story, execution state, and console together.",
+        "altShort": "Proof artifact: the same run data now drives copy, evaluation, execution state, and UI display.",
+        "altStandard": "The useful milestone is not a prettier demo.\n\nIt is that Wingbeat now has a shared run object, so a blocked claim or missing receipt is visible wherever the run is inspected."
+      },
+      "evidenceGate": "Requires a concrete artifact outside the claim itself; avoid subjective proof language like first real proof point.",
+      "exampleCount": 6
+    },
+    {
+      "id": "failure-learning",
+      "audienceIntent": "Trust the builder more because failures are specific and useful.",
+      "evidenceRequired": [
+        "failure",
+        "diagnosis",
+        "fixOrLearning",
+        "currentRisk"
+      ],
+      "useWhen": "A real failed draft, missed boundary, flaky integration, or wrong assumption happened.",
+      "avoidWhen": "Failure involves private or security-sensitive detail.",
+      "emotionalPosture": "Candid, responsible, non-dramatic.",
+      "hookFamilies": [
+        "This failed because...",
+        "I got this wrong:",
+        "The first version lied by omission",
+        "A bug I am glad I caught:"
+      ],
+      "beatSheet": [
+        "failure",
+        "consequence",
+        "diagnosis",
+        "correction",
+        "watch item"
+      ],
+      "lengthBands": {
+        "short": [
+          100,
+          160
+        ],
+        "standard": [
+          180,
+          280
+        ],
+        "premium": [
+          500,
+          1300
+        ]
+      },
+      "lineBreakRhythm": "Direct failure line, blank line, explanation, fix.",
+      "ctaPatterns": [
+        "ask for edge cases only if useful"
+      ],
+      "mediaPlacement": "Trace screenshot or diff if no secrets.",
+      "hashtagPosture": "Optional build-in-public.",
+      "forbiddenLanguage": [
+        "faux vulnerability",
+        "blaming tools or users",
+        "private logs"
+      ],
+      "autoReject": [
+        "no actual failure",
+        "no fix or learning"
+      ],
+      "examples": {
+        "short": "First bad draft passed tone but claimed a public post existed.\n\nThe critic now checks receipt status before allowing that sentence.",
+        "standard": "The failure was subtle: the draft sounded launch-ready, but the run only had a browser handoff.\n\nNow Wingbeat blocks published/live wording unless receipt evidence is present.",
+        "premiumLong": "A failure I am glad Wingbeat caught: the draft used the language of a completed public post while the executor only had a ready handoff.\n\nThat is exactly the kind of confident half-truth an auto-marketing product cannot allow.\n\nThe fix is stricter than tone review: publication words require publication evidence.",
+        "videoCaption": "The draft says published. The receipt field is empty. The critic blocks it.",
+        "altShort": "Bad draft: good rhythm, wrong truth state.\n\nIt treated ready as published.",
+        "altStandard": "I kept the failed draft because it shows the product boundary clearly.\n\nReady means ready for handoff. Published means a verified public URL was recorded. The copy cannot blur those states."
+      },
+      "evidenceGate": "Use for a specific failed run, draft, assumption, or integration; include the correction and current remaining risk.",
+      "exampleCount": 6
+    },
+    {
+      "id": "technical-decision",
+      "audienceIntent": "Learn the reasoning behind a product or engineering choice.",
+      "evidenceRequired": [
+        "decision",
+        "alternatives",
+        "reason",
+        "userConsequence"
+      ],
+      "useWhen": "Architecture matters because it changes safety, reliability, trust, speed, or product fit.",
+      "avoidWhen": "It is just implementation trivia.",
+      "emotionalPosture": "Precise, practical, lightly opinionated.",
+      "hookFamilies": [
+        "I chose X over Y because...",
+        "Technical decision:",
+        "The boring architecture choice:",
+        "Why Wingbeat uses..."
+      ],
+      "beatSheet": [
+        "decision",
+        "rejected alternative",
+        "reason",
+        "consequence"
+      ],
+      "lengthBands": {
+        "short": [
+          100,
+          160
+        ],
+        "standard": [
+          180,
+          280
+        ],
+        "premium": [
+          600,
+          1600
+        ]
+      },
+      "lineBreakRhythm": "Decision first, blank line, explanation.",
+      "ctaPatterns": [
+        "ask for counterexamples from builders"
+      ],
+      "mediaPlacement": "Diagram or trace if it clarifies.",
+      "hashtagPosture": "None.",
+      "forbiddenLanguage": [
+        "jargon as status",
+        "untranslated internal type names"
+      ],
+      "autoReject": [
+        "no user consequence",
+        "no alternative"
+      ],
+      "examples": {
+        "short": "Technical decision: the X post is not Wingbeat's source of truth.\n\nThe evidence package is.",
+        "standard": "I kept Wingbeat's content package channel-independent.\n\nThe X adapter can write copy, but it cannot rewrite the evidence. That keeps future channels from inheriting X-shaped shortcuts.",
+        "premiumLong": "Technical decision in Wingbeat: channel adapters are downstream of the content package.\n\nThe package owns what changed, why it matters, audience, evidence, supported claims, and prohibited claims.\n\nX gets to adapt that story to the feed. It does not get to decide what is true.",
+        "videoCaption": "Behind the scenes: the evidence package exists before the X adapter writes copy.",
+        "altShort": "Architecture choice: separate truth from distribution.\n\nThe content package decides claims. X only decides shape.",
+        "altStandard": "I chose a channel-neutral package before the X adapter because marketing memory should outlast one post.\n\nA Reddit adapter later should reuse the same evidence, not reverse-engineer it from a tweet."
+      },
+      "evidenceGate": "Use only when the engineering choice changes trust, reuse, safety, or operator understanding.",
+      "exampleCount": 6
+    },
+    {
+      "id": "experiment-result",
+      "audienceIntent": "See what was tested, what happened, and what will change.",
+      "evidenceRequired": [
+        "hypothesis",
+        "method",
+        "result",
+        "limitation",
+        "nextAction"
+      ],
+      "useWhen": "A real test, evaluator run, dogfood run, or comparison exists.",
+      "avoidWhen": "No result exists or the sample is too thin.",
+      "emotionalPosture": "Empirical, modest.",
+      "hookFamilies": [
+        "Experiment:",
+        "I tested...",
+        "Result:",
+        "The surprising part..."
+      ],
+      "beatSheet": [
+        "hypothesis",
+        "test",
+        "result",
+        "interpretation",
+        "next test"
+      ],
+      "lengthBands": {
+        "short": [
+          100,
+          160
+        ],
+        "standard": [
+          180,
+          280
+        ],
+        "premium": [
+          600,
+          1500
+        ]
+      },
+      "lineBreakRhythm": "Label result clearly; do not bury limitation.",
+      "ctaPatterns": [
+        "ask what to test next"
+      ],
+      "mediaPlacement": "Chart/table/screenshot if result is visual; avoid fake precision.",
+      "hashtagPosture": "None.",
+      "forbiddenLanguage": [
+        "broad claims from one run",
+        "invented metrics",
+        "misleading percentages"
+      ],
+      "autoReject": [
+        "no method/result",
+        "unsupported quantitative claim"
+      ],
+      "examples": {
+        "short": "Tested a launch-ready-sounding draft with no receipt.\n\nResult: the critic rejected the publication claim, not the prose.",
+        "standard": "I tested Wingbeat with a draft that sounded good but had the wrong truth state.\n\nIt said the post was public. The run only had a handoff.\n\nThe evidence gate caught it.",
+        "premiumLong": "Experiment: can Wingbeat reject a polished post for the right reason?\n\nI gave it copy that implied publication before the executor had a receipt.\n\nThe critic failed the exact sentence that outran the evidence, then preserved the failure in the run history.\n\nNext test: make the rewrite remove the claim instead of hiding it behind softer wording.",
+        "videoCaption": "Experiment result: polished copy fails because the receipt is missing.",
+        "altShort": "Result from today's test: tone passed, evidence failed.\n\nThat is the right failure order for Wingbeat.",
+        "altStandard": "The test case was intentionally unfair to the prose: make it sound good, but remove the proof.\n\nWingbeat caught the missing receipt before the draft could call itself published."
+      },
+      "evidenceGate": "Requires hypothesis, method, result, limitation, and next action; quantify only measured facts.",
+      "exampleCount": 6
+    },
+    {
+      "id": "community-feedback",
+      "audienceIntent": "Contribute useful criticism or shape product direction.",
+      "evidenceRequired": [
+        "decisionPoint",
+        "optionsOrConstraint",
+        "specificAsk"
+      ],
+      "useWhen": "Feedback can change the product.",
+      "avoidWhen": "The ask is vague engagement bait.",
+      "emotionalPosture": "Open, specific, builder-to-builder.",
+      "hookFamilies": [
+        "Question for builders:",
+        "Would you trust...",
+        "Which failure is worse?",
+        "I need a sharper constraint."
+      ],
+      "beatSheet": [
+        "context",
+        "decision",
+        "options or question",
+        "how feedback is used"
+      ],
+      "lengthBands": {
+        "short": [
+          80,
+          140
+        ],
+        "standard": [
+          160,
+          280
+        ],
+        "premium": [
+          400,
+          800
+        ]
+      },
+      "lineBreakRhythm": "Question line first or second; one ask only.",
+      "ctaPatterns": [
+        "reply with choice and reason"
+      ],
+      "mediaPlacement": "Screenshot if asking about UI/copy/proof.",
+      "hashtagPosture": "None.",
+      "forbiddenLanguage": [
+        "Thoughts? alone",
+        "engagement bait",
+        "multiple asks"
+      ],
+      "autoReject": [
+        "no decision point",
+        "feedback cannot affect outcome"
+      ],
+      "examples": {
+        "short": "Question for builders:\n\nBefore an agent posts from your repo, would you rather review the final copy first or the evidence behind it?",
+        "standard": "I am designing Wingbeat's pre-publish preview.\n\nWhich should be the first thing you see?\n\n1. final X copy\n2. why this story was chosen\n3. source evidence for each claim",
+        "premiumLong": "Question for developers building in public:\n\nIf an agent drafts a post from your repo, what would make you trust an auto-publish window?\n\nMy current answer is final copy, evidence, avoided claims, edit/block/delay controls, and a receipt after publish.\n\nWhat would still make you nervous?",
+        "videoCaption": "Feedback ask: this is the pre-publish preview. Which proof should be surfaced first?",
+        "altShort": "Would you trust a repo-to-X agent more if it showed the blocked claims, not just the final post?",
+        "altStandard": "I need a sharper trust boundary for Wingbeat.\n\nIs the useful preview the polished post, the evidence map, or the list of claims the critic refused to make?"
+      },
+      "evidenceGate": "Requires one decision that feedback can change; ask a specific builder question, not Thoughts?",
+      "exampleCount": 6
+    },
+    {
+      "id": "changelog-update",
+      "audienceIntent": "Quickly understand what changed and whether it affects them.",
+      "evidenceRequired": [
+        "changedSurface",
+        "userImpact",
+        "sourceOrLink"
+      ],
+      "useWhen": "One or more small updates are real and useful.",
+      "avoidWhen": "The update is not relevant outside maintainers.",
+      "emotionalPosture": "Concise, utilitarian.",
+      "hookFamilies": [
+        "New:",
+        "Updated:",
+        "This week in Wingbeat:",
+        "Small but important:"
+      ],
+      "beatSheet": [
+        "changed item",
+        "user impact",
+        "link/detail"
+      ],
+      "lengthBands": {
+        "short": [
+          70,
+          140
+        ],
+        "standard": [
+          150,
+          280
+        ],
+        "premium": [
+          500,
+          1200
+        ]
+      },
+      "lineBreakRhythm": "Outcome-led bullets acceptable.",
+      "ctaPatterns": [
+        "Read the changelog",
+        "Try the demo",
+        "none"
+      ],
+      "mediaPlacement": "Link at end; screenshot only if UI-visible.",
+      "hashtagPosture": "None.",
+      "forbiddenLanguage": [
+        "commit hashes",
+        "file names",
+        "dependency chores"
+      ],
+      "autoReject": [
+        "no user impact",
+        "no source"
+      ],
+      "examples": {
+        "short": "Execution states are now explicit: queue, veto, ready, blocked, published.\n\nA run cannot reach published without a recorded receipt.",
+        "standard": "Wingbeat update:\n\n- failed drafts keep their critic trace\n- X jobs expose queue/veto/ready/blocked/published\n- published requires a receipt field, not just good copy",
+        "premiumLong": "Wingbeat changelog:\n\n1. Failed drafts now stay attached to the run.\n2. X execution states are explicit.\n3. The console reads the persisted run instead of a hand-copied story.\n4. Published means a receipt exists.\n\nLess flashy than generated copy, much more important for trust.",
+        "videoCaption": "Changelog demo: blocked, ready, and published are now visibly different states.",
+        "altShort": "Small update with a big trust effect: ready and published are no longer allowed to mean the same thing.",
+        "altStandard": "This week's useful change: Wingbeat stopped treating a clean draft as a successful publish.\n\nThe execution state now has to prove where the post actually is."
+      },
+      "evidenceGate": "Use for grouped small updates only when every bullet has user/operator impact.",
+      "exampleCount": 6
+    },
+    {
+      "id": "demo-video-post",
+      "audienceIntent": "Watch the product do one concrete thing.",
+      "evidenceRequired": [
+        "visibleAction",
+        "videoAsset",
+        "outcome"
+      ],
+      "useWhen": "A real video/GIF/screen recording exists.",
+      "avoidWhen": "The visual does not prove the claim.",
+      "emotionalPosture": "Show, do not oversell.",
+      "hookFamilies": [
+        "Demo:",
+        "Watch Wingbeat...",
+        "This is the loop:",
+        "From X to Y in..."
+      ],
+      "beatSheet": [
+        "visible action",
+        "why it matters",
+        "CTA"
+      ],
+      "lengthBands": {
+        "short": [
+          70,
+          180
+        ],
+        "standard": [
+          180,
+          260
+        ],
+        "premium": [
+          300,
+          700
+        ]
+      },
+      "lineBreakRhythm": "One clear caption line plus optional context.",
+      "ctaPatterns": [
+        "watch",
+        "inspect",
+        "reply with project"
+      ],
+      "mediaPlacement": "Video is primary; link after context.",
+      "hashtagPosture": "None or #BuildInPublic for progress demo.",
+      "forbiddenLanguage": [
+        "quick demo without action",
+        "unmeasured speed claims"
+      ],
+      "autoReject": [
+        "no video asset",
+        "caption claims invisible behavior"
+      ],
+      "examples": {
+        "short": "Demo: the critic rejects a draft because the receipt field is empty.",
+        "standard": "Demo: Wingbeat catches a draft that says published before the executor has a receipt.\n\nThe visible part: the claim fails, the run stays out of published, and the rejection is kept.",
+        "premiumLong": "Demo of the trust boundary I care about most:\n\nA draft can sound good. It can even be ready for handoff.\n\nBut if it claims a public post exists before the receipt exists, Wingbeat blocks the sentence and keeps the failure visible in the run.",
+        "videoCaption": "Critic vetoes the published claim because the receipt field is empty.",
+        "altShort": "Watch ready stop before published. The missing receipt is the whole point.",
+        "altStandard": "Demo: a confident X draft hits the evidence gate.\n\nThe video shows the rejected sentence, the missing receipt, and the run staying in the correct state."
+      },
+      "evidenceGate": "Requires a real video/GIF/screen recording whose visible content proves the caption claim.",
+      "exampleCount": 6,
+      "requiresVisibleAsset": true
+    },
+    {
+      "id": "open-source-repo-launch",
+      "audienceIntent": "Decide whether to inspect, star, fork, contribute, or use.",
+      "evidenceRequired": [
+        "repoUrl",
+        "license",
+        "currentStatus",
+        "whatWorks",
+        "contributionPath"
+      ],
+      "useWhen": "Repository is public or a major open-source milestone ships.",
+      "avoidWhen": "Repo is private or not ready for inspection.",
+      "emotionalPosture": "Transparent, invitation-oriented.",
+      "hookFamilies": [
+        "Open-sourcing...",
+        "The Wingbeat repo is public",
+        "I made the repo inspectable",
+        "If you want to see..."
+      ],
+      "beatSheet": [
+        "repo state",
+        "what it contains",
+        "what works",
+        "where help is useful"
+      ],
+      "lengthBands": {
+        "short": [
+          120,
+          180
+        ],
+        "standard": [
+          200,
+          280
+        ],
+        "premium": [
+          700,
+          1500
+        ]
+      },
+      "lineBreakRhythm": "Lead with access; bullets for what is inside.",
+      "ctaPatterns": [
+        "inspect repo",
+        "open issue",
+        "suggest starter issue"
+      ],
+      "mediaPlacement": "Repo link at end; screenshot optional.",
+      "hashtagPosture": "Optional #OpenSource.",
+      "forbiddenLanguage": [
+        "production-ready without evidence",
+        "stars before value"
+      ],
+      "autoReject": [
+        "no repo link/license/status",
+        "contributor traction claim without evidence"
+      ],
+      "examples": {
+        "short": "Open-sourcing Wingbeat as an inspectable prototype for repo-to-X marketing agents.\n\nThe trust boundary is the part I most want reviewed.",
+        "standard": "The Wingbeat repo is public.\n\nIt includes the local agency runtime, content package shape, operator console, and X execution state machine.\n\nStill early; best review target is the evidence and publish boundary.",
+        "premiumLong": "Open-sourcing Wingbeat.\n\nIt is an early prototype, not a hosted service.\n\nWorth inspecting: how project evidence becomes a content package, how drafts are evaluated, how X handoff state is represented, and why the repo refuses to call anything published without a receipt.",
+        "videoCaption": "Repo tour: evidence package, critic history, X job state, receipt field.",
+        "altShort": "The Wingbeat repo is public for review: local runtime, X handoff state, and the claim gates around publish.",
+        "altStandard": "Open-source note: Wingbeat is ready for inspection, not production claims.\n\nIf you review one thing, review whether the evidence gates are strict enough before X copy leaves draft."
+      },
+      "evidenceGate": "Disabled unless public repo URL, license, and contribution/inspection path are present. If not, use milestone-proof or technical-decision.",
+      "exampleCount": 6,
+      "requiresExplicitAvailabilityEvidence": true
+    },
+    {
+      "id": "waitlist-early-access",
+      "audienceIntent": "Understand whether they can try it and why early access matters.",
+      "evidenceRequired": [
+        "accessState",
+        "eligibility",
+        "testerValue",
+        "feedbackNeeded"
+      ],
+      "useWhen": "A real waitlist or early access path exists.",
+      "avoidWhen": "No collection mechanism or follow-up path exists.",
+      "emotionalPosture": "Inviting, specific, humble.",
+      "hookFamilies": [
+        "Opening early access for...",
+        "Looking for X builders to try...",
+        "If your repo has stories you never post..."
+      ],
+      "beatSheet": [
+        "who",
+        "problem",
+        "what early access includes",
+        "ask"
+      ],
+      "lengthBands": {
+        "short": [
+          120,
+          180
+        ],
+        "standard": [
+          200,
+          280
+        ],
+        "premium": [
+          500,
+          1000
+        ]
+      },
+      "lineBreakRhythm": "Audience/problem lead; CTA last.",
+      "ctaPatterns": [
+        "reply",
+        "DM",
+        "form link"
+      ],
+      "mediaPlacement": "Waitlist link at end; demo visual helps.",
+      "hashtagPosture": "None.",
+      "forbiddenLanguage": [
+        "fake scarcity",
+        "fake batch size",
+        "join thousands"
+      ],
+      "autoReject": [
+        "no access path",
+        "no tester profile"
+      ],
+      "examples": {
+        "short": "Looking for a few technical builders to test Wingbeat on active repos.\n\nBest fit: you ship often, but your updates stay trapped in code and notes.",
+        "standard": "Opening early access for Wingbeat.\n\nI am looking for developers with active projects who want X posts grounded in repo evidence, not invented launch copy.\n\nReply with the kind of project you would test it on.",
+        "premiumLong": "I am looking for early Wingbeat testers.\n\nBest fit: developer-facing product, meaningful work in repo/docs, desire to post more consistently on X, and low tolerance for fake proof.\n\nThe first loop is narrow: inspect project evidence, draft a build-in-public post, and stop before publishing until the handoff is approved.",
+        "videoCaption": "Early access preview: repo evidence becomes a checked X draft before any publish step.",
+        "altShort": "If your repo has stories you never post, I want you in the first Wingbeat test group.",
+        "altStandard": "Early access ask: bring an active repo and a healthy distrust of AI marketing copy.\n\nI want to test whether Wingbeat can find useful public stories without inventing proof."
+      },
+      "evidenceGate": "Disabled unless there is a real access path. If missing, convert to community-feedback or product-introduction.",
+      "exampleCount": 6,
+      "requiresExplicitAvailabilityEvidence": true
+    },
+    {
+      "id": "comparison-contrarian",
+      "audienceIntent": "Hear a useful distinction or disagreement.",
+      "evidenceRequired": [
+        "comparedAlternatives",
+        "specificClaim",
+        "wingbeatStance",
+        "caveat"
+      ],
+      "useWhen": "A contrast clarifies product philosophy.",
+      "avoidWhen": "It punches at competitors without evidence.",
+      "emotionalPosture": "Opinionated but fair.",
+      "hookFamilies": [
+        "I do not want Wingbeat to be...",
+        "Contrarian take:",
+        "The wrong abstraction is...",
+        "Most tools start at X. Wingbeat starts at Y."
+      ],
+      "beatSheet": [
+        "common belief/tool",
+        "disagreement",
+        "why",
+        "Wingbeat alternative",
+        "caveat"
+      ],
+      "lengthBands": {
+        "short": [
+          100,
+          160
+        ],
+        "standard": [
+          180,
+          280
+        ],
+        "premium": [
+          600,
+          1600
+        ]
+      },
+      "lineBreakRhythm": "Bold first line, then nuance.",
+      "ctaPatterns": [
+        "Agree/disagree? only when debate is useful"
+      ],
+      "mediaPlacement": "Optional diagram; avoid competitor logos.",
+      "hashtagPosture": "None.",
+      "forbiddenLanguage": [
+        "strawmen",
+        "rage bait",
+        "unsupported competitor claims"
+      ],
+      "autoReject": [
+        "no nuance",
+        "no evidence",
+        "generic contrarian phrasing"
+      ],
+      "examples": {
+        "short": "I do not want Wingbeat to be a tweet generator.\n\nThe tweet is the last artifact. The evidence decision comes first.",
+        "standard": "Contrarian take for AI marketing tools:\n\nwriting more posts is the easy part.\n\nThe hard part is deciding what should be said, what must not be said, and what proof has to exist before publish.",
+        "premiumLong": "I am trying not to build Wingbeat as a scheduler with an LLM bolted on.\n\nThat starts too late.\n\nBy the time a post is scheduled, the important questions are upstream: what happened, why it matters, who should care, what evidence exists, and which claim is tempting but unsafe.",
+        "videoCaption": "Post generator vs evidence gate: the same draft fails for different reasons.",
+        "altShort": "Most social tools start with a blank composer.\n\nWingbeat starts with the project evidence.",
+        "altStandard": "The wrong abstraction is \"write me a tweet.\"\n\nThe better one is \"what changed, who should care, and what are we allowed to claim?\""
+      },
+      "evidenceGate": "Use sparingly; contrast must clarify Wingbeat without unsupported competitor claims.",
+      "exampleCount": 6
+    },
+    {
+      "id": "thread-opener",
+      "audienceIntent": "Decide whether a longer explanation is worth reading.",
+      "evidenceRequired": [
+        "multiStepStory",
+        "threadMap",
+        "followUpSubstance"
+      ],
+      "useWhen": "Explaining architecture, launch story, postmortem, or framework.",
+      "avoidWhen": "The idea fits in one post.",
+      "emotionalPosture": "Promise value, then deliver.",
+      "hookFamilies": [
+        "I built X. Here's the exact loop:",
+        "The architecture behind...",
+        "What I learned building...",
+        "From repo to X post:"
+      ],
+      "beatSheet": [
+        "hook",
+        "promise",
+        "thread map",
+        "first useful detail"
+      ],
+      "lengthBands": {
+        "short": [
+          180,
+          280
+        ],
+        "standard": [
+          180,
+          280
+        ],
+        "premium": [
+          180,
+          280
+        ]
+      },
+      "lineBreakRhythm": "Opener should stand alone; follow-ups carry one idea each.",
+      "ctaPatterns": [
+        "final reply asks for feedback or points to artifact"
+      ],
+      "mediaPlacement": "Visual in opener if it earns attention; links in final reply.",
+      "hashtagPosture": "None.",
+      "forbiddenLanguage": [
+        "A thread as only promise",
+        "vague hooks",
+        "bait and switch"
+      ],
+      "autoReject": [
+        "no thread map",
+        "not enough substance for 4+ replies"
+      ],
+      "examples": {
+        "short": "I built Wingbeat's first X loop around one rule: no evidence, no post.\n\nHere is the architecture behind that boundary:",
+        "standard": "Wingbeat is not a prompt that writes tweets.\n\nIt is a loop: project evidence -> claim check -> X draft -> handoff gate -> receipt.\n\nHere is what each step is allowed to change:",
+        "premiumLong": "I am building Wingbeat for developers who ship more than they market.\n\nThe first loop is narrow: turn real project work into a source-checked X post, then stop before publishing until the handoff and receipt rules are satisfied.\n\nThread:",
+        "videoCaption": "Thread with demo: why ready, handoff, and final receipt are separate states.",
+        "altShort": "From repo change to X post, the dangerous part is the claim boundary.\n\nThread on the Wingbeat loop:",
+        "altStandard": "A useful marketing agent needs more than a good first draft.\n\nIt needs evidence, blocked claims, channel adaptation, and a receipt gate.\n\nHere is how Wingbeat splits those jobs:"
+      },
+      "evidenceGate": "Use only when the story needs at least four useful replies; opener must stand alone and promise concrete substance.",
+      "exampleCount": 6
+    },
+    {
+      "id": "follow-up-replies",
+      "audienceIntent": "Answer objections, add context, continue discussion, or convert interest.",
+      "evidenceRequired": [
+        "replyTarget",
+        "supportedAnswer",
+        "safeCTA"
+      ],
+      "useWhen": "Responding under own post or in thread follow-ups.",
+      "avoidWhen": "Reply would overclaim, argue defensively, or expose private detail.",
+      "emotionalPosture": "Concise, generous, specific.",
+      "hookFamilies": [
+        "Direct answer",
+        "The key distinction...",
+        "Concrete example:",
+        "The current limitation..."
+      ],
+      "beatSheet": [
+        "answer",
+        "evidence/detail",
+        "next step"
+      ],
+      "lengthBands": {
+        "short": [
+          40,
+          180
+        ],
+        "standard": [
+          40,
+          180
+        ],
+        "premium": [
+          120,
+          280
+        ]
+      },
+      "lineBreakRhythm": "One or two small paragraphs.",
+      "ctaPatterns": [
+        "answer first, link/repo/DM only if relevant"
+      ],
+      "mediaPlacement": "Only when it resolves the reply.",
+      "hashtagPosture": "Never.",
+      "forbiddenLanguage": [
+        "canned replies",
+        "salesy DMs",
+        "dunking",
+        "unsupported roadmap promises"
+      ],
+      "autoReject": [
+        "does not answer parent",
+        "repeats original post"
+      ],
+      "examples": {
+        "short": "The key distinction: ready for handoff is not the same as published.",
+        "standard": "Current limitation: the local prototype can prepare the X handoff, but a run is only published after a verified public URL is recorded.\n\nThat constraint is intentional.",
+        "premiumLong": "Concrete example: if the repo shows a safe browser handoff was added, Wingbeat can say that.\n\nIt cannot say the post went live unless the execution job has a verified X receipt attached.",
+        "videoCaption": "Reply with a clipped moment only when the clip shows the state or claim being discussed.",
+        "altShort": "Yep. I am treating the receipt as product state, not a nice-to-have log line.",
+        "altStandard": "That is exactly the boundary I am testing: the agent can draft and prepare, but the product cannot call it published until the external receipt exists."
+      },
+      "evidenceGate": "Use only when replying to a specific parent; answer first, then add evidence or next step.",
+      "exampleCount": 6
+    }
+  ],
+  "categoryIdFormat": "kebab-case",
+  "idMigration": [
+    {
+      "from": "daily_build_log",
+      "to": "daily-build-log"
+    },
+    {
+      "from": "product_introduction",
+      "to": "product-introduction"
+    },
+    {
+      "from": "product_launch",
+      "to": "product-launch"
+    },
+    {
+      "from": "feature_intro_launch",
+      "to": "feature-intro-launch"
+    },
+    {
+      "from": "insight_lesson",
+      "to": "insight-lesson"
+    },
+    {
+      "from": "milestone_proof",
+      "to": "milestone-proof"
+    },
+    {
+      "from": "failure_learning",
+      "to": "failure-learning"
+    },
+    {
+      "from": "technical_decision",
+      "to": "technical-decision"
+    },
+    {
+      "from": "experiment_result",
+      "to": "experiment-result"
+    },
+    {
+      "from": "community_feedback",
+      "to": "community-feedback"
+    },
+    {
+      "from": "changelog_update",
+      "to": "changelog-update"
+    },
+    {
+      "from": "demo_video_post",
+      "to": "demo-video-post"
+    },
+    {
+      "from": "open_source_repo_launch",
+      "to": "open-source-repo-launch"
+    },
+    {
+      "from": "waitlist_early_access",
+      "to": "waitlist-early-access"
+    },
+    {
+      "from": "comparison_contrarian",
+      "to": "comparison-contrarian"
+    },
+    {
+      "from": "thread_opener",
+      "to": "thread-opener"
+    },
+    {
+      "from": "follow_up_replies",
+      "to": "follow-up-replies"
+    }
+  ],
+  "grokReview": {
+    "conversationUrl": "https://x.com/i/grok?conversation=2076215460920705132",
+    "promptScope": "Wingbeat product/prose brief, category definitions, selected examples, and evaluation rules only.",
+    "acceptedThemes": [
+      "Normalize machine category ids to kebab-case.",
+      "Keep 17 semantic categories but add stricter evidence gates for launch, open-source, waitlist, and video categories.",
+      "Stop reintroducing Wingbeat in progress categories.",
+      "Vary repeated nouns around source-backed, safety boundary, handoff, and receipt.",
+      "Make examples more concrete and less template-like.",
+      "Make video captions describe visible behavior only.",
+      "Add duplicate/template-similarity validation."
+    ],
+    "rejectedThemes": [
+      "Do not remove product-launch, open-source-repo-launch, or waitlist-early-access; keep them as gated categories because the visual pipeline needs the full taxonomy.",
+      "Do not merge insight-lesson and failure-learning; keep both but clarify routing and gates."
+    ]
+  }
+}
