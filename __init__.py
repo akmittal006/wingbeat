@@ -140,6 +140,24 @@ def _automate(args) -> None:
     raise SystemExit(registered.returncode)
 
 
+def _sync_automation(args) -> None:
+    builder = PLUGIN_DIR / "scripts" / "automation-builder.mjs"
+    compiled = subprocess.run(
+        [_node_executable(), str(builder), "compile", args.request],
+        cwd=str(PLUGIN_DIR), capture_output=True, text=True,
+    )
+    if compiled.returncode != 0:
+        print(compiled.stderr or compiled.stdout, file=sys.stderr)
+        raise SystemExit(compiled.returncode)
+    workflow = json.loads(compiled.stdout)
+    workflow["name"] = args.name
+    registered = subprocess.run(
+        [_node_executable(), str(builder), "register", json.dumps(workflow), args.cron_id],
+        cwd=str(PLUGIN_DIR),
+    )
+    raise SystemExit(registered.returncode)
+
+
 def _wingbeat_cli(args) -> None:
     command = getattr(args, "wingbeat_command", None)
     if command == "run":
@@ -153,6 +171,9 @@ def _wingbeat_cli(args) -> None:
         return
     if command == "automate":
         _automate(args)
+        return
+    if command == "sync-automation":
+        _sync_automation(args)
         return
 
     print("Usage: hermes wingbeat {run,post-x}")
@@ -197,6 +218,11 @@ def _setup_cli(subparser) -> None:
     automate = subcommands.add_parser("automate", help="Build and install a general-purpose Wingbeat automation")
     automate.add_argument("request", help="Natural-language automation goal including its schedule")
     automate.set_defaults(func=_wingbeat_cli)
+    sync_automation = subcommands.add_parser("sync-automation", help="Register an existing Hermes cron in Wingbeat")
+    sync_automation.add_argument("--cron-id", required=True, help="Existing Hermes cron job ID")
+    sync_automation.add_argument("--name", required=True, help="Automation name shown in Wingbeat")
+    sync_automation.add_argument("--request", required=True, help="Original automation request including its schedule")
+    sync_automation.set_defaults(func=_wingbeat_cli)
 
 
 def _slash_help(raw_args: str) -> str:

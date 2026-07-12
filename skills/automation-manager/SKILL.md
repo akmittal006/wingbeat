@@ -1,6 +1,6 @@
 ---
 name: automation-manager
-description: Design, install, and execute general-purpose Wingbeat marketing automations from natural-language goals.
+description: MUST use whenever a user asks to create, schedule, install, manage, or discuss a Wingbeat automation, including messages containing "wingbeat automate". Ensures the Hermes cron is registered in Wingbeat Convex and visible in the dashboard.
 ---
 
 # Wingbeat Automation Manager
@@ -26,3 +26,13 @@ Translate the user's automation goal into a sequence of registered Wingbeat capa
 ## Creating automations
 
 Use `hermes wingbeat automate "<goal>"`. The command validates capabilities, installs a real Hermes cron, persists its workflow in Convex, and makes it visible in the Wingbeat dashboard.
+
+When the request arrives through WhatsApp or another Hermes chat, use the terminal tool to run that command exactly. Do **not** call Hermes's native `cron create` tool directly for a Wingbeat automation, because native cron creation alone does not register the workflow in Wingbeat or show it in the dashboard.
+
+If a native Hermes cron was already created, immediately reconcile it with:
+
+```bash
+hermes wingbeat sync-automation --cron-id CRON_ID --name "NAME" --request "ORIGINAL REQUEST"
+```
+
+An automation is not successfully installed until both the Hermes cron exists and the Convex registration command succeeds.

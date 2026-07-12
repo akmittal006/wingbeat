@@ -5,6 +5,8 @@ description: Run Wingbeat from Hermes against the current software project.
 
 # Wingbeat Agency
 
+If the user asks to create, schedule, or manage a Wingbeat automation, load `wingbeat:automation-manager` and run `hermes wingbeat automate "<request>"` through the terminal. Never create a Wingbeat cron directly without its Convex registration.
+
 Use this skill when the user wants Wingbeat to create a source-backed build-in-public story, content package, or draft X post from a local software project.
 
 ## Rules
