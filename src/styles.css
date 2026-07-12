@@ -20,7 +20,7 @@
   --utility-surface: #181918;
 
   /* elevated selected pill (active tab) */
-  --pill-active-bg: #2c2c2e;
+  --pill-active-bg: #38383b;
 
   /* text: near-white primary, warm muted grays below */
   --text: #f4f4f5;
@@ -197,8 +197,9 @@ a {
 
 .ops-tab.active {
   background: var(--pill-active-bg);
-  border-color: var(--line-strong);
+  border-color: rgba(255, 255, 255, 0.28);
   color: var(--text);
+  font-weight: 600;
 }
 
 .ops-main {
