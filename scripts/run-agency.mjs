@@ -37,8 +37,8 @@ Usage:
   node scripts/run-agency.mjs [--trigger NAME] [--objective TEXT] [--no-hermes]
 
 Outputs:
-  Writes a UI-consumable AgencyRun JSON file under src/agency/runs/.
-  Prints the exact output path and a compact run summary.`
+  Writes the run, trace events, package, memory, and queued execution job to Convex.
+  Prints the Convex identifiers and a compact run summary.`
 }
 
 const args = parseArgs(process.argv.slice(2))
@@ -56,16 +56,16 @@ try {
     objective: args.objective,
     useHermes: args.useHermes,
   })
-  const output = persistRun(rootDir, run)
+  const output = await persistRun(rootDir, run)
 
   console.log(`Wingbeat agency run complete`)
   console.log(`runId: ${run.id}`)
   console.log(`status: ${run.status}`)
   console.log(`crew: ${run.agents.map((agent) => agent.role).join(" -> ")}`)
   console.log(`hermes: ${run.generation?.provider ?? "unknown"} (${run.generation?.status ?? "unknown"})`)
-  console.log(`output: ${output.runPath}`)
-  console.log(`latest: ${output.latestPath}`)
-  console.log(`dashboard: ${output.publicLatestPath}`)
+  console.log(`convex: ${output.convexUrl}`)
+  console.log(`convexRunId: ${output.runId}`)
+  console.log(`convexJobId: ${output.jobId}`)
 } catch (error) {
   console.error(error instanceof Error ? error.message : String(error))
   process.exit(1)

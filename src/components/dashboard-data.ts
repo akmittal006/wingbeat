@@ -34,35 +34,6 @@ export type DashboardRun = AgencyRun & {
   evaluation?: unknown
 }
 
-export const fallbackRun: DashboardRun = {
-  id: "no-live-run",
-  project: "Wingbeat",
-  trigger: "Waiting for /data/latest-run.json",
-  status: "running",
-  startedAt: new Date(0).toISOString(),
-  package: {
-    id: "no-package",
-    project: "Wingbeat",
-    category: "build-in-public",
-    whatChanged: "No live run has been loaded yet.",
-    whyItMatters: "The console is ready, but it is not inventing run output.",
-    audience: "Operator",
-    narrative: "Waiting for real run data from /data/latest-run.json.",
-    supportedClaims: [],
-    prohibitedClaims: [],
-    hooks: [],
-    channelNeutralBody: "No channel-neutral package loaded.",
-    evidence: [],
-    confidence: 0,
-    adaptation: {
-      channel: "x",
-      copy: "No X adaptation loaded.",
-    },
-  },
-  agents: [],
-  events: [],
-}
-
 export function getExecutionJobs(run: DashboardRun): ExecutionJob[] {
   return run.executionJobs ?? (run.executionJob ? [run.executionJob] : [])
 }

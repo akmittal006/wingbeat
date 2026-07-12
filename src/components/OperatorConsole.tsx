@@ -51,7 +51,7 @@ interface OperatorConsoleProps {
   onViewChange: (view: ViewKey) => void
   selectedAgentId: string
   onSelectAgent: (agentId: string) => void
-  dataSource: "remote" | "fallback"
+  dataSource: "convex"
 }
 
 const navItems: Array<{ key: ViewKey; label: string; icon: typeof Activity }> = [
@@ -91,7 +91,7 @@ export function OperatorConsole({
             <span>Search runs, agents, evidence</span>
           </div>
           <StatusChip status={run.status} />
-          <span className="source-pill">{dataSource === "remote" ? "Live data" : "Fallback: no run"}</span>
+          <span className="source-pill">Convex live</span>
         </div>
       </header>
 

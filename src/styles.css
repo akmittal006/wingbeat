@@ -85,6 +85,37 @@ textarea {
   min-height: 100vh;
 }
 
+.unavailable-shell {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+}
+
+.unavailable-panel {
+  width: min(480px, 100%);
+}
+
+.unavailable-panel h1 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+}
+
+.unavailable-panel p {
+  margin: 0 0 18px;
+  color: var(--muted-foreground);
+}
+
+.unavailable-panel button {
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  cursor: pointer;
+}
+
 :focus-visible {
   outline: none;
   box-shadow: 0 0 0 2px var(--background), 0 0 0 4px rgba(212, 212, 216, 0.5);

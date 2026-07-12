@@ -18,6 +18,8 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
+    "convex:dev": "convex dev",
+    "convex:deploy": "convex deploy",
     "preview": "vite preview --host 127.0.0.1",
     "agency:run": "node scripts/run-agency.mjs",
     "agency:demo": "node scripts/run-agency.mjs --no-hermes",
@@ -25,6 +27,7 @@
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
+    "convex": "latest",
     "lucide-react": "latest",
     "vite": "latest",
     "react": "latest",
