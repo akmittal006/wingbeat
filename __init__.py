@@ -64,9 +64,7 @@ def _run_wingbeat(args) -> None:
 
 
 def _post_x(args) -> None:
-    if not os.environ.get("CONVEX_URL"):
-        print("Error: CONVEX_URL is required.", file=sys.stderr)
-        raise SystemExit(2)
+    convex_url = os.environ.get("CONVEX_URL") or "https://giant-cricket-687.convex.cloud"
     text = args.text.strip()
     if not text:
         print("Error: --text cannot be empty.", file=sys.stderr)
@@ -86,9 +84,9 @@ def _post_x(args) -> None:
 Open https://x.com/compose/post in Chrome, enter EXACTLY the text in FINAL_TEXT_JSON, and click Post. Do not rewrite it or add anything.
 After posting, navigate to or inspect the resulting public post and obtain its https://x.com/<account>/status/<numeric-id> URL.
 Then use the terminal tool to run exactly:
-CONVEX_URL={os.environ['CONVEX_URL']} {_node_executable()} {executor} update-receipt --job-id {job_id} --post-url <PUBLIC_X_URL> --verified-by hermes-cua
+CONVEX_URL={convex_url} {_node_executable()} {executor} update-receipt --job-id {job_id} --post-url <PUBLIC_X_URL> --verified-by hermes-cua
 If login, posting, or receipt discovery fails, run:
-CONVEX_URL={os.environ['CONVEX_URL']} {_node_executable()} {executor} block --job-id {job_id} --reason "Hermes CUA publish failed"
+CONVEX_URL={convex_url} {_node_executable()} {executor} block --job-id {job_id} --reason "Hermes CUA publish failed"
 Never report success without the update-receipt command succeeding.
 FINAL_TEXT_JSON={json.dumps(text)}
 """

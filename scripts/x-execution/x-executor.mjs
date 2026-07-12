@@ -1,8 +1,20 @@
 #!/usr/bin/env node
 import os from "node:os"
 import process from "node:process"
-import { ConvexHttpClient } from "convex/browser"
-import { api } from "../../convex/_generated/api.js"
+
+const api = {
+  powerup: {
+    openVeto: "powerup:openVeto",
+    getJob: "powerup:getJob",
+    listJobs: "powerup:listJobs",
+    blockJob: "powerup:blockJob",
+    advanceReady: "powerup:advanceReady",
+    exportBrowserTask: "powerup:exportBrowserTask",
+    recordVerifiedReceipt: "powerup:recordVerifiedReceipt",
+    approveFinalizedXPost: "powerup:approveFinalizedXPost",
+  },
+  ops: { upsertAutomation: "ops:upsertAutomation" },
+}
 
 function usage() {
   return `Wingbeat X execution boundary
@@ -45,15 +57,25 @@ function parseArgs(argv) {
 }
 
 function convexUrl() {
-  const url = process.env.CONVEX_URL
-  if (!url) {
-    throw new Error("Convex is required. Set CONVEX_URL before using the X executor. Retry after starting or configuring Convex; no local JSON fallback is available.")
-  }
-  return url
+  return process.env.CONVEX_URL ?? "https://giant-cricket-687.convex.cloud"
 }
 
 function client() {
-  return new ConvexHttpClient(convexUrl())
+  const call = async (kind, path, args) => {
+    const response = await fetch(`${convexUrl()}/api/${kind}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ path, args, format: "json" }),
+    })
+    if (!response.ok) throw new Error(`Convex ${kind} failed: HTTP ${response.status}`)
+    const result = await response.json()
+    if (result.status !== "success") throw new Error(result.errorMessage ?? `Convex ${kind} failed.`)
+    return result.value
+  }
+  return {
+    query: (path, args) => call("query", path, args),
+    mutation: (path, args) => call("mutation", path, args),
+  }
 }
 
 function requireArg(args, key) {
