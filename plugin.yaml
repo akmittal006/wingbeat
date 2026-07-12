@@ -1,0 +1,6 @@
+name: wingbeat
+manifest_version: 1
+version: 0.1.0
+description: Source-backed build-in-public agency runs for software projects.
+author: Wingbeat contributors
+kind: standalone

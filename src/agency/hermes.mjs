@@ -6,17 +6,18 @@ function estimateTokens(text) {
 
 export function deterministicNarrative(context) {
   const dirtyFiles = context.layers.currentJob.dirtyFiles
-  const changedSurface = dirtyFiles.length > 0 ? dirtyFiles.slice(0, 5).join(", ") : "the MVP agency spine"
+  const changedSurface = dirtyFiles.length > 0 ? dirtyFiles.slice(0, 5).join(", ") : "the current repository state"
   const latestCommit = context.layers.projectHistory.recentCommits.split(/\r?\n/).find(Boolean) ?? "no commit history"
   const evidenceLabels = context.evidence.map((item) => item.label.replace(/\.md$/, "")).join(", ")
   const workspaceDigest = context.contextReferences.find((item) => item.id === "ctx-workspace-shape")?.digest ?? "unknown"
+  const project = context.project || "this project"
   return {
     provider: "deterministic-fallback",
     status: "fallback",
     text:
-      `Building Wingbeat, an AI Marketing Agency for indie developers. ` +
-      `Wingbeat helps builders turn shipping work into consistent marketing without claiming a live post before there is a receipt. ` +
-      `This local run used ${evidenceLabels || "local evidence"} plus git context (${latestCommit}) to draft from its own codebase. ` +
+      `Building ${project} in public. ` +
+      `This Wingbeat run used ${evidenceLabels || "local evidence"} plus git context (${latestCommit}) to prepare a source-backed story without publishing it. ` +
+      `${context.description || "The project was summarized from local files."} ` +
       `Current proof ${workspaceDigest}: ${changedSurface}.`,
     usage: {
       promptTokens: 0,

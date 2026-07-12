@@ -6,7 +6,7 @@ The boundary deliberately does not create OAuth tokens, read browser profiles, o
 
 ## State Model
 
-Jobs live in Convex. Set `CONVEX_URL` or `VITE_CONVEX_URL` before using the executor.
+Jobs live in Convex. Set `CONVEX_URL` before using the executor. `VITE_CONVEX_URL` is only for the dashboard.
 
 The Convex execution job is the execution source of truth. State-changing commands call server-side mutations that validate run/job matches and allowed transitions. There is no local state file and no run JSON mirror.
 

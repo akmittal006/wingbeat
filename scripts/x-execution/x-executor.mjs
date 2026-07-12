@@ -19,7 +19,7 @@ Usage:
 
 Safety:
   This CLI never authenticates to X, never reads browser profiles, and never stores cookies.
-  Convex is the only persistent execution state. Set CONVEX_URL or VITE_CONVEX_URL.`
+  Convex is the only persistent execution state. Set CONVEX_URL.`
 }
 
 function parseArgs(argv) {
@@ -44,9 +44,9 @@ function parseArgs(argv) {
 }
 
 function convexUrl() {
-  const url = process.env.CONVEX_URL ?? process.env.VITE_CONVEX_URL
+  const url = process.env.CONVEX_URL
   if (!url) {
-    throw new Error("Convex is required. Set CONVEX_URL or VITE_CONVEX_URL before using the X executor.")
+    throw new Error("Convex is required. Set CONVEX_URL before using the X executor. Retry after starting or configuring Convex; no local JSON fallback is available.")
   }
   return url
 }

@@ -3,8 +3,10 @@ import fs from "node:fs"
 import path from "node:path"
 import { execFileSync } from "node:child_process"
 
-const DOCS = [
+const PREFERRED_DOCS = [
+  "README.md",
   "docs/product-concept.md",
+  "docs/architecture.md",
   "docs/two-hour-mvp-roadmap.md",
   "docs/browser-x-executor.md",
 ]
@@ -60,12 +62,11 @@ function walkFiles(rootDir, current = rootDir, files = []) {
   return files
 }
 
-function readPackageName(rootDir) {
+function readPackage(rootDir) {
   try {
-    const pkg = JSON.parse(readIfExists(path.join(rootDir, "package.json")))
-    return typeof pkg.name === "string" ? pkg.name : "wingbeat"
+    return JSON.parse(readIfExists(path.join(rootDir, "package.json")))
   } catch {
-    return "wingbeat"
+    return {}
   }
 }
 
@@ -80,8 +81,26 @@ function normalizeRepositoryUrl(remoteUrl) {
   return undefined
 }
 
-function docEvidence(rootDir) {
-  return DOCS.map((relativePath, index) => {
+function projectName(rootDir) {
+  const pkg = readPackage(rootDir)
+  if (typeof pkg.name === "string" && pkg.name.trim()) return pkg.name
+  return path.basename(rootDir) || "project"
+}
+
+function projectDescription(rootDir) {
+  const pkg = readPackage(rootDir)
+  if (typeof pkg.description === "string" && pkg.description.trim()) return pkg.description.trim()
+  const readme = firstNonEmptyLines(readIfExists(path.join(rootDir, "README.md")), 3)
+  return readme || "No project description found."
+}
+
+function docEvidence(rootDir, sourceFiles) {
+  const markdownDocs = sourceFiles
+    .filter((file) => file.toLowerCase().endsWith(".md"))
+    .filter((file) => file === "README.md" || file.startsWith("docs/"))
+  const candidates = [...new Set([...PREFERRED_DOCS, ...markdownDocs])].slice(0, 8)
+
+  return candidates.map((relativePath, index) => {
     const absolutePath = path.join(rootDir, relativePath)
     const content = readIfExists(absolutePath)
     if (!content) return undefined
@@ -95,7 +114,8 @@ function docEvidence(rootDir) {
   }).filter(Boolean)
 }
 
-function buildContextReferences({ docs, gitLog, gitStatus, sourceFiles, objective }) {
+function buildContextReferences({ project, description, docs, gitLog, gitStatus, sourceFiles, objective }) {
+  const primaryDoc = docs[0]?.detail || description
   return [
     {
       id: "ctx-current-job",
@@ -118,11 +138,10 @@ function buildContextReferences({ docs, gitLog, gitStatus, sourceFiles, objectiv
     {
       id: "ctx-brand-policy",
       layer: "brand_policy",
-      source: "docs/product-concept.md",
-      label: "Wingbeat product laws and publishing policy",
-      digest: docs[0]?.digest ?? "missing",
-      excerpt:
-        "Break down every barrier preventing consistent marketing. Content must be source-backed, channel-independent, and published only through a vetoable execution contract.",
+      source: docs[0]?.source ?? "package/readme",
+      label: `${project} positioning and publishing policy`,
+      digest: docs[0]?.digest ?? digest(description),
+      excerpt: primaryDoc,
     },
     {
       id: "ctx-workspace-shape",
@@ -136,15 +155,18 @@ function buildContextReferences({ docs, gitLog, gitStatus, sourceFiles, objectiv
 }
 
 export function collectProjectContext({ rootDir, trigger, objective }) {
-  const project = readPackageName(rootDir)
-  const docs = docEvidence(rootDir)
+  const project = projectName(rootDir)
+  const description = projectDescription(rootDir)
   const gitLog = git(rootDir, ["log", "--oneline", "--decorate", "-8"])
   const gitStatus = git(rootDir, ["status", "--short"])
   const diffStat = git(rootDir, ["diff", "--stat"])
   const repositoryUrl = normalizeRepositoryUrl(git(rootDir, ["remote", "get-url", "origin"]))
   const sourceFiles = walkFiles(rootDir)
+  const docs = docEvidence(rootDir, sourceFiles)
 
   const contextReferences = buildContextReferences({
+    project,
+    description,
     docs,
     gitLog,
     gitStatus,
@@ -154,6 +176,7 @@ export function collectProjectContext({ rootDir, trigger, objective }) {
 
   return {
     project,
+    description,
     trigger,
     objective,
     gatheredAt: new Date().toISOString(),
@@ -175,7 +198,7 @@ export function collectProjectContext({ rootDir, trigger, objective }) {
         docs,
       },
       brandPolicy: {
-        motto: "Break down every barrier preventing you from marketing consistently.",
+        motto: `Turn ${project} repository evidence into honest marketing material.`,
         firstChannel: "x",
         contentCategory: "build-in-public",
         guardrails: [
