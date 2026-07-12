@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import json
 import shutil
 import subprocess
 import sys
@@ -62,13 +63,52 @@ def _run_wingbeat(args) -> None:
     raise SystemExit(completed.returncode)
 
 
+def _post_x(args) -> None:
+    if not os.environ.get("CONVEX_URL"):
+        print("Error: CONVEX_URL is required.", file=sys.stderr)
+        raise SystemExit(2)
+    text = args.text.strip()
+    if not text:
+        print("Error: --text cannot be empty.", file=sys.stderr)
+        raise SystemExit(2)
+
+    executor = PLUGIN_DIR / "scripts" / "x-execution" / "x-executor.mjs"
+    approved = subprocess.run(
+        [_node_executable(), str(executor), "approve-final", "--text", text],
+        cwd=str(PLUGIN_DIR), capture_output=True, text=True,
+    )
+    if approved.returncode != 0:
+        print(approved.stderr or approved.stdout, file=sys.stderr)
+        raise SystemExit(approved.returncode)
+    job = json.loads(approved.stdout)
+    job_id = job["id"]
+    prompt = f"""Use the computer_use tool to publish one finalized post to X in Google Chrome.
+Open https://x.com/compose/post in Chrome, enter EXACTLY the text in FINAL_TEXT_JSON, and click Post. Do not rewrite it or add anything.
+After posting, navigate to or inspect the resulting public post and obtain its https://x.com/<account>/status/<numeric-id> URL.
+Then use the terminal tool to run exactly:
+CONVEX_URL={os.environ['CONVEX_URL']} {_node_executable()} {executor} update-receipt --job-id {job_id} --post-url <PUBLIC_X_URL> --verified-by hermes-cua
+If login, posting, or receipt discovery fails, run:
+CONVEX_URL={os.environ['CONVEX_URL']} {_node_executable()} {executor} block --job-id {job_id} --reason "Hermes CUA publish failed"
+Never report success without the update-receipt command succeeding.
+FINAL_TEXT_JSON={json.dumps(text)}
+"""
+    completed = subprocess.run(
+        ["hermes", "-z", prompt, "-t", "computer_use,terminal"],
+        cwd=str(PLUGIN_DIR),
+    )
+    raise SystemExit(completed.returncode)
+
+
 def _wingbeat_cli(args) -> None:
     command = getattr(args, "wingbeat_command", None)
     if command == "run":
         _run_wingbeat(args)
         return
+    if command == "post-x":
+        _post_x(args)
+        return
 
-    print("Usage: hermes wingbeat run [--project PATH] [--no-hermes]")
+    print("Usage: hermes wingbeat {run,post-x}")
     raise SystemExit(2)
 
 
@@ -99,6 +139,9 @@ def _setup_cli(subparser) -> None:
         help="Use the deterministic local fallback instead of calling Hermes/model providers.",
     )
     run.set_defaults(func=_wingbeat_cli)
+    post_x = subcommands.add_parser("post-x", help="Publish finalized text to X through Hermes Computer Use")
+    post_x.add_argument("--text", required=True, help="Finalized tweet text; posted exactly as provided")
+    post_x.set_defaults(func=_wingbeat_cli)
 
 
 def _slash_help(raw_args: str) -> str:
@@ -112,7 +155,8 @@ def _slash_help(raw_args: str) -> str:
         f"hermes wingbeat run --project {project}\n\n"
         "Set CONVEX_URL before running. Wingbeat writes the project, run, events, "
         "content package, memory records, and execution job to Convex only; it "
-        "does not publish."
+        "does not publish.\n\nPublish explicitly finalized text through Chrome CUA:\n"
+        'hermes wingbeat post-x --text "Final tweet"'
     )
 
 

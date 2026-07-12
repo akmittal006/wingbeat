@@ -11,6 +11,7 @@ Usage:
   node scripts/x-execution/x-executor.mjs prepare --run-id RUN [--job-id JOB] [--veto-seconds 60]
   node scripts/x-execution/x-executor.mjs show --job-id JOB
   node scripts/x-execution/x-executor.mjs list
+  node scripts/x-execution/x-executor.mjs approve-final --text "Final tweet"
   node scripts/x-execution/x-executor.mjs block --job-id JOB --reason "reason"
   node scripts/x-execution/x-executor.mjs advance --job-id JOB [--force]
   node scripts/x-execution/x-executor.mjs export-browser-task --job-id JOB --confirm-action-time "PUBLISH JOB"
@@ -96,6 +97,20 @@ async function commandList() {
   return client().query(api.powerup.listJobs, {})
 }
 
+async function commandApproveFinal(args) {
+  const result = await client().mutation(api.powerup.approveFinalizedXPost, {
+    text: requireArg(args, "text"),
+    operator: typeof args.operator === "string" ? args.operator : os.userInfo().username,
+  })
+  await client().mutation(api.ops.upsertAutomation, {
+    name: "Post to X",
+    channel: "x",
+    trigger: "hermes wingbeat post-x",
+    enabled: true,
+  })
+  return result
+}
+
 async function commandBlock(args) {
   return client().mutation(api.powerup.blockJob, {
     jobId: requireArg(args, "job-id"),
@@ -149,6 +164,7 @@ async function main() {
     prepare: commandPrepare,
     show: commandShow,
     list: commandList,
+    "approve-final": commandApproveFinal,
     block: commandBlock,
     advance: commandAdvance,
     "export-browser-task": commandExportBrowserTask,

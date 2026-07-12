@@ -262,6 +262,34 @@ export const latestRun = query({
   },
 })
 
+export const approveFinalizedXPost = mutation({
+  args: {
+    text: v.string(),
+    operator: v.string(),
+  },
+  handler: async (ctx, { text, operator }) => {
+    const finalizedText = text.trim()
+    if (!finalizedText) throw new Error("Finalized X post text is required.")
+    if (finalizedText.length > 280) throw new Error(`Finalized X post is ${finalizedText.length} characters; maximum is 280.`)
+
+    const jobs = await ctx.db.query("executionJobs").collect()
+    const job = jobs
+      .filter((row) => row.channel === "x" && ["queue", "veto", "ready"].includes(row.status))
+      .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))[0]
+    if (!job) throw new Error("No active X execution job is available for the finalized post.")
+
+    const at = now()
+    const payload = { ...job.payload, text: finalizedText, finalizedText, explicitlyApprovedBy: operator, explicitlyApprovedAt: at }
+    const statusHistory = [
+      ...job.statusHistory,
+      { status: "ready", at, detail: `Finalized post explicitly approved by ${operator}; veto countdown bypassed.` },
+    ]
+    await ctx.db.patch(job._id, { status: "ready", payload, vetoEndsAt: undefined, statusHistory, updatedAt: at })
+    await patchRunStatus(ctx, job.runId, "ready")
+    return { ...jobShape({ ...job, status: "ready", payload, vetoEndsAt: undefined }), text: finalizedText }
+  },
+})
+
 export const runProof = query({
   args: { runId: v.string() },
   handler: async (ctx, { runId }) => {

@@ -10,7 +10,7 @@ Use this skill when the user wants Wingbeat to create a source-backed build-in-p
 ## Rules
 
 - Treat the current working directory as the target project unless the user gives another path.
-- Do not publish anything. Wingbeat only prepares draft content and Convex records.
+- Do not publish drafts. Publish only when the user explicitly says the text is finalized and asks to post it.
 - Require `CONVEX_URL` before running. Do not use local JSON persistence or `.wingbeat` output.
 - Prefer the deterministic local fallback unless the user explicitly asks for provider-backed generation.
 - Before provider-backed generation, warn that repository-derived context may be sent to the model provider configured in Hermes.
@@ -30,5 +30,13 @@ Provider-backed generation:
 ```bash
 hermes wingbeat run --project .
 ```
+
+Explicit finalized-post automation:
+
+```bash
+hermes wingbeat post-x --text "exact finalized tweet"
+```
+
+This command is the only publish path. It uses Hermes Computer Use to open X in Chrome and records the resulting public X URL in Convex. Never claim success without that verified receipt.
 
 The run is persisted to Convex only. If `CONVEX_URL` is missing or Convex is unavailable, report the retryable failure instead of inventing a local result.
