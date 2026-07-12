@@ -39,4 +39,12 @@ hermes wingbeat post-x --text "exact finalized tweet"
 
 This command is the only publish path. It uses Hermes Computer Use to open X in Chrome and records the resulting public X URL in Convex. Never claim success without that verified receipt.
 
+When the user asks for the top, first, or latest opportunity in the Wingbeat inbox, run:
+
+```bash
+hermes wingbeat top-opportunity
+```
+
+Return the command's live Convex result. Do not invent an opportunity.
+
 The run is persisted to Convex only. If `CONVEX_URL` is missing or Convex is unavailable, report the retryable failure instead of inventing a local result.

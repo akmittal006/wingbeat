@@ -99,6 +99,12 @@ FINAL_TEXT_JSON={json.dumps(text)}
     raise SystemExit(completed.returncode)
 
 
+def _top_opportunity() -> None:
+    script = PLUGIN_DIR / "scripts" / "top-opportunity.mjs"
+    completed = subprocess.run([_node_executable(), str(script)], cwd=str(PLUGIN_DIR))
+    raise SystemExit(completed.returncode)
+
+
 def _wingbeat_cli(args) -> None:
     command = getattr(args, "wingbeat_command", None)
     if command == "run":
@@ -106,6 +112,9 @@ def _wingbeat_cli(args) -> None:
         return
     if command == "post-x":
         _post_x(args)
+        return
+    if command == "top-opportunity":
+        _top_opportunity()
         return
 
     print("Usage: hermes wingbeat {run,post-x}")
@@ -142,6 +151,11 @@ def _setup_cli(subparser) -> None:
     post_x = subcommands.add_parser("post-x", help="Publish finalized text to X through Hermes Computer Use")
     post_x.add_argument("--text", required=True, help="Finalized tweet text; posted exactly as provided")
     post_x.set_defaults(func=_wingbeat_cli)
+    top_opportunity = subcommands.add_parser(
+        "top-opportunity",
+        help="Return the first new opportunity from the live Convex inbox",
+    )
+    top_opportunity.set_defaults(func=_wingbeat_cli)
 
 
 def _slash_help(raw_args: str) -> str:
