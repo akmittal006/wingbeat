@@ -2,6 +2,18 @@
   "name": "wingbeat",
   "private": true,
   "version": "0.1.0",
+  "description": "An experimental, project-aware AI marketing agency for developers.",
+  "license": "Apache-2.0",
+  "keywords": [
+    "ai-agents",
+    "developer-tools",
+    "marketing-automation",
+    "open-source"
+  ],
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "packageManager": "pnpm@11.7.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",

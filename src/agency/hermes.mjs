@@ -7,14 +7,17 @@ function estimateTokens(text) {
 export function deterministicNarrative(context) {
   const dirtyFiles = context.layers.currentJob.dirtyFiles
   const changedSurface = dirtyFiles.length > 0 ? dirtyFiles.slice(0, 5).join(", ") : "the MVP agency spine"
+  const latestCommit = context.layers.projectHistory.recentCommits.split(/\r?\n/).find(Boolean) ?? "no commit history"
+  const evidenceLabels = context.evidence.map((item) => item.label.replace(/\.md$/, "")).join(", ")
+  const workspaceDigest = context.contextReferences.find((item) => item.id === "ctx-workspace-shape")?.digest ?? "unknown"
   return {
     provider: "deterministic-fallback",
     status: "fallback",
     text:
-      `Today Wingbeat crossed from product concept into an inspectable agency runtime. ` +
-      `The manager reads the repo, assembles specialists only when the work calls for them, and turns evidence from docs and git into a reusable content package before any X-specific copy exists. ` +
-      `That matters because the product promise is not another posting prompt; it is marketing infrastructure that can explain its work, revise weak drafts, and hand execution to a vetoable publishing boundary. ` +
-      `Current implementation surface: ${changedSurface}.`,
+      `Building Wingbeat, an AI Marketing Agency for indie developers. ` +
+      `Wingbeat helps builders turn shipping work into consistent marketing without claiming a live post before there is a receipt. ` +
+      `This local run used ${evidenceLabels || "local evidence"} plus git context (${latestCommit}) to draft from its own codebase. ` +
+      `Current proof ${workspaceDigest}: ${changedSurface}.`,
     usage: {
       promptTokens: 0,
       completionTokens: 0,
@@ -31,7 +34,7 @@ export async function generateWithHermes({ prompt, cwd, fallbackContext, timeout
 
   const started = Date.now()
   return new Promise((resolve) => {
-    const child = spawn("hermes", ["-z", prompt, "chat"], {
+    const child = spawn("hermes", ["-z", prompt], {
       cwd,
       stdio: ["ignore", "pipe", "pipe"],
     })

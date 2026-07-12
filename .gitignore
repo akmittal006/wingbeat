@@ -4,6 +4,8 @@ dist/
 .DS_Store
 *.log
 *.tsbuildinfo
+.claude/settings.local.json
+.github/workflows/ci.yml
 
 # Local execution state and browser receipts
 scripts/x-execution/state/

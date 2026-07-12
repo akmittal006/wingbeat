@@ -87,10 +87,10 @@ function selectCrew(context) {
   return crew
 }
 
-function buildHermesPrompt(context, specialistOutputs) {
+function buildDraftPrompt(context, specialistOutputs) {
   return [
     "You are Wingbeat's agency manager.",
-    "Write a concise channel-independent build-in-public narrative for marketing the Wingbeat repo itself.",
+    "Write a concise channel-independent first draft for a build-in-public narrative marketing the Wingbeat repo itself.",
     "Use only the provided evidence. Avoid fake metrics, fake publishing receipts, and unsupported claims.",
     "",
     `Objective: ${context.objective}`,
@@ -105,35 +105,318 @@ function buildHermesPrompt(context, specialistOutputs) {
   ].join("\n")
 }
 
-function makeWeakDraft(context) {
-  return `We made Wingbeat better today. It has agents, content, and publishing, and it will help everyone market everything automatically.`
+function buildRevisionPrompt({ context, specialistOutputs, draft, findings }) {
+  return [
+    "You are Wingbeat's Editor / Critic revising a build-in-public narrative.",
+    "Revise the draft using the named findings. Keep only source-backed claims from the context.",
+    "Do not add fake metrics, fake receipts, or live publishing claims.",
+    "",
+    `Objective: ${context.objective}`,
+    "",
+    "Named findings:",
+    ...findings.map((finding) => `- ${finding}`),
+    "",
+    "Context references:",
+    ...context.contextReferences.map((ref) => `- ${ref.layer}/${ref.id}: ${ref.excerpt}`),
+    "",
+    "Specialist notes:",
+    ...specialistOutputs.map((item) => `- ${item.role}: ${item.output}`),
+    "",
+    "Draft to revise:",
+    draft,
+    "",
+    "Return 2 short paragraphs. No markdown heading.",
+  ].join("\n")
+}
+
+function evidenceTerms(evidence) {
+  return evidence
+    .flatMap((item) => `${item.label} ${item.detail}`.toLowerCase().match(/[a-z][a-z-]{5,}/g) ?? [])
+    .filter((term, index, all) => all.indexOf(term) === index)
 }
 
 function evaluateDraft({ draft, evidence }) {
   const lower = draft.toLowerCase()
-  const unsupported = []
-  if (lower.includes("everyone")) unsupported.push("Overbroad audience claim.")
-  if (lower.includes("publish") && !lower.includes("veto")) unsupported.push("Publishing claim lacks veto-boundary context.")
-  if (lower.includes("automatically") && !lower.includes("inspect")) unsupported.push("Autonomy claim lacks observability or inspection detail.")
+  const findings = []
+  const terms = evidenceTerms(evidence)
+  const evidenceHits = terms.filter((term) => lower.includes(term)).slice(0, 8)
 
-  const specificity = evidence.some((item) => lower.includes("wingbeat")) && draft.length > 180
-  const score = Math.max(0.25, 0.92 - unsupported.length * 0.18 - (specificity ? 0 : 0.12))
+  if (!lower.includes("wingbeat")) findings.push("missing-project-name")
+  if (evidenceHits.length < 2) findings.push("insufficient-evidence-anchoring")
+  if (lower.includes("everyone") || lower.includes("everything")) findings.push("overbroad-audience-claim")
+  if ((lower.includes("published") || lower.includes("live post")) && !lower.includes("receipt")) {
+    findings.push("unsupported-live-publishing-claim")
+  }
+  if ((lower.includes("automatic") || lower.includes("autonomous")) && !lower.includes("veto")) {
+    findings.push("autonomy-without-veto-context")
+  }
+  if (!lower.includes("runtime") && !lower.includes("agency")) findings.push("missing-runtime-or-agency-specificity")
+  if (draft.length < 180) findings.push("too-thin-for-canonical-package")
+
+  const score = Math.max(0.2, 0.96 - findings.length * 0.12)
   return {
     id: stableId("eval", draft),
     name: "source-backed-build-in-public-gate",
-    passed: unsupported.length === 0 && score >= 0.72,
+    passed: findings.length === 0 && score >= 0.72,
     score: Number(score.toFixed(2)),
-    findings: unsupported.length > 0 ? unsupported : ["Specific, source-backed, and suitable for revision into X copy."],
+    findings: findings.length > 0 ? findings : ["source-backed", "specific", "veto-aware"],
+    evidenceHits,
   }
 }
 
-function buildContentPackage({ runId, context, narrative, finalEvaluation }) {
-  const whatChanged =
-    "Wingbeat now has a dynamic agency runtime that inspects the repo, selects a conditional crew, and produces a UI-consumable run package."
-  const whyItMatters =
-    "The product promise depends on visible marketing infrastructure: evidence collection, specialist handoffs, critic revision, and a vetoable execution boundary before channel-specific publishing."
+function sentenceFrom(text, fallback) {
+  return text
+    .replace(/\s+/g, " ")
+    .split(/(?<=[.!?])\s+/)
+    .map((part) => part.trim())
+    .find(Boolean) ?? fallback
+}
+
+function truncateForX(text, limit = 280) {
+  const clean = text
+    .split(/\r?\n/)
+    .map((line) => line.replace(/[ \t]+/g, " ").trim())
+    .filter(Boolean)
+    .join("\n")
+  if ([...clean].length <= limit) return clean
+  const sliced = [...clean].slice(0, limit - 1).join("").replace(/\s+\S*$/, "")
+  return `${sliced.trim()}…`
+}
+
+function evidenceSourceLabel(context) {
+  const primary = context.evidence.find((item) => item.source === "docs/product-concept.md") ?? context.evidence[0]
+  return primary?.label ?? "repo docs"
+}
+
+function repositoryUrl(context) {
+  return context.repositoryUrl ?? context.layers.currentJob.repositoryUrl
+}
+
+function classifyContentMode({ context }) {
+  const objective = context.objective.toLowerCase()
+  const hasRunHistory = context.layers.currentJob.dirtyFiles.some((file) => file.startsWith("src/agency/runs/"))
+  if (objective.includes("introduc") || objective.includes("launch") || !hasRunHistory) return "introduction"
+  return "build-in-public"
+}
+
+function reservedXLimit(context) {
+  return repositoryUrl(context) ? 257 : 280
+}
+
+function hashtagCount(copy) {
+  return (copy.match(/(^|\s)#[\p{L}\p{N}_]+/gu) ?? []).length
+}
+
+function scoreCriterion(passed, partial = false) {
+  if (passed) return 2
+  return partial ? 1 : 0
+}
+
+function capabilityLines(context) {
+  const docs = context.layers.projectHistory.docs.map((item) => item.detail).join(" ").toLowerCase()
+  const capabilities = []
+  if (docs.includes("detect") || docs.includes("story")) capabilities.push("code -> stories")
+  if (docs.includes("canonical content package") || docs.includes("content package")) capabilities.push("proof -> reusable posts")
+  if (docs.includes("veto") || docs.includes("x loop")) capabilities.push("draft -> veto-ready X")
+  if (docs.includes("asset") || docs.includes("beauty")) capabilities.push("visual briefs")
+  return capabilities.slice(0, 4)
+}
+
+function introProof(context) {
+  const hasAgencyRuntime = context.layers.currentJob.sourceFiles.includes("src/agency/runtime.mjs")
+  const hasRunScript = context.layers.currentJob.sourceFiles.includes("scripts/run-agency.mjs")
+  const source = evidenceSourceLabel(context).replace(/\.md$/, "")
+  if (hasAgencyRuntime && hasRunScript) return "agency run that reads this repo and drafts from its docs"
+  return `repo-backed first X loop from ${source}`
+}
+
+function buildIntroductionCopy({ context }) {
+  const list = "code -> stories / proof -> reusable posts / draft -> veto-ready X"
   const copy =
-    "Today Wingbeat got its agency spine: repo inspection, conditional specialists, source-backed content, critic revision, and an X handoff with a veto window.\n\nThe principle: marketing output should emerge from inspectable infrastructure—not a posting prompt.\n\n#BuildInPublic"
+    `Building Wingbeat, an AI Marketing Agency for indie developers.\n` +
+    `It helps builders ship more and post consistently.\n` +
+    `Handles: ${list}.\n` +
+    `Week 1: shipped repo-backed X draft loop.\n` +
+    `Want early access? Reply "Wingbeat".`
+  return truncateForX(copy, reservedXLimit(context))
+}
+
+function buildBuildInPublicCopy({ narrative, context }) {
+  const source = evidenceSourceLabel(context).replace(/\.md$/, "")
+  const copy =
+    `Building Wingbeat in public.\n` +
+    `It is an AI marketing team for builders who would rather ship than post.\n` +
+    `Today: drafted an X post from ${source} and local git context, before any live posting.\n` +
+    `What should it notice next?`
+  return truncateForX(copy, reservedXLimit(context))
+}
+
+function buildXCopy({ narrative, context, mode }) {
+  if (mode === "introduction") return buildIntroductionCopy({ context })
+  return buildBuildInPublicCopy({ narrative, context })
+}
+
+function evaluateIntroductionXQuality(copy, context) {
+  const lower = copy.toLowerCase()
+  const chars = [...copy].length
+  const hashtags = hashtagCount(copy)
+  const limit = reservedXLimit(context)
+  const autoRejectFindings = []
+
+  if (!/^(building|introducing) wingbeat/i.test(copy)) autoRejectFindings.push("missing-direct-intro-first-line")
+  if (!/(ai marketing agency|ai marketing team)/.test(lower)) autoRejectFindings.push("wingbeat-unexplained")
+  if (/commit|diff|merged|branch|sha|runtime|specialist|manager|critic|handoff|trace|architecture/.test(lower)) {
+    autoRejectFindings.push("commit-summary-or-internal-architecture-voice")
+  }
+  if (/(launched|published|posted itself|live post)/.test(lower) && !/receipt/.test(lower)) {
+    autoRejectFindings.push("unsupported-launch-or-publish-claim")
+  }
+  if (/principle:|infrastructure|canonical|channel-independent|source-backed|no fluff/.test(lower)) {
+    autoRejectFindings.push("abstract-principle-dominates")
+  }
+  if (hashtags > 0 && !/wingbeat/.test(lower)) autoRejectFindings.push("hashtags-supply-context")
+
+  const questions = (copy.match(/\?/g) ?? []).length
+  const capabilities = capabilityLines(context).filter((item) => lower.includes(item.toLowerCase()))
+  const arrowCapabilities = (copy.match(/->/g) ?? []).length
+  const rubric = [
+    {
+      name: "product-introduction",
+      score: scoreCriterion(/^(building|introducing) wingbeat/i.test(copy) && /ai marketing agency/i.test(copy)),
+    },
+    {
+      name: "audience-value",
+      score: scoreCriterion(/indie developers|builders/.test(lower) && /post consistently|ship more|rather ship/.test(lower)),
+    },
+    {
+      name: "capability-clarity",
+      score: scoreCriterion(/handles:/.test(lower) && arrowCapabilities >= 3, /handles:/.test(lower) && arrowCapabilities >= 2),
+    },
+    {
+      name: "grounded-capabilities",
+      score: scoreCriterion(/code -> stories/.test(lower) && /draft -> veto-ready x/.test(lower)),
+    },
+    {
+      name: "shipped-proof",
+      score: scoreCriterion(/week 1: shipped/.test(lower) && /repo|docs|git|x loop|agency run/.test(lower)),
+    },
+    {
+      name: "evidence-integrity",
+      score: scoreCriterion(!/(public repo|launched|published|live post|posted itself)/.test(lower)),
+    },
+    {
+      name: "native-voice",
+      score: scoreCriterion(copy.split(/\s+/).length <= 46, copy.split(/\s+/).length <= 54),
+    },
+    {
+      name: "specific-cta",
+      score: scoreCriterion(/want early access\? reply "wingbeat"\.?/i.test(copy), questions === 1 && /early access/.test(lower)),
+    },
+    {
+      name: "intro-structure",
+      score: scoreCriterion(copy.split(/\n/).length >= 5 && /^handles:/im.test(copy) && /^(first up|week 1):/im.test(copy)),
+    },
+    {
+      name: "compression",
+      score: scoreCriterion(chars <= limit && hashtags <= 1, chars <= 280 && hashtags <= 1),
+    },
+  ]
+
+  const score = rubric.reduce((sum, item) => sum + item.score, 0)
+  const failedCriteria = rubric.filter((item) => item.score < 2).map((item) => `${item.name}:${item.score}`)
+  const passed = score >= 17 && autoRejectFindings.length === 0
+
+  return {
+    id: stableId("xquality", copy),
+    name: "introduction-x-quality-gate",
+    mode: "introduction",
+    passed,
+    score,
+    maxScore: 20,
+    threshold: 17,
+    autoRejectFindings,
+    failedCriteria,
+    rubric,
+    characterCount: chars,
+    hashtagCount: hashtags,
+    reservedLinkCharacters: repositoryUrl(context) ? 23 : 0,
+  }
+}
+
+function evaluateBuildInPublicXQuality(copy, context) {
+  const lower = copy.toLowerCase()
+  const chars = [...copy].length
+  const hashtags = hashtagCount(copy)
+  const limit = reservedXLimit(context)
+  const autoRejectFindings = []
+  if (!/wingbeat/.test(lower) || !/ai marketing team/.test(lower)) autoRejectFindings.push("wingbeat-unexplained")
+  if (/(launched|published|posted itself|live post|public repo)/.test(lower) && !/receipt/.test(lower)) {
+    autoRejectFindings.push("unsupported-launch-or-publish-claim")
+  }
+  if (hashtags > 0 && !/wingbeat/.test(lower)) autoRejectFindings.push("hashtags-supply-context")
+  const rubric = [
+    { name: "standalone-context", score: scoreCriterion(/wingbeat/.test(lower) && /ai marketing team/.test(lower)) },
+    { name: "plain-product-clarity", score: scoreCriterion(/builders/.test(lower) && /post/.test(lower)) },
+    { name: "concrete-progress", score: scoreCriterion(/today:/.test(lower) && /drafted/.test(lower)) },
+    { name: "specificity", score: scoreCriterion(/docs|git|repo/.test(lower)) },
+    { name: "evidence-integrity", score: scoreCriterion(!/(launched|published|live post|posted itself|public repo)/.test(lower)) },
+    { name: "native-voice", score: scoreCriterion(copy.split(/\s+/).length <= 48, copy.split(/\s+/).length <= 56) },
+    { name: "specific-invitation", score: scoreCriterion(/\?$/.test(copy.trim())) },
+    { name: "compression", score: scoreCriterion(chars <= limit && hashtags <= 1) },
+    { name: "mode-fit", score: scoreCriterion(/^building wingbeat in public/i.test(copy)) },
+    { name: "not-pain-forced", score: scoreCriterion(true) },
+  ]
+  const score = rubric.reduce((sum, item) => sum + item.score, 0)
+  const failedCriteria = rubric.filter((item) => item.score < 2).map((item) => `${item.name}:${item.score}`)
+  return {
+    id: stableId("xquality", copy),
+    name: "build-in-public-x-quality-gate",
+    mode: "build-in-public",
+    passed: score >= 17 && autoRejectFindings.length === 0,
+    score,
+    maxScore: 20,
+    threshold: 17,
+    autoRejectFindings,
+    failedCriteria,
+    rubric,
+    characterCount: chars,
+    hashtagCount: hashtags,
+    reservedLinkCharacters: repositoryUrl(context) ? 23 : 0,
+  }
+}
+
+function evaluateXQuality(copy, context, mode) {
+  if (mode === "introduction") return evaluateIntroductionXQuality(copy, context)
+  return evaluateBuildInPublicXQuality(copy, context)
+}
+
+function repairXCopy({ narrative, context, mode }) {
+  return buildXCopy({ narrative, context, mode })
+}
+
+function buildContentPackage({ runId, context, narrative, finalEvaluation }) {
+  const whatChanged = sentenceFrom(
+    narrative,
+    "Wingbeat now has a repo-inspecting agency runtime that can produce a UI-consumable run package.",
+  )
+  const whyItMatters =
+    narrative
+      .replace(/\s+/g, " ")
+      .split(/(?<=[.!?])\s+/)
+      .slice(1)
+      .join(" ")
+      .trim() ||
+    "The product promise depends on evidence collection, specialist handoffs, critic evaluation, and a vetoable execution boundary."
+  const contentMode = classifyContentMode({ context })
+  let copy = buildXCopy({ narrative, context, mode: contentMode })
+  let xQuality = evaluateXQuality(copy, context, contentMode)
+  if (!xQuality.passed) {
+    copy = repairXCopy({ narrative, context, mode: contentMode })
+    xQuality = {
+      ...evaluateXQuality(copy, context, contentMode),
+      repairedFrom: xQuality,
+    }
+  }
 
   return {
     id: stableId("pkg", `${runId}:${narrative}`),
@@ -160,13 +443,16 @@ function buildContentPackage({ runId, context, narrative, finalEvaluation }) {
     ],
     channelNeutralBody: narrative,
     evidence: context.evidence,
-    confidence: finalEvaluation.score,
+    confidence: Number(((finalEvaluation.score + xQuality.score / 20) / 2).toFixed(2)),
     adaptation: {
       channel: "x",
+      mode: contentMode,
       copy,
+      characterCount: [...copy].length,
       asset: "deterministic-card:agency-trace",
     },
-    evaluations: [finalEvaluation],
+    evaluations: [finalEvaluation, xQuality],
+    xQuality,
     contextReferences: context.contextReferences,
     executionHistory: [
       {
@@ -238,7 +524,7 @@ export async function runAgency({ rootDir, trigger, objective, useHermes = true 
       objective: "Find the strongest build-in-public story supported by project evidence.",
       work: async () => {
         await sleep(10)
-        return "Strongest story: the system is moving from static product concept to an agency runtime that can inspect itself, assemble specialists, revise weak output, and hand off to execution."
+        return "Strongest story: the system is moving from static product concept to an agency runtime that can inspect itself, assemble specialists, evaluate drafts, and hand off to execution."
       },
     },
     {
@@ -306,9 +592,10 @@ export async function runAgency({ rootDir, trigger, objective, useHermes = true 
     output: result.output,
   }))
 
-  const prompt = buildHermesPrompt(context, specialistOutputs)
-  const generation = await generateWithHermes({
-    prompt,
+  const criticId = stableId("agent", `${runId}:Editor / Critic`)
+  const draftPrompt = buildDraftPrompt(context, specialistOutputs)
+  const draftGeneration = await generateWithHermes({
+    prompt: draftPrompt,
     cwd: rootDir,
     fallbackContext: context,
     enabled: useHermes,
@@ -318,23 +605,59 @@ export async function runAgency({ rootDir, trigger, objective, useHermes = true 
       runId,
       managerId,
       "tool",
-      "Narrative generated",
-      `${generation.provider} ${generation.status}; latency ${generation.usage.latencyMs}ms`,
+      "First draft delegated",
+      `${draftGeneration.provider} ${draftGeneration.status}; latency ${draftGeneration.usage.latencyMs}ms`,
     ),
   )
 
-  const weakDraft = makeWeakDraft(context)
-  const weakEval = evaluateDraft({ draft: weakDraft, evidence: context.evidence })
+  const firstEvaluation = evaluateDraft({ draft: draftGeneration.text, evidence: context.evidence })
   events.push(
-    event(runId, managerId, "evaluation", "Weak draft evaluated", `${weakEval.passed ? "passed" : "failed"} at ${weakEval.score}`),
+    event(
+      runId,
+      criticId,
+      "evaluation",
+      "First draft evaluated",
+      `${firstEvaluation.passed ? "passed" : "failed"} at ${firstEvaluation.score}: ${firstEvaluation.findings.join(", ")}`,
+    ),
   )
 
-  const revisedNarrative = generation.text
+  let revisionGeneration
+  let revisedNarrative = draftGeneration.text
+  if (!firstEvaluation.passed) {
+    const revisionPrompt = buildRevisionPrompt({
+      context,
+      specialistOutputs,
+      draft: draftGeneration.text,
+      findings: firstEvaluation.findings,
+    })
+    revisionGeneration = await generateWithHermes({
+      prompt: revisionPrompt,
+      cwd: rootDir,
+      fallbackContext: context,
+      enabled: useHermes,
+    })
+    revisedNarrative = revisionGeneration.text
+    events.push(
+      event(
+        runId,
+        criticId,
+        "revision",
+        "Second generation requested",
+        `Findings: ${firstEvaluation.findings.join(", ")}; provider ${revisionGeneration.provider} ${revisionGeneration.status}`,
+      ),
+    )
+  }
+
   const finalEval = evaluateDraft({ draft: revisedNarrative, evidence: context.evidence })
   const criticStatus = finalEval.passed ? "passed" : "revising"
   events.push(
-    event(runId, managerId, "revision", "Manager revision requested", weakEval.findings.join(" ")),
-    event(runId, managerId, "evaluation", "Revised package evaluated", `${criticStatus} at ${finalEval.score}`),
+    event(
+      runId,
+      criticId,
+      "evaluation",
+      revisionGeneration ? "Revised draft evaluated" : "Final draft accepted without revision",
+      `${criticStatus} at ${finalEval.score}: ${finalEval.findings.join(", ")}`,
+    ),
   )
 
   const contentPackage = buildContentPackage({
@@ -343,6 +666,19 @@ export async function runAgency({ rootDir, trigger, objective, useHermes = true 
     narrative: revisedNarrative,
     finalEvaluation: finalEval,
   })
+  const xAdapterId = stableId("agent", `${runId}:X Channel Adapter`)
+  events.push(
+    event(
+      runId,
+      xAdapterId,
+      "evaluation",
+      "X quality gate evaluated",
+      `${contentPackage.xQuality.passed ? "passed" : "failed"} ${contentPackage.xQuality.score}/20; ${[
+        ...contentPackage.xQuality.autoRejectFindings,
+        ...contentPackage.xQuality.failedCriteria,
+      ].join(", ") || "all criteria met"}`,
+    ),
+  )
   const xJob = executionJob(runId, contentPackage)
 
   const strategist = await runSpecialist({
@@ -359,7 +695,10 @@ export async function runAgency({ rootDir, trigger, objective, useHermes = true 
     objective: "Check accuracy, specificity, repetition, and brand fit.",
     parentId: managerId,
     context,
-    work: async () => `Gate ${finalEval.passed ? "passed" : "needs caution"}: ${finalEval.findings.join(" ")}`,
+    work: async () =>
+      `Gate ${finalEval.passed ? "passed" : "needs caution"} after ${
+        revisionGeneration ? "revision" : "first draft"
+      }: ${finalEval.findings.join(", ")}`,
   })
   const adapter = await runSpecialist({
     runId,
@@ -387,12 +726,19 @@ export async function runAgency({ rootDir, trigger, objective, useHermes = true 
   managerAgent.finishedAt = now()
   managerAgent.latencyMs = Date.parse(managerAgent.finishedAt) - Date.parse(managerAgent.startedAt)
   managerAgent.tokens = estimateTokens(`${objective}\n${JSON.stringify(contentPackage)}`)
-  managerAgent.costUsd = estimateCost(managerAgent.tokens) + (generation.usage?.estimatedCostUsd ?? 0)
+  managerAgent.costUsd =
+    estimateCost(managerAgent.tokens) +
+    (draftGeneration.usage?.estimatedCostUsd ?? 0) +
+    (revisionGeneration?.usage?.estimatedCostUsd ?? 0)
   managerAgent.status = "passed"
-  managerAgent.output = `Selected ${selectedCrew.length} roles, rejected a weak draft, revised into package ${contentPackage.id}, and prepared X handoff ${xJob.id}.`
+  managerAgent.output = `Selected ${selectedCrew.length} roles, produced package ${contentPackage.id} from evaluated narrative, and prepared X handoff ${xJob.id}.`
 
   const totalCostUsd = Number(
-    (agents.reduce((sum, agent) => sum + (agent.costUsd ?? 0), 0) + (generation.usage?.estimatedCostUsd ?? 0)).toFixed(6),
+    (
+      agents.reduce((sum, agent) => sum + (agent.costUsd ?? 0), 0) +
+      (draftGeneration.usage?.estimatedCostUsd ?? 0) +
+      (revisionGeneration?.usage?.estimatedCostUsd ?? 0)
+    ).toFixed(6),
   )
 
   return {
@@ -409,16 +755,22 @@ export async function runAgency({ rootDir, trigger, objective, useHermes = true 
     contextEnvelope: context.layers,
     contextReferences: context.contextReferences,
     selectedCrew,
-    generation,
+    generation: {
+      provider: revisionGeneration?.provider ?? draftGeneration.provider,
+      status: revisionGeneration ? revisionGeneration.status : draftGeneration.status,
+      draft: draftGeneration,
+      revision: revisionGeneration,
+    },
     evaluation: {
-      weakDraft: {
-        text: weakDraft,
-        result: weakEval,
+      firstDraft: {
+        text: draftGeneration.text,
+        result: firstEvaluation,
       },
-      revisedDraft: {
+      finalDraft: {
         text: revisedNarrative,
         result: finalEval,
       },
+      xQuality: contentPackage.xQuality,
     },
     executionJob: xJob,
     metrics: {

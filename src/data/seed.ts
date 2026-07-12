@@ -1,38 +1,32 @@
 import type {
   AgencyRun,
-  AgentNode,
   AgentRole,
-  ContextEnvelope,
   ContentPackage,
-  Evidence,
   ExecutionJob,
-  MemoryReference,
   Policy,
   ProjectContext,
-  PublishReceipt,
-  SourceEvent,
-  TraceEvent,
+  RuntimeContextReference,
 } from "../types"
-import { createContextEnvelope } from "../lib/memory"
 
 const projectContext: ProjectContext = {
   id: "project-wingbeat",
   name: "Wingbeat",
   repoPath: "/Users/ankurmittal/Documents/wingbeat",
   description:
-    "A dynamic AI marketing agency that turns real product work into reusable stories, assets, and published posts.",
+    "A dynamic AI marketing agency that turns real product work into reusable stories, assets, and channel handoffs.",
   positioning:
-    "For technical builders who need consistent marketing without turning every product milestone into manual campaign work.",
+    "For technical builders who need consistent marketing without turning each product milestone into manual campaign work.",
   primaryAudience: {
     id: "aud-builders",
     label: "Technical product builders",
     segment: "Indie developers, developer-tool startups, and small product teams",
     pain: "Meaningful progress happens in code and notes but rarely becomes credible public marketing.",
-    desiredOutcome: "Keep a publishing cadence that is specific, source-backed, and beautiful.",
+    desiredOutcome: "Keep a publishing cadence that is specific, source-backed, and inspectable.",
   },
   links: [
     { label: "Local repo", href: "/Users/ankurmittal/Documents/wingbeat", kind: "repo" },
     { label: "Product concept", href: "docs/product-concept.md", kind: "docs" },
+    { label: "MVP roadmap", href: "docs/two-hour-mvp-roadmap.md", kind: "docs" },
   ],
 }
 
@@ -40,13 +34,13 @@ export const agentRoles: AgentRole[] = [
   {
     id: "role-manager",
     name: "Hermes Agency Manager",
-    job: "Assemble the specialist crew, own the objective, and keep the run moving through publish.",
+    job: "Assemble the specialist crew, own the objective, and keep the run moving toward a truthful execution boundary.",
     dynamic: false,
     tools: [
       { id: "tool-repo", label: "Repository reader", kind: "repo", enabled: true },
       { id: "tool-eval", label: "Evaluation gate", kind: "evaluation", enabled: true },
     ],
-    guardrails: ["Only use source-backed claims", "Escalate or revise failed evaluation checks"],
+    guardrails: ["Only use source-backed claims", "Do not mark a run published without a verified receipt"],
   },
   {
     id: "role-story",
@@ -62,526 +56,376 @@ export const agentRoles: AgentRole[] = [
     job: "Evaluate accuracy, specificity, repetition, and channel fit before execution.",
     dynamic: false,
     tools: [{ id: "tool-eval", label: "Evaluation gate", kind: "evaluation", enabled: true }],
-    guardrails: ["Fail vague copy", "Require evidence for product claims"],
-  },
-  {
-    id: "role-mockup",
-    name: "Product Mockup Specialist",
-    job: "Create deterministic branded-card assets when a story needs visual proof.",
-    dynamic: true,
-    tools: [{ id: "tool-renderer", label: "Branded card renderer", kind: "renderer", enabled: true }],
-    guardrails: ["Use templates instead of live generative imagery", "Keep asset text source-backed"],
+    guardrails: ["Fail vague copy", "Require evidence for product and publishing claims"],
   },
   {
     id: "role-x",
-    name: "X Execution Agent",
-    job: "Notify, wait through the veto window, publish, verify, and write the receipt.",
+    name: "X Channel Adapter",
+    job: "Convert canonical package copy into an X-native payload without claiming live publish.",
     dynamic: false,
-    tools: [
-      { id: "tool-telegram", label: "Telegram notification", kind: "telegram", enabled: true },
-      { id: "tool-x", label: "X posting adapter", kind: "x", enabled: true },
-    ],
-    guardrails: ["Respect block/edit/delay actions", "Do not mutate canonical evidence"],
+    tools: [{ id: "tool-x", label: "X handoff adapter", kind: "x", enabled: true }],
+    guardrails: ["Do not mutate canonical evidence", "Receipt is owned by the external executor"],
   },
 ]
 
 export const policy: Policy = {
-  id: "policy-x-autopublish",
+  id: "policy-x-veto-boundary",
   channel: "x",
   autonomy: "veto_window",
-  vetoWindowSeconds: 60,
+  vetoWindowSeconds: 45,
   allowedCategories: ["build-in-public", "product-update", "educational"],
-  blockedClaims: ["Guaranteed growth", "Unverified live integrations", "Performance claims without receipts"],
+  blockedClaims: ["Guaranteed growth", "Verified live publish without receipt", "Performance claims without analytics"],
   requiredEvidenceCount: 2,
 }
 
-const memoryReferences: MemoryReference[] = [
+const contextReferences: RuntimeContextReference[] = [
   {
-    id: "mem-current-roadmap",
+    id: "ctx-current-job",
     layer: "current_job",
-    label: "Two-hour MVP target",
-    summary:
-      "Build the agency spine around one real X build-in-public loop with visible trace, evaluation, veto, and receipt.",
-    source: "docs/two-hour-mvp-roadmap.md",
-    updatedAt: "2026-07-12T09:15:00.000Z",
+    source: "runtime fixture",
+    label: "Current agency objective",
+    digest: "f8ce2a590f",
+    excerpt: "Market the Wingbeat repository itself with a build-in-public story.",
   },
   {
-    id: "mem-current-scope",
-    layer: "current_job",
-    label: "Lane B ownership",
-    summary: "Own shared schemas, seed data, trace helpers, status transitions, and publish receipts.",
-    source: "delegation input",
-    updatedAt: "2026-07-12T09:20:00.000Z",
-  },
-  {
-    id: "mem-history-laws",
+    id: "ctx-project-history",
     layer: "project_history",
-    label: "Core product laws",
-    summary:
-      "No meaningful progress stays private; beauty is infrastructure; remove bottlenecks, not just symptoms.",
-    source: "docs/product-concept.md",
-    updatedAt: "2026-07-12T08:50:00.000Z",
+    source: "git log/status",
+    label: "Recent repository movement",
+    digest: "21964ef797",
+    excerpt: "Docs, runtime, UI, and safe browser X executor work are present in the current worktree.",
   },
   {
-    id: "mem-history-catalog",
-    layer: "project_history",
-    label: "Canonical catalog",
-    summary:
-      "Stories, claims, assets, usage, and performance should remain channel-independent for future reuse.",
-    source: "docs/product-concept.md",
-    updatedAt: "2026-07-12T08:52:00.000Z",
-  },
-  {
-    id: "mem-policy-veto",
+    id: "ctx-brand-policy",
     layer: "brand_policy",
-    label: "Autonomy with veto",
-    summary:
-      "Send a preview with edit, delay, block, and reject controls; silence during the window means publish.",
     source: "docs/product-concept.md",
-    updatedAt: "2026-07-12T08:55:00.000Z",
-  },
-  {
-    id: "mem-policy-tone",
-    layer: "brand_policy",
-    label: "Build-in-public tone",
-    summary:
-      "Prefer decisions, trade-offs, failures, lessons, and progress over generic launch or commit-summary copy.",
-    source: "docs/two-hour-mvp-roadmap.md",
-    updatedAt: "2026-07-12T09:00:00.000Z",
-  },
-]
-
-const contextEnvelope = createContextEnvelope(memoryReferences)
-
-const sourceEvents: SourceEvent[] = [
-  {
-    id: "event-schema-freeze",
-    projectId: "project-wingbeat",
-    kind: "agent-observation",
-    title: "Shared contract frozen for MVP lanes",
-    summary:
-      "Lane B turned the roadmap entities into typed objects so dashboard, runtime, and execution can share one shape.",
-    occurredAt: "2026-07-12T09:28:00.000Z",
-    url: "src/types.ts",
-  },
-  {
-    id: "event-weak-draft",
-    projectId: "project-wingbeat",
-    kind: "test-result",
-    title: "First draft failed specificity gate",
-    summary:
-      "The evaluator rejected broad agency claims because the copy lacked concrete source evidence and receipt language.",
-    occurredAt: "2026-07-12T09:36:00.000Z",
-  },
-  {
-    id: "event-asset-need",
-    projectId: "project-wingbeat",
-    kind: "agent-observation",
-    title: "Visual progress story needed a deterministic asset",
-    summary:
-      "Manager spawned a Product Mockup Specialist because the run-detail trace is easier to trust with a branded proof card.",
-    occurredAt: "2026-07-12T09:42:00.000Z",
-  },
-]
-
-const evidence: Evidence[] = [
-  {
-    id: "ev-roadmap-entities",
-    sourceEventId: "event-schema-freeze",
-    source: "docs/two-hour-mvp-roadmap.md",
-    label: "Lane B required entities",
-    detail: "Run, AgentNode, TraceEvent, ContentPackage, EvalResult, ExecutionJob, PublishReceipt, Policy, and AgentRole.",
-    confidence: 0.98,
-  },
-  {
-    id: "ev-canonical-contract",
-    sourceEventId: "event-schema-freeze",
-    source: "docs/product-concept.md",
-    label: "Canonical content package",
-    detail: "Content intelligence is stored channel-independently before channel-specific execution agents adapt it.",
-    confidence: 0.96,
-  },
-  {
-    id: "ev-veto-contract",
-    sourceEventId: "event-schema-freeze",
-    source: "docs/product-concept.md",
-    label: "Autonomous publishing contract",
-    detail: "Preview notification includes remaining veto duration and edit, delay, block, or reject controls.",
-    confidence: 0.94,
-  },
-  {
-    id: "ev-failed-draft",
-    sourceEventId: "event-weak-draft",
-    source: "evaluation log",
-    label: "Failed evaluation preserved",
-    detail: "The first run scored 0.48 because it made unsupported claims and had no receipt.",
-    confidence: 0.9,
-  },
-  {
-    id: "ev-asset-specialist",
-    sourceEventId: "event-asset-need",
-    source: "trace log",
-    label: "Dynamic specialist spawned",
-    detail: "The manager added a Product Mockup Specialist only after the visual-progress story needed an asset.",
-    confidence: 0.89,
+    label: "Wingbeat product laws and publishing policy",
+    digest: "9264429687",
+    excerpt:
+      "Content must be source-backed, channel-independent, and published only through a vetoable execution contract.",
   },
 ]
 
 export const latestContentPackage: ContentPackage = {
-  id: "pkg-wingbeat-typed-spine",
+  id: "pkg-runtime-handoff",
   projectContext,
-  sourceEvents,
-  evidence,
+  sourceEvents: [
+    {
+      id: "event-runtime-handoff",
+      projectId: "project-wingbeat",
+      kind: "agent-observation",
+      title: "Runtime produced a UI-consumable X handoff",
+      summary:
+        "The runtime inspected docs and repo state, selected a conditional crew, revised a weak draft, and prepared a veto-window X handoff.",
+      occurredAt: "2026-07-12T06:30:00.052Z",
+      url: "public/data/latest-run.json",
+    },
+  ],
+  evidence: [
+    {
+      id: "evidence-doc-1",
+      source: "docs/product-concept.md",
+      label: "Product concept",
+      detail: "Wingbeat is defined as a dynamic AI marketing agency with channel-independent content and a veto contract.",
+    },
+    {
+      id: "evidence-doc-2",
+      source: "docs/two-hour-mvp-roadmap.md",
+      label: "MVP roadmap",
+      detail: "The MVP calls for dynamic crew selection, revision, context layers, trace, cost, latency, and a UI-consumable run.",
+    },
+    {
+      id: "evidence-doc-3",
+      source: "docs/browser-x-executor.md",
+      label: "Safe X executor boundary",
+      detail:
+        "The browser executor prepares a payload and records a receipt only after live post verification.",
+    },
+  ],
   whatChanged:
-    "Wingbeat now has a typed agency spine covering runs, agents, traces, evaluations, execution jobs, receipts, and memory.",
+    "Wingbeat produced a runtime run package that is ready for veto-window X execution handoff.",
   whyItMatters:
-    "The dashboard and runtime can show the same source-backed story from detection through evaluation, veto, publish, and verification.",
+    "The UI can show draft failure, revision, context, crew selection, and execution state without pretending a live post already exists.",
   audience: projectContext.primaryAudience,
   category: "build-in-public",
   narrative:
-    "The interesting part of building an AI marketing agency is not the first post. It is making the handoffs inspectable enough that the agency can learn and be trusted.",
+    "Wingbeat crossed from product concept into an inspectable agency runtime: repo inspection, conditional specialists, critic revision, and a vetoable X handoff.",
   supportedClaims: [
     {
-      id: "claim-shared-contract",
-      text: "Wingbeat stores content packages separately from X-specific adaptations.",
-      evidenceIds: ["ev-canonical-contract"],
+      id: "claim-runtime-handoff",
+      text: "The current run prepared an X execution handoff, not a verified live post.",
+      evidenceIds: ["evidence-doc-3"],
       risk: "low",
     },
     {
-      id: "claim-visible-trace",
-      text: "Every specialist step can carry latency, token, cost, input, output, and evaluation details.",
-      evidenceIds: ["ev-roadmap-entities"],
+      id: "claim-revision",
+      text: "The runtime preserved a weak-draft failure and revised it into a passing draft.",
+      evidenceIds: ["evidence-doc-2"],
       risk: "low",
-    },
-    {
-      id: "claim-veto",
-      text: "Publishing uses a veto window where silence means the job can proceed.",
-      evidenceIds: ["ev-veto-contract"],
-      risk: "medium",
     },
   ],
   prohibitedClaims: [
     {
-      id: "claim-no-live-proof-yet",
-      text: "Do not claim real X posting is fully integrated unless a verified receipt exists.",
-      evidenceIds: ["ev-veto-contract"],
+      id: "claim-no-published-receipt",
+      text: "Do not claim a live X post was published unless an external receipt exists.",
+      evidenceIds: ["evidence-doc-3"],
       risk: "high",
     },
   ],
   hooks: [
-    "The hard part of an AI marketing agency is not writing the post. It is making the agency auditable.",
-    "Today Wingbeat got its spine: traces, evaluations, veto windows, receipts, and memory in one shared contract.",
-    "A publish button is easy. A source-backed agency loop you can inspect is the useful part.",
+    "The post is the last step, not the product.",
+    "Wingbeat is turning marketing into inspectable infrastructure.",
+    "Today the agency stopped being a diagram and started producing runs.",
   ],
   channelNeutralBody:
-    "Wingbeat's MVP now treats every marketing run as an inspectable object: source events become a canonical content package, specialists add work through trace nodes, the critic can fail a weak draft, and execution writes a receipt only after notification and verification. That keeps the agency focused on credible stories instead of generic content output.",
-  assetBrief: {
-    id: "brief-trace-card",
-    objective: "Show the agency spine as proof: detect, revise, veto, publish, verify.",
-    format: "branded-card",
-    instructions: "Render a compact dark card with a trace tree, pass/fail badge, and receipt strip.",
-    palette: ["#111827", "#2563eb", "#22c55e", "#f97316", "#ef4444"],
-    requiredText: ["Trace visible", "Evaluation passed", "Receipt verified"],
-  },
-  assets: [
-    {
-      id: "asset-trace-card",
-      kind: "image",
-      label: "Agency trace proof card",
-      href: "/data/wingbeat-trace-card.png",
-      alt: "A compact Wingbeat proof card showing a trace tree, evaluation pass, veto window, and verified receipt.",
-      generatedByAgentId: "agent-mockup",
-      briefId: "brief-trace-card",
-    },
-  ],
-  confidence: 0.88,
+    "Today Wingbeat crossed from product concept into an inspectable agency runtime. The manager reads the repo, assembles specialists only when the work calls for them, and turns evidence from docs and git into a reusable content package before any X-specific copy exists.",
+  assets: [],
+  confidence: 0.92,
   evaluations: [
     {
-      id: "eval-weak-draft",
-      runId: "run-failed-001",
-      contentPackageId: "pkg-wingbeat-typed-spine-failed",
-      evaluatorAgentId: "agent-critic-failed",
-      evaluationSet: "x-build-in-public-gate-v1",
+      id: "eval-weak-draft-runtime",
+      runId: "run-runtime-handoff",
+      contentPackageId: "pkg-runtime-handoff",
+      evaluatorAgentId: "agent-critic",
+      evaluationSet: "source-backed-build-in-public-gate",
       passed: false,
-      score: 0.48,
-      createdAt: "2026-07-12T09:37:12.000Z",
+      score: 0.26,
+      createdAt: "2026-07-12T06:30:00.052Z",
       revisionRequest:
-        "Replace broad agency claims with concrete schema, trace, veto, and receipt details backed by project docs.",
-      capturedAsCase: {
-        id: "case-unsupported-agency-claims",
-        sourceRunId: "run-failed-001",
-        label: "Unsupported agency claims",
-        reason: "Draft described live autonomous publishing without a verified receipt.",
-        capturedAt: "2026-07-12T09:37:14.000Z",
-      },
+        "Remove overbroad audience and automation claims; name the veto-boundary and observability mechanics.",
       checks: [
         {
-          id: "check-accuracy-failed",
-          label: "Accuracy",
+          id: "check-overbroad-audience",
+          label: "Audience scope",
           status: "fail",
-          score: 0.35,
-          detail: "Claimed live posting before receipt verification existed.",
-          evidenceIds: ["ev-failed-draft"],
-        },
-        {
-          id: "check-specificity-failed",
-          label: "Specificity",
-          status: "fail",
-          score: 0.41,
-          detail: "Did not mention trace, evaluation, veto, or receipt mechanics.",
-          evidenceIds: ["ev-failed-draft"],
+          score: 0.2,
+          detail: "The weak draft claimed Wingbeat helps everyone market everything automatically.",
+          evidenceIds: ["evidence-doc-1"],
         },
       ],
     },
     {
-      id: "eval-pass-typed-spine",
-      runId: "run-live-003",
-      contentPackageId: "pkg-wingbeat-typed-spine",
+      id: "eval-revised-runtime",
+      runId: "run-runtime-handoff",
+      contentPackageId: "pkg-runtime-handoff",
       evaluatorAgentId: "agent-critic",
-      evaluationSet: "x-build-in-public-gate-v1",
+      evaluationSet: "source-backed-build-in-public-gate",
       passed: true,
-      score: 0.91,
-      createdAt: "2026-07-12T09:50:02.000Z",
+      score: 0.92,
+      createdAt: "2026-07-12T06:30:00.052Z",
       checks: [
         {
-          id: "check-accuracy-pass",
-          label: "Accuracy",
+          id: "check-source-backed",
+          label: "Source-backed",
           status: "pass",
-          score: 0.94,
-          detail: "All claims tie back to product concept or roadmap evidence.",
-          evidenceIds: ["ev-roadmap-entities", "ev-canonical-contract", "ev-veto-contract"],
-        },
-        {
-          id: "check-specificity-pass",
-          label: "Specificity",
-          status: "pass",
-          score: 0.9,
-          detail: "Names the exact agency mechanics being built.",
-          evidenceIds: ["ev-roadmap-entities"],
-        },
-        {
-          id: "check-aesthetic-warn",
-          label: "Aesthetic support",
-          status: "warn",
-          score: 0.78,
-          detail: "Asset is deterministic and useful, but not yet generated from live screenshots.",
-          evidenceIds: ["ev-asset-specialist"],
+          score: 0.92,
+          detail: "The revised draft is specific, source-backed, and suitable for X handoff.",
+          evidenceIds: ["evidence-doc-1", "evidence-doc-2", "evidence-doc-3"],
         },
       ],
     },
   ],
   adaptations: [
     {
-      id: "adapt-x-typed-spine",
+      id: "adapt-x-runtime",
       channel: "x",
-      status: "published",
+      status: "approved",
       copy:
-        "The hard part of an AI marketing agency is not the first post. It is the spine around it: source-backed story packages, visible specialist traces, a critic that can fail weak drafts, veto-window execution, and receipts you can inspect after publish.",
-      assetIds: ["asset-trace-card"],
-      callToAction: "Build the agency loop before polishing the copy.",
-      createdByAgentId: "agent-strategist",
-      createdAt: "2026-07-12T09:49:20.000Z",
+        "Today Wingbeat got its agency spine: repo inspection, conditional specialists, source-backed content, critic revision, and an X handoff with a veto window.\n\nThe principle: marketing output should emerge from inspectable infrastructure-not a posting prompt.\n\n#BuildInPublic",
+      assetIds: [],
+      createdByAgentId: "agent-x-adapter",
+      createdAt: "2026-07-12T06:30:00.052Z",
     },
   ],
   executionHistory: [
     {
-      id: "exec-record-notify",
-      executionJobId: "job-x-003",
+      id: "exec-handoff-ready",
+      executionJobId: "xjob-runtime-handoff",
       channel: "x",
       status: "veto_window",
-      at: "2026-07-12T09:50:20.000Z",
-      note: "Telegram preview sent with 60-second veto window.",
-    },
-    {
-      id: "exec-record-published",
-      executionJobId: "job-x-003",
-      channel: "x",
-      status: "published",
-      at: "2026-07-12T09:51:28.000Z",
-      note: "Silence during veto window; X post published and verified.",
-      receiptId: "receipt-x-003",
+      at: "2026-07-12T06:30:00.052Z",
+      note: "Runtime produced X copy and veto-window metadata; browser executor owns live posting and receipt.",
     },
   ],
   reuse: {
-    usedChannels: ["x"],
-    availableFor: ["reddit"],
-    lastUsedAt: "2026-07-12T09:51:28.000Z",
+    usedChannels: [],
+    availableFor: ["x", "reddit"],
   },
 }
 
-const failedContentPackage: ContentPackage = {
+const latestExecutionJob: ExecutionJob = {
+  id: "xjob-runtime-handoff",
+  runId: "run-runtime-handoff",
+  contentPackageId: "pkg-runtime-handoff",
+  adaptationId: "adapt-x-runtime",
+  channel: "x",
+  status: "veto_window",
+  executionPhase: "handoff_ready",
+  scheduledFor: "2026-07-12T06:31:00.052Z",
+  vetoWindowSeconds: 45,
+  vetoEndsAt: "2026-07-12T06:30:45.052Z",
+  payload: {
+    copy: latestContentPackage.adaptations[0].copy,
+    asset: "deterministic-card:agency-trace",
+  },
+  handoff: {
+    executor: "scripts/x-execution/x-executor.mjs",
+    commandPreview:
+      "node scripts/x-execution/x-executor.mjs prepare --run-id run-runtime-handoff --copy-file <copy-file> --veto-seconds 45",
+  },
+}
+
+export const latestRun: AgencyRun = {
+  id: "run-runtime-handoff",
+  project: "wingbeat",
+  trigger: "manual-demo",
+  status: "veto_window",
+  dataOrigin: "runtime",
+  startedAt: "2026-07-12T06:29:59.994Z",
+  finishedAt: "2026-07-12T06:30:00.052Z",
+  scheduledFor: "2026-07-12T06:31:00.052Z",
+  vetoEndsAt: "2026-07-12T06:30:45.052Z",
+  package: toDashboardPackage(latestContentPackage),
+  contentPackage: latestContentPackage,
+  agents: [
+    agent("agent-manager", undefined, "Agency Manager", "Market the Wingbeat repository itself with a build-in-public story.", "passed", 58, 0.006976, 1744),
+    agent("agent-intel", "agent-manager", "Project Intelligence", "Summarize the repo-backed facts and implementation surface.", "passed", 16, 0.00036, 90),
+    agent("agent-story", "agent-manager", "Story Detector", "Find the strongest build-in-public story supported by project evidence.", "passed", 11, 0.000252, 63),
+    agent("agent-critic", "agent-manager", "Editor / Critic", "Check accuracy, specificity, repetition, and brand fit.", "passed", 0, 0.000132, 33),
+    agent("agent-x-adapter", "agent-manager", "X Channel Adapter", "Convert canonical package into an X-native payload.", "passed", 0, 0.000324, 81),
+  ],
+  events: [
+    event("evt-runtime-start", "run-runtime-handoff", "agent-manager", "spawn", "Agency manager started", "Inspecting docs, git, current job, and brand policy."),
+    event("evt-runtime-weak", "run-runtime-handoff", "agent-manager", "evaluation", "Weak draft evaluated", "failed at 0.26"),
+    event("evt-runtime-revision", "run-runtime-handoff", "agent-manager", "revision", "Manager revision requested", "Overbroad audience claim. Publishing claim lacks veto-boundary context."),
+    event("evt-runtime-pass", "run-runtime-handoff", "agent-critic", "evaluation", "Revised package evaluated", "passed at 0.92"),
+    event("evt-runtime-handoff", "run-runtime-handoff", "agent-x-adapter", "publish", "Execution handoff prepared", latestExecutionJob.handoff?.commandPreview ?? "handoff prepared"),
+  ],
+  executionJobs: [latestExecutionJob],
+  executionJob: latestExecutionJob,
+  receipts: [],
+  policy,
+  contextReferences,
+  selectedCrew: ["Project Intelligence", "Story Detector", "Editor / Critic", "X Channel Adapter"],
+  evaluation: {
+    weakDraft: {
+      text: "We made Wingbeat better today. It has agents, content, and publishing, and it will help everyone market everything automatically.",
+      result: {
+        id: "eval-weak-draft-runtime",
+        name: "source-backed-build-in-public-gate",
+        passed: false,
+        score: 0.26,
+        findings: [
+          "Overbroad audience claim.",
+          "Publishing claim lacks veto-boundary context.",
+          "Autonomy claim lacks observability or inspection detail.",
+        ],
+      },
+    },
+    revisedDraft: {
+      text: latestContentPackage.channelNeutralBody,
+      result: {
+        id: "eval-revised-runtime",
+        name: "source-backed-build-in-public-gate",
+        passed: true,
+        score: 0.92,
+        findings: ["Specific, source-backed, and suitable for revision into X copy."],
+      },
+    },
+  },
+  metrics: {
+    totalLatencyMs: 58,
+    totalEstimatedCostUsd: 0.008044,
+    agentCount: 5,
+    traceEventCount: 5,
+  },
+}
+
+const failedFixturePackage: ContentPackage = {
   ...latestContentPackage,
-  id: "pkg-wingbeat-typed-spine-failed",
-  confidence: 0.44,
+  id: "pkg-fixture-failed-overclaim",
+  confidence: 0.26,
   narrative:
-    "Wingbeat can now autonomously market any project end to end with beautiful assets and live publishing.",
+    "Historical fixture: a weak draft overclaimed audience scope and implied autonomous publishing without receipt proof.",
   supportedClaims: latestContentPackage.supportedClaims.slice(0, 1),
-  assets: [],
+  prohibitedClaims: latestContentPackage.prohibitedClaims,
   adaptations: [
     {
-      id: "adapt-x-failed",
+      id: "adapt-fixture-failed",
       channel: "x",
       status: "rejected",
       copy:
-        "Wingbeat is a fully autonomous AI agency that turns every product change into perfect marketing across every channel.",
+        "We made Wingbeat better today. It has agents, content, and publishing, and it will help everyone market everything automatically.",
       assetIds: [],
-      createdByAgentId: "agent-strategist-failed",
-      createdAt: "2026-07-12T09:36:40.000Z",
+      createdByAgentId: "agent-fixture-strategist",
+      createdAt: "2026-07-12T06:29:59.000Z",
     },
   ],
   executionHistory: [],
 }
 
-const latestAgents: AgentNode[] = [
-  agent("agent-manager", undefined, "role-manager", "Hermes Agency Manager", "Select specialists and own the run.", "passed", 1600, 0.0132, 4200, contextEnvelope, "Spawned story, critic, mockup, and X execution agents."),
-  agent("agent-story", "agent-manager", "role-story", "Story Detector", "Find the source-backed build-in-public angle.", "passed", 1380, 0.0098, 3100, contextEnvelope, "Selected the typed agency spine as the credible story."),
-  agent("agent-critic", "agent-manager", "role-critic", "Editor / Critic", "Evaluate the revised X adaptation.", "passed", 940, 0.0067, 1900, contextEnvelope, "Passed the revised copy with one asset-quality warning."),
-  agent("agent-mockup", "agent-manager", "role-mockup", "Product Mockup Specialist", "Create deterministic proof-card brief.", "passed", 680, 0.0024, 1400, contextEnvelope, "Produced branded-card requirements for the dashboard renderer."),
-  agent("agent-x", "agent-manager", "role-x", "X Execution Agent", "Notify, publish after veto, verify, and receipt.", "passed", 1180, 0.0056, 7300, contextEnvelope, "Recorded verified publish receipt."),
-]
-
-const latestEvents: TraceEvent[] = [
-  event("trace-start", "run-live-003", "agent-manager", "run_started", "Run started", "Cron deadline triggered build-in-public story selection.", 320),
-  event("trace-story", "run-live-003", "agent-story", "handoff", "Story selected", "Story Detector chose the shared agency spine based on roadmap entities.", 1380, 3100, 0.0098),
-  event("trace-fail-reference", "run-live-003", "agent-critic", "revision", "Prior failure loaded", "Critic loaded the preserved failed run to avoid unsupported autonomy claims.", 240),
-  event("trace-mockup", "run-live-003", "agent-mockup", "tool", "Asset brief generated", "Dynamic mockup specialist produced deterministic branded-card requirements.", 680, 1400, 0.0024),
-  event("trace-eval-pass", "run-live-003", "agent-critic", "evaluation", "Evaluation passed", "x-build-in-public-gate-v1 passed at 0.91.", 940, 1900, 0.0067),
-  event("trace-notify", "run-live-003", "agent-x", "notification", "Veto notification sent", "Telegram preview sent with edit, delay, block, and reject controls.", 430, 900, 0.0011),
-  event("trace-publish", "run-live-003", "agent-x", "publish", "Published after silence", "Veto window expired without action; X adapter published the approved copy.", 620, 2100, 0.0023),
-  event("trace-receipt", "run-live-003", "agent-x", "receipt", "Receipt verified", "Live post identifier and URL were recorded.", 130, 700, 0.0009),
-]
-
-const latestExecutionJob: ExecutionJob = {
-  id: "job-x-003",
-  runId: "run-live-003",
-  contentPackageId: "pkg-wingbeat-typed-spine",
-  adaptationId: "adapt-x-typed-spine",
-  channel: "x",
-  status: "published",
-  scheduledFor: "2026-07-12T09:50:00.000Z",
-  vetoWindowSeconds: 60,
-  vetoEndsAt: "2026-07-12T09:51:20.000Z",
-  receiptId: "receipt-x-003",
-  notification: {
-    id: "notify-telegram-003",
-    provider: "telegram",
-    recipient: "@ankur",
-    sentAt: "2026-07-12T09:50:20.000Z",
-    preview: latestContentPackage.adaptations[0].copy,
-    actions: [
-      { id: "veto-edit", label: "edit", status: "expired" },
-      { id: "veto-delay", label: "delay", status: "expired" },
-      { id: "veto-block", label: "block", status: "expired" },
-      { id: "veto-reject", label: "reject_angle", status: "expired" },
-    ],
-  },
-}
-
-const latestReceipt: PublishReceipt = {
-  id: "receipt-x-003",
-  executionJobId: "job-x-003",
-  channel: "x",
-  status: "verified",
-  publishedAt: "2026-07-12T09:51:28.000Z",
-  verifiedAt: "2026-07-12T09:51:34.000Z",
-  postId: "demo-typed-spine-003",
-  url: "https://x.com/wingbeat_demo/status/demo-typed-spine-003",
-  account: "@wingbeat_demo",
-  preview: latestContentPackage.adaptations[0].copy,
-  verificationLog: ["posted copy matched approved adaptation", "post id returned", "public URL resolved"],
-}
-
-export const latestRun: AgencyRun = {
-  id: "run-live-003",
-  project: "Wingbeat",
-  trigger: "Daily build-in-public deadline",
-  status: "published",
-  startedAt: "2026-07-12T09:45:10.000Z",
-  finishedAt: "2026-07-12T09:51:34.000Z",
-  scheduledFor: "2026-07-12T09:50:00.000Z",
-  vetoEndsAt: "2026-07-12T09:51:20.000Z",
-  publishedUrl: latestReceipt.url,
-  package: toDashboardPackage(latestContentPackage),
-  contentPackage: latestContentPackage,
-  agents: latestAgents,
-  events: latestEvents,
-  executionJobs: [latestExecutionJob],
-  receipts: [latestReceipt],
-  policy,
-}
-
 export const failedRun: AgencyRun = {
-  id: "run-failed-001",
-  project: "Wingbeat",
-  trigger: "First ugly vertical slice rehearsal",
+  id: "fixture-failed-overclaim-001",
+  project: "wingbeat",
+  trigger: "historical-fixture",
   status: "failed",
-  startedAt: "2026-07-12T09:34:20.000Z",
-  finishedAt: "2026-07-12T09:37:14.000Z",
-  scheduledFor: "2026-07-12T09:36:00.000Z",
-  package: toDashboardPackage(failedContentPackage),
-  contentPackage: failedContentPackage,
+  dataOrigin: "fixture",
+  fixtureLabel: "Historical failed draft fixture; not a real publish attempt",
+  startedAt: "2026-07-12T06:29:59.000Z",
+  finishedAt: "2026-07-12T06:30:00.000Z",
+  package: toDashboardPackage(failedFixturePackage),
+  contentPackage: failedFixturePackage,
   agents: [
-    agent("agent-manager-failed", undefined, "role-manager", "Hermes Agency Manager", "Attempt first vertical slice.", "failed", 800, 0.0053, 2100, contextEnvelope, "Sent vague draft to critic too early."),
-    agent("agent-critic-failed", "agent-manager-failed", "role-critic", "Editor / Critic", "Evaluate first X draft.", "failed", 620, 0.0041, 1600, contextEnvelope, "Failed unsupported autonomy and specificity checks."),
+    agent("agent-fixture-manager", undefined, "Agency Manager", "Preserve a failed draft for UI comparison.", "failed", 12, 0, 0),
+    agent("agent-fixture-critic", "agent-fixture-manager", "Editor / Critic", "Reject unsupported claims.", "failed", 8, 0, 0),
   ],
   events: [
-    event("trace-failed-start", "run-failed-001", "agent-manager-failed", "run_started", "Failed run started", "First vertical slice generated an overbroad draft.", 280),
-    event("trace-failed-eval", "run-failed-001", "agent-critic-failed", "evaluation", "Evaluation failed", "Draft scored 0.48 and was captured as a regression case.", 620, 1600, 0.0041),
-    event("trace-failed-alert", "run-failed-001", "agent-critic-failed", "alert", "Unsupported claim alert", "Copy claimed live autonomous publishing without a verified receipt.", 90),
+    event("evt-fixture-failed", "fixture-failed-overclaim-001", "agent-fixture-critic", "evaluation", "Historical fixture failed", "Weak draft failed at 0.26 before notification or publish."),
   ],
   executionJobs: [
     {
-      id: "job-x-failed-001",
-      runId: "run-failed-001",
-      contentPackageId: "pkg-wingbeat-typed-spine-failed",
-      adaptationId: "adapt-x-failed",
+      id: "xjob-fixture-failed",
+      runId: "fixture-failed-overclaim-001",
+      contentPackageId: "pkg-fixture-failed-overclaim",
+      adaptationId: "adapt-fixture-failed",
       channel: "x",
       status: "failed",
-      scheduledFor: "2026-07-12T09:36:00.000Z",
-      vetoWindowSeconds: 60,
-      failureReason: "Evaluation gate blocked unsupported claims before notification.",
+      scheduledFor: "2026-07-12T06:30:00.000Z",
+      vetoWindowSeconds: 45,
+      failureReason: "Historical fixture blocked by evaluation gate before execution handoff.",
     },
   ],
-  receipts: [
-    {
-      id: "receipt-x-failed-001",
-      executionJobId: "job-x-failed-001",
-      channel: "x",
-      status: "failed",
-      preview: failedContentPackage.adaptations[0].copy,
-      verificationLog: ["publish skipped because evaluation failed"],
-      error: "Blocked by x-build-in-public-gate-v1.",
-    },
-  ],
+  receipts: [],
   policy,
 }
 
 export const overdueRun: AgencyRun = {
   ...latestRun,
-  id: "run-overdue-002",
-  trigger: "Laptop offline during scheduled deadline",
+  id: "fixture-overdue-recovery-001",
+  trigger: "historical-fixture",
   status: "overdue",
-  startedAt: "2026-07-12T09:39:00.000Z",
+  dataOrigin: "fixture",
+  fixtureLabel: "Historical overdue recovery fixture; not current runtime output",
+  startedAt: "2026-07-12T06:31:00.000Z",
   finishedAt: undefined,
   vetoEndsAt: undefined,
-  publishedUrl: undefined,
   executionJobs: [
     {
       ...latestExecutionJob,
-      id: "job-x-overdue-002",
-      runId: "run-overdue-002",
+      id: "xjob-fixture-overdue",
+      runId: "fixture-overdue-recovery-001",
       status: "overdue",
-      scheduledFor: "2026-07-12T09:40:00.000Z",
-      vetoEndsAt: undefined,
       receiptId: undefined,
       notification: undefined,
     },
   ],
+  executionJob: {
+    ...latestExecutionJob,
+    id: "xjob-fixture-overdue",
+    runId: "fixture-overdue-recovery-001",
+    status: "overdue",
+  },
   receipts: [],
-  events: [
-    event("trace-overdue-start", "run-overdue-002", "agent-manager", "run_started", "Deadline detected", "Scheduled job found after device wake.", 210),
-    event("trace-overdue-transition", "run-overdue-002", "agent-x", "status_transition", "Marked overdue", "Job is overdue rather than cancelled; recovery notification pending.", 120),
-  ],
 }
 
 export const runs: AgencyRun[] = [latestRun, overdueRun, failedRun]
@@ -589,39 +433,49 @@ export const runs: AgencyRun[] = [latestRun, overdueRun, failedRun]
 function agent(
   id: string,
   parentId: string | undefined,
-  roleId: string,
   role: string,
   objective: string,
-  status: AgentNode["status"],
+  status: AgencyRun["agents"][number]["status"],
   latencyMs: number,
   costUsd: number,
   tokens: number,
-  envelope: ContextEnvelope,
-  output: string,
-): AgentNode {
+): AgencyRun["agents"][number] {
   return {
     id,
     parentId,
-    roleId,
     role,
     objective,
     status,
-    startedAt: "2026-07-12T09:45:10.000Z",
-    finishedAt: "2026-07-12T09:51:34.000Z",
+    startedAt: "2026-07-12T06:30:00.000Z",
+    finishedAt: "2026-07-12T06:30:00.052Z",
     latencyMs,
     costUsd,
     tokens,
-    input: objective,
-    output,
-    contextEnvelope: envelope,
+    output: objective,
+  }
+}
+
+function event(
+  id: string,
+  runId: string,
+  agentId: string,
+  type: AgencyRun["events"][number]["type"],
+  title: string,
+  detail: string,
+): AgencyRun["events"][number] {
+  return {
+    id,
+    runId,
+    agentId,
+    at: "2026-07-12T06:30:00.052Z",
+    type,
+    title,
+    detail,
   }
 }
 
 function toDashboardPackage(contentPackage: ContentPackage): AgencyRun["package"] {
   const adaptation = contentPackage.adaptations.find((item) => item.channel === "x") ?? contentPackage.adaptations[0]
-  const asset = adaptation?.assetIds[0]
-    ? contentPackage.assets.find((item) => item.id === adaptation.assetIds[0])?.label
-    : undefined
 
   return {
     id: contentPackage.id,
@@ -640,32 +494,20 @@ function toDashboardPackage(contentPackage: ContentPackage): AgencyRun["package"
     adaptation: {
       channel: "x",
       copy: adaptation?.copy ?? "",
-      asset,
     },
-  }
-}
-
-function event(
-  id: string,
-  runId: string,
-  agentId: string,
-  type: TraceEvent["type"],
-  title: string,
-  detail: string,
-  latencyMs: number,
-  tokens?: number,
-  costUsd?: number,
-): TraceEvent {
-  return {
-    id,
-    runId,
-    agentId,
-    at: "2026-07-12T09:50:00.000Z",
-    type,
-    title,
-    detail,
-    latencyMs,
-    tokens,
-    costUsd,
+    evaluations: contentPackage.evaluations.map((evaluation) => ({
+      id: evaluation.id,
+      name: evaluation.evaluationSet,
+      passed: evaluation.passed,
+      score: evaluation.score,
+      findings: evaluation.checks.map((check) => check.detail),
+    })),
+    contextReferences,
+    executionHistory: contentPackage.executionHistory.map((record) => ({
+      id: record.id,
+      channel: record.channel,
+      status: record.status,
+      detail: record.note,
+    })),
   }
 }

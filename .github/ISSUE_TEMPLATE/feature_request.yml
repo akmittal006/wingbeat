@@ -1,0 +1,55 @@
+name: Feature request
+description: Propose a focused improvement to Wingbeat.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What developer or operator problem should Wingbeat solve?
+      placeholder: Contributors cannot tell why a run used deterministic fallback...
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe observable behavior, not only a proposed implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: approach
+    attributes:
+      label: Suggested scope
+      description: What is the smallest useful change? Mention alternatives considered.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Agency runtime
+        - Context and evidence
+        - Operator console
+        - X executor
+        - Documentation or setup
+        - New channel or integration
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: trust
+    attributes:
+      label: Trust and safety impact
+      description: Could this affect provider-bound context, claims, approvals, credentials, or publishing?
+    validations:
+      required: true
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to help implement or test this.

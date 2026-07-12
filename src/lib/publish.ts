@@ -12,6 +12,10 @@ export function isLivePublished(run: Pick<AgencyRun, "status" | "receipts">): bo
   return run.status === "published" && Boolean(getVerifiedReceipt(run))
 }
 
+export function hasPublishReceipt(run: Pick<AgencyRun, "receipts">): boolean {
+  return Boolean(run.receipts?.length)
+}
+
 export function summarizeReceipt(receipt: PublishReceipt): string {
   if (receipt.status === "verified") {
     return `${receipt.channel.toUpperCase()} post ${receipt.postId ?? receipt.id} verified.`

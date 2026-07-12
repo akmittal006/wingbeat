@@ -1,7 +1,6 @@
 import {
   Activity,
   Archive,
-  ArrowRight,
   BadgeCheck,
   Blocks,
   Bot,
@@ -17,25 +16,37 @@ import {
   GitBranch,
   Globe2,
   Layers3,
-  Pause,
-  Play,
+  Link,
   Radio,
   RefreshCcw,
   Search,
   Send,
   ShieldAlert,
-  Sparkles,
   Timer,
   WalletCards,
   XCircle,
 } from "lucide-react"
 import { useEffect, useState, type ReactNode } from "react"
-import type { AgencyRun, AgentNode, AgentStatus, RunStatus, TraceEvent } from "../types"
-import type { QueueItem, RoleSummary, ViewKey } from "./dashboard-data"
-import { buildQueue, buildRoleSummaries } from "./dashboard-data"
+import type {
+  AgentNode,
+  AgentStatus,
+  ExecutionJob,
+  ExecutionJobStatus,
+  PublishReceipt,
+  RunStatus,
+  TraceEvent,
+} from "../types"
+import {
+  getExecutionJobs,
+  getPrimaryReceipt,
+  getReviewMoment,
+  getRuntimeMetrics,
+  type DashboardRun,
+  type ViewKey,
+} from "./dashboard-data"
 
 interface OperatorConsoleProps {
-  run: AgencyRun
+  run: DashboardRun
   view: ViewKey
   onViewChange: (view: ViewKey) => void
   selectedAgentId: string
@@ -58,9 +69,9 @@ export function OperatorConsole({
   onSelectAgent,
   dataSource,
 }: OperatorConsoleProps) {
-  const queue = buildQueue(run)
-  const roles = buildRoleSummaries(run)
   const selectedAgent = run.agents.find((agent) => agent.id === selectedAgentId) ?? run.agents[0]
+  const jobs = getExecutionJobs(run)
+  const receipt = getPrimaryReceipt(run)
 
   return (
     <div className="app-shell">
@@ -80,7 +91,7 @@ export function OperatorConsole({
             <span>Search runs, agents, evidence</span>
           </div>
           <StatusChip status={run.status} />
-          <span className="source-pill">{dataSource === "remote" ? "Live data" : "Fallback data"}</span>
+          <span className="source-pill">{dataSource === "remote" ? "Live data" : "Fallback: no run"}</span>
         </div>
       </header>
 
@@ -111,7 +122,8 @@ export function OperatorConsole({
       <main className="console-main">
         {view === "operations" && (
           <OperationsView
-            queue={queue}
+            jobs={jobs}
+            receipt={receipt}
             run={run}
             selectedAgent={selectedAgent}
             selectedAgentId={selectedAgentId}
@@ -122,7 +134,6 @@ export function OperatorConsole({
         {view === "agency" && (
           <AgencyView
             run={run}
-            roles={roles}
             selectedAgentId={selectedAgentId}
             onSelectAgent={onSelectAgent}
           />
@@ -140,41 +151,48 @@ export function OperatorConsole({
 }
 
 function OperationsView({
-  queue,
+  jobs,
+  receipt,
   run,
   selectedAgent,
   selectedAgentId,
   onSelectAgent,
 }: {
-  queue: QueueItem[]
-  run: AgencyRun
+  jobs: ExecutionJob[]
+  receipt?: PublishReceipt
+  run: DashboardRun
   selectedAgent?: AgentNode
   selectedAgentId: string
   onSelectAgent: (agentId: string) => void
 }) {
+  const reviewMoment = getReviewMoment(run)
+
   return (
     <section className="view-grid operations-grid">
       <div className="section-header wide">
         <div>
           <p className="eyebrow">Autonomous publishing</p>
-          <h2>Weekly Queue</h2>
+          <h2>Actual Run State</h2>
         </div>
         <div className="button-row">
-          <button className="icon-button" title="Pause automation" type="button">
-            <Pause size={17} />
-          </button>
-          <button className="primary-action" type="button">
-            <Play size={17} />
-            Start job
-          </button>
+          <StatusChip status={run.status} />
         </div>
       </div>
 
       <Panel className="queue-panel">
+        <div className="panel-heading">
+          <div>
+            <p className="eyebrow">Execution</p>
+            <h3>Jobs from run data</h3>
+          </div>
+          <CalendarClock size={18} />
+        </div>
         <div className="queue-list">
-          {queue.map((item) => (
-            <QueueRow item={item} key={item.id} />
-          ))}
+          {jobs.length > 0 ? (
+            jobs.map((job) => <JobRow job={job} key={job.id} run={run} />)
+          ) : (
+            <EmptyState>No execution jobs recorded for this run.</EmptyState>
+          )}
         </div>
       </Panel>
 
@@ -188,8 +206,25 @@ function OperationsView({
         </div>
         <p className="run-summary">{run.package.narrative}</p>
         <MetricGrid run={run} />
-        <VetoCountdown vetoEndsAt={run.vetoEndsAt} status={run.status} />
+        <VetoCountdown job={jobs[0]} run={run} />
       </Panel>
+
+      <ReceiptPanel receipt={receipt} />
+
+      {reviewMoment ? (
+        <ReviewMomentPanel run={run} />
+      ) : (
+        <Panel className="review-panel">
+          <div className="panel-heading">
+            <div>
+              <p className="eyebrow">Review</p>
+              <h3>Draft Evaluation</h3>
+            </div>
+            <BadgeCheck size={18} />
+          </div>
+          <EmptyState>No failed/revised review moment recorded.</EmptyState>
+        </Panel>
+      )}
 
       <Panel className="trace-panel">
         <div className="panel-heading">
@@ -214,7 +249,7 @@ function OperationsView({
           </div>
           {selectedAgent && <AgentStatusChip status={selectedAgent.status} />}
         </div>
-        {selectedAgent ? <AgentDrawer agent={selectedAgent} events={run.events} /> : null}
+        {selectedAgent ? <AgentDrawer agent={selectedAgent} events={run.events} /> : <EmptyState>No agents recorded.</EmptyState>}
       </Panel>
 
       <Panel className="evidence-panel">
@@ -242,7 +277,7 @@ function OperationsView({
   )
 }
 
-function CatalogView({ run }: { run: AgencyRun }) {
+function CatalogView({ run }: { run: DashboardRun }) {
   return (
     <section className="view-grid catalog-grid">
       <div className="section-header wide">
@@ -277,14 +312,7 @@ function CatalogView({ run }: { run: AgencyRun }) {
           </div>
           <BadgeCheck size={18} />
         </div>
-        <ul className="check-list">
-          {run.package.supportedClaims.map((claim) => (
-            <li key={claim}>
-              <CheckCircle2 size={16} />
-              <span>{claim}</span>
-            </li>
-          ))}
-        </ul>
+        <ClaimList claims={run.package.supportedClaims} empty="No supported claims recorded." />
       </Panel>
 
       <Panel>
@@ -295,32 +323,29 @@ function CatalogView({ run }: { run: AgencyRun }) {
           </div>
           <ShieldAlert size={18} />
         </div>
-        <ul className="check-list danger">
-          {run.package.prohibitedClaims.map((claim) => (
-            <li key={claim}>
-              <XCircle size={16} />
-              <span>{claim}</span>
-            </li>
-          ))}
-        </ul>
+        <ClaimList claims={run.package.prohibitedClaims} danger empty="No prohibited claims recorded." />
       </Panel>
 
       <Panel>
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Reusable hooks</p>
-            <h3>Unused Angles</h3>
+            <p className="eyebrow">Recorded hooks</p>
+            <h3>Package Hooks</h3>
           </div>
-          <Sparkles size={18} />
+          <Archive size={18} />
         </div>
-        <div className="hook-list">
-          {run.package.hooks.map((hook, index) => (
-            <div className="hook-row" key={hook}>
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <p>{hook}</p>
-            </div>
-          ))}
-        </div>
+        {run.package.hooks.length > 0 ? (
+          <div className="hook-list">
+            {run.package.hooks.map((hook, index) => (
+              <div className="hook-row" key={hook}>
+                <span className="hook-index">{String(index + 1).padStart(2, "0")}</span>
+                <p>{hook}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <EmptyState>No hooks recorded.</EmptyState>
+        )}
       </Panel>
 
       <Panel className="evidence-panel catalog-evidence">
@@ -345,9 +370,9 @@ function CatalogView({ run }: { run: AgencyRun }) {
         <div className="asset-card">
           <div className="asset-card-top">
             <span>W</span>
-            <strong>Operator Card</strong>
+            <strong>{run.package.adaptation.asset ? "Recorded Asset" : "No asset"}</strong>
           </div>
-          <p>{run.package.adaptation.asset ?? "No asset requested."}</p>
+          <p>{run.package.adaptation.asset ?? "No asset recorded for this package."}</p>
         </div>
       </Panel>
     </section>
@@ -356,12 +381,10 @@ function CatalogView({ run }: { run: AgencyRun }) {
 
 function AgencyView({
   run,
-  roles,
   selectedAgentId,
   onSelectAgent,
 }: {
-  run: AgencyRun
-  roles: RoleSummary[]
+  run: DashboardRun
   selectedAgentId: string
   onSelectAgent: (agentId: string) => void
 }) {
@@ -370,46 +393,35 @@ function AgencyView({
       <div className="section-header wide">
         <div>
           <p className="eyebrow">Dynamic agency</p>
-          <h2>Role Registry</h2>
+          <h2>Recorded Crew</h2>
         </div>
-        <div className="button-row">
-          <button className="secondary-action" type="button">
-            <RefreshCcw size={16} />
-            Retry
-          </button>
-          <button className="primary-action" type="button">
-            <Bot size={16} />
-            Create role
-          </button>
-        </div>
+        <span className="source-pill">{run.agents.length} agents recorded</span>
       </div>
 
       <Panel className="role-registry">
         <div className="role-grid">
-          {roles.map((role) => (
-            <div className="role-card" key={role.role}>
-              <div className="role-card-header">
-                <Bot size={18} />
-                <div>
-                  <h3>{role.role}</h3>
-                  <p>{role.agents} active agent{role.agents === 1 ? "" : "s"}</p>
+          {run.agents.length > 0 ? (
+            run.agents.map((agent) => (
+              <button
+                className={selectedAgentId === agent.id ? "role-card selected" : "role-card"}
+                key={agent.id}
+                onClick={() => onSelectAgent(agent.id)}
+                type="button"
+              >
+                <div className="role-card-header">
+                  <Bot size={18} />
+                  <div>
+                    <h3>{agent.role}</h3>
+                    <p>{agent.objective}</p>
+                  </div>
+                  <AgentStatusChip status={agent.status} />
                 </div>
-                <span>{role.status}</span>
-              </div>
-              <div className="tag-wrap">
-                {role.tools.map((tool) => (
-                  <span className="tag" key={tool}>
-                    {tool}
-                  </span>
-                ))}
-              </div>
-              <ul className="compact-list">
-                {role.guardrails.map((guardrail) => (
-                  <li key={guardrail}>{guardrail}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
+                {agent.output ? <p className="role-output">{agent.output}</p> : null}
+              </button>
+            ))
+          ) : (
+            <EmptyState>No crew recorded for this run.</EmptyState>
+          )}
         </div>
       </Panel>
 
@@ -419,7 +431,7 @@ function AgencyView({
             <p className="eyebrow">Delegation</p>
             <h3>Handoffs</h3>
           </div>
-          <ArrowRight size={18} />
+          <ChevronRight size={18} />
         </div>
         <TraceTree
           agents={run.agents}
@@ -431,22 +443,12 @@ function AgencyView({
       <Panel className="agency-actions">
         <div className="panel-heading">
           <div>
-            <p className="eyebrow">Controls</p>
-            <h3>Run Management</h3>
+            <p className="eyebrow">Execution boundary</p>
+            <h3>Recorded State</h3>
           </div>
           <Gauge size={18} />
         </div>
-        <div className="control-grid">
-          <ControlButton icon={Pause} label="Pause" />
-          <ControlButton icon={RefreshCcw} label="Retry" />
-          <ControlButton icon={Eye} label="Inspect" />
-          <ControlButton icon={ShieldAlert} label="Block" />
-        </div>
-        <p className="muted-copy">
-          {run.status === "veto_window"
-            ? "Countdown is active. Blocking now prevents autonomous publish."
-            : "Controls apply to the currently selected run."}
-        </p>
+        <ExecutionStateList run={run} />
       </Panel>
     </section>
   )
@@ -457,7 +459,7 @@ function ObservabilityView({
   selectedAgentId,
   onSelectAgent,
 }: {
-  run: AgencyRun
+  run: DashboardRun
   selectedAgentId: string
   onSelectAgent: (agentId: string) => void
 }) {
@@ -466,7 +468,7 @@ function ObservabilityView({
       <div className="section-header wide">
         <div>
           <p className="eyebrow">Run telemetry</p>
-          <h2>Trace, Costs, Latency</h2>
+          <h2>Estimated Cost, Tokens, Latency</h2>
         </div>
         <StatusChip status={run.status} />
       </div>
@@ -474,6 +476,8 @@ function ObservabilityView({
       <Panel className="metrics-panel">
         <MetricGrid run={run} />
       </Panel>
+
+      <ReviewMomentPanel run={run} />
 
       <Panel className="timeline-panel">
         <div className="panel-heading">
@@ -505,18 +509,22 @@ function ObservabilityView({
         <div className="panel-heading">
           <div>
             <p className="eyebrow">Latest events</p>
-            <h3>Tool Calls</h3>
+            <h3>Recorded Calls</h3>
           </div>
           <Clock3 size={18} />
         </div>
         <div className="event-grid">
-          {run.events.slice(-4).map((event) => (
-            <div className="event-card" key={event.id}>
-              <span>{event.type}</span>
-              <strong>{event.title}</strong>
-              <p>{event.detail}</p>
-            </div>
-          ))}
+          {run.events.length > 0 ? (
+            run.events.slice(-4).map((event) => (
+              <div className="event-card" key={event.id}>
+                <span>{event.type}</span>
+                <strong>{event.title}</strong>
+                <p>{event.detail}</p>
+              </div>
+            ))
+          ) : (
+            <EmptyState>No trace events recorded.</EmptyState>
+          )}
         </div>
       </Panel>
     </section>
@@ -533,24 +541,157 @@ function Panel({
   return <section className={`panel ${className}`}>{children}</section>
 }
 
-function QueueRow({ item }: { item: QueueItem }) {
+function EmptyState({ children }: { children: ReactNode }) {
+  return <div className="empty-state">{children}</div>
+}
+
+function JobRow({ job, run }: { job: ExecutionJob; run: DashboardRun }) {
   return (
     <article className="queue-row">
       <div className="queue-date">
         <CalendarClock size={16} />
-        <span>{formatShortDate(item.scheduledFor)}</span>
+        <span>{formatShortDate(job.scheduledFor)}</span>
       </div>
       <div className="queue-main">
-        <h3>{item.title}</h3>
+        <h3>{job.id}</h3>
         <p>
-          {item.project} <ChevronRight size={14} /> {item.channel}
+          {run.project} <ChevronRight size={14} /> {job.channel.toUpperCase()}
         </p>
       </div>
       <div className="queue-meta">
-        <StatusChip status={item.status} />
-        <span>{Math.round(item.confidence * 100)}%</span>
+        <ExecutionStatusChip status={job.status} />
+        {job.receiptId ? <span>{job.receiptId}</span> : null}
       </div>
     </article>
+  )
+}
+
+function ReceiptPanel({ receipt }: { receipt?: PublishReceipt }) {
+  return (
+    <Panel className={receipt?.url ? "receipt-panel receipt-panel-live" : "receipt-panel"}>
+      <div className="panel-heading">
+        <div>
+          <p className="eyebrow">Publish receipt</p>
+          <h3>{receipt ? receipt.status : "No receipt yet"}</h3>
+        </div>
+        <Link size={18} />
+      </div>
+      {receipt ? (
+        <div className="receipt-body">
+          {receipt.url ? (
+            <a className="receipt-url" href={receipt.url} rel="noreferrer" target="_blank">
+              {receipt.url}
+            </a>
+          ) : (
+            <p>No public URL recorded yet.</p>
+          )}
+          <div className="receipt-grid">
+            <KeyValue label="Channel" value={receipt.channel.toUpperCase()} />
+            <KeyValue label="Account" value={receipt.account ?? "Not recorded"} />
+            <KeyValue label="Post ID" value={receipt.postId ?? "Not recorded"} />
+            <KeyValue label="Verified" value={receipt.verifiedAt ? formatTime(receipt.verifiedAt) : "Not recorded"} />
+          </div>
+          {receipt.verificationLog.length > 0 ? (
+            <ul className="compact-list">
+              {receipt.verificationLog.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      ) : (
+        <EmptyState>No publish receipt recorded for this run.</EmptyState>
+      )}
+    </Panel>
+  )
+}
+
+function ReviewMomentPanel({ run }: { run: DashboardRun }) {
+  const reviewMoment = getReviewMoment(run)
+
+  if (!reviewMoment) {
+    return (
+      <Panel className="review-panel">
+        <div className="panel-heading">
+          <div>
+            <p className="eyebrow">Evaluation</p>
+            <h3>Review Moment</h3>
+          </div>
+          <BadgeCheck size={18} />
+        </div>
+        <EmptyState>No weak-draft and revised-draft evaluation pair recorded.</EmptyState>
+      </Panel>
+    )
+  }
+
+  return (
+    <Panel className="review-panel">
+      <div className="panel-heading">
+        <div>
+          <p className="eyebrow">Evaluation</p>
+          <h3>Draft failed → revised passed</h3>
+        </div>
+        <BadgeCheck size={18} />
+      </div>
+      <div className="review-grid">
+        <ReviewCard
+          label="Draft failed"
+          text={reviewMoment.weakDraft.text}
+          result={reviewMoment.weakDraft.result}
+        />
+        <ReviewCard
+          label="Revised passed"
+          text={reviewMoment.revisedDraft.text}
+          result={reviewMoment.revisedDraft.result}
+        />
+      </div>
+    </Panel>
+  )
+}
+
+function ReviewCard({
+  label,
+  text,
+  result,
+}: {
+  label: string
+  text: string
+  result: {
+    name: string
+    passed: boolean
+    score: number
+    findings: string[]
+  }
+}) {
+  return (
+    <article className={result.passed ? "review-card passed" : "review-card failed"}>
+      <div className="review-card-top">
+        <span>{label}</span>
+        <strong>{Math.round(result.score * 100)}%</strong>
+      </div>
+      <p>{text}</p>
+      <div className="review-findings">
+        <span>{result.name}</span>
+        {result.findings.map((finding) => (
+          <p key={finding}>{finding}</p>
+        ))}
+      </div>
+    </article>
+  )
+}
+
+function ExecutionStateList({ run }: { run: DashboardRun }) {
+  const jobs = getExecutionJobs(run)
+  const receipt = getPrimaryReceipt(run)
+
+  return (
+    <div className="state-list">
+      <KeyValue label="Run status" value={run.status} />
+      <KeyValue label="Scheduled for" value={run.scheduledFor ? formatDateTime(run.scheduledFor) : "Not recorded"} />
+      <KeyValue label="Veto ends" value={run.vetoEndsAt ? formatDateTime(run.vetoEndsAt) : "Not recorded"} />
+      <KeyValue label="Execution jobs" value={jobs.length ? jobs.map((job) => `${job.id}: ${job.status}`).join(", ") : "None recorded"} />
+      <KeyValue label="Receipt" value={receipt?.url ?? receipt?.status ?? "None recorded"} />
+    </div>
   )
 }
 
@@ -565,6 +706,16 @@ function StatusChip({ status }: { status: RunStatus }) {
   )
 }
 
+function ExecutionStatusChip({ status }: { status: ExecutionJobStatus }) {
+  const Icon = executionStatusIcon(status)
+  return (
+    <span className={`status-chip status-${status}`}>
+      <Icon size={14} />
+      {status.replace("_", " ")}
+    </span>
+  )
+}
+
 function AgentStatusChip({ status }: { status: AgentStatus }) {
   const Icon = agentStatusIcon(status)
   return (
@@ -575,17 +726,26 @@ function AgentStatusChip({ status }: { status: AgentStatus }) {
   )
 }
 
-function MetricGrid({ run }: { run: AgencyRun }) {
-  const totalCost = run.agents.reduce((sum, agent) => sum + (agent.costUsd ?? 0), 0)
-  const totalTokens = run.agents.reduce((sum, agent) => sum + (agent.tokens ?? 0), 0)
-  const totalLatency = run.agents.reduce((sum, agent) => sum + (agent.latencyMs ?? 0), 0)
+function MetricGrid({ run }: { run: DashboardRun }) {
+  const metrics = getRuntimeMetrics(run)
+  const estimatedTokens = sumRecorded(run.agents.map((agent) => agent.tokens), run.events.map((event) => event.tokens))
   const passed = run.agents.filter((agent) => agent.status === "passed").length
 
   return (
     <div className="metric-grid">
-      <Metric icon={Bot} label="Agents" value={`${run.agents.length}`} detail={`${passed} passed`} />
-      <Metric icon={Coins} label="Cost" value={`$${totalCost.toFixed(2)}`} detail={`${totalTokens.toLocaleString()} tokens`} />
-      <Metric icon={Timer} label="Latency" value={formatLatency(totalLatency)} detail="summed steps" />
+      <Metric icon={Bot} label="Agents" value={`${metrics.agentCount ?? run.agents.length}`} detail={`${passed} passed`} />
+      <Metric
+        icon={Coins}
+        label="Estimated cost"
+        value={formatMoney(metrics.totalEstimatedCostUsd)}
+        detail={`${formatNumber(estimatedTokens)} est. tokens`}
+      />
+      <Metric
+        icon={Timer}
+        label="Estimated latency"
+        value={formatLatency(metrics.totalLatencyMs)}
+        detail={`${metrics.traceEventCount ?? run.events.length} trace events`}
+      />
       <Metric icon={Globe2} label="Channel" value={run.package.adaptation.channel.toUpperCase()} detail={run.package.category} />
     </div>
   )
@@ -604,37 +764,37 @@ function Metric({
 }) {
   return (
     <div className="metric-card">
-      <Icon size={18} />
-      <span>{label}</span>
-      <strong>{value}</strong>
-      <p>{detail}</p>
+      <div className="metric-top">
+        <Icon size={14} />
+        <span className="metric-label">{label}</span>
+      </div>
+      <strong className="metric-value">{value}</strong>
+      <p className="metric-detail">{detail}</p>
     </div>
   )
 }
 
-function VetoCountdown({ vetoEndsAt, status }: { vetoEndsAt?: string; status: RunStatus }) {
+function VetoCountdown({ job, run }: { job?: ExecutionJob; run: DashboardRun }) {
   const [now, setNow] = useState(Date.now())
+  const vetoEndsAt = job?.vetoEndsAt ?? run.vetoEndsAt
+  const active = (job?.status ?? run.status) === "veto_window"
 
   useEffect(() => {
-    if (status !== "veto_window") return
+    if (!active) return
 
     const timer = window.setInterval(() => setNow(Date.now()), 1000)
     return () => window.clearInterval(timer)
-  }, [status, vetoEndsAt])
-
-  const remaining = formatRemaining(vetoEndsAt, now)
+  }, [active, vetoEndsAt])
 
   return (
     <div className="veto-box">
-      <div>
-        <span className="veto-icon">
-          <Timer size={18} />
-        </span>
-      </div>
-      <div>
-        <p className="eyebrow">Veto window</p>
-        <strong>{status === "veto_window" ? remaining : "Inactive"}</strong>
-        <span>Edit, delay, block, or let the job publish.</span>
+      <span className="veto-label">
+        <Timer size={15} />
+        Veto window
+      </span>
+      <div className="veto-meta">
+        <strong className="veto-timer">{active ? formatRemaining(vetoEndsAt, now) : "Inactive"}</strong>
+        <span>{job ? `Job ${job.id}` : "No execution job recorded."}</span>
       </div>
     </div>
   )
@@ -650,6 +810,8 @@ function TraceTree({
   onSelectAgent: (agentId: string) => void
 }) {
   const roots = agents.filter((agent) => !agent.parentId)
+
+  if (agents.length === 0) return <EmptyState>No agent trace recorded.</EmptyState>
 
   return (
     <div className="trace-tree">
@@ -687,7 +849,7 @@ function TraceNode({
         type="button"
       >
         <span className={`node-dot agent-${agent.status}`} />
-        <span>
+        <span className="trace-label">
           <strong>{agent.role}</strong>
           <small>{agent.objective}</small>
         </span>
@@ -719,14 +881,15 @@ function AgentDrawer({ agent, events }: { agent: AgentNode; events: TraceEvent[]
       <div className="drawer-stat-row">
         <span>
           <Timer size={15} />
-          {formatLatency(agent.latencyMs ?? 0)}
+          Est. {formatLatency(agent.latencyMs)}
         </span>
         <span>
-          <Coins size={15} />${(agent.costUsd ?? 0).toFixed(2)}
+          <Coins size={15} />
+          Est. {formatMoney(agent.costUsd)}
         </span>
         <span>
           <Gauge size={15} />
-          {(agent.tokens ?? 0).toLocaleString()} tok
+          Est. {formatNumber(agent.tokens)} tokens
         </span>
       </div>
       <div className="drawer-output">
@@ -734,19 +897,25 @@ function AgentDrawer({ agent, events }: { agent: AgentNode; events: TraceEvent[]
         <p>{agent.output ?? "No output recorded yet."}</p>
       </div>
       <div className="mini-events">
-        {agentEvents.map((event) => (
-          <div key={event.id}>
-            <span>{formatTime(event.at)}</span>
-            <strong>{event.title}</strong>
-            <p>{event.detail}</p>
-          </div>
-        ))}
+        {agentEvents.length > 0 ? (
+          agentEvents.map((event) => (
+            <div key={event.id}>
+              <span>{formatTime(event.at)}</span>
+              <strong>{event.title}</strong>
+              <p>{event.detail}</p>
+            </div>
+          ))
+        ) : (
+          <EmptyState>No events recorded for this agent.</EmptyState>
+        )}
       </div>
     </div>
   )
 }
 
-function EvidenceList({ run }: { run: AgencyRun }) {
+function EvidenceList({ run }: { run: DashboardRun }) {
+  if (run.package.evidence.length === 0) return <EmptyState>No evidence recorded.</EmptyState>
+
   return (
     <div className="evidence-list">
       {run.package.evidence.map((evidence) => (
@@ -760,6 +929,29 @@ function EvidenceList({ run }: { run: AgencyRun }) {
   )
 }
 
+function ClaimList({
+  claims,
+  danger = false,
+  empty,
+}: {
+  claims: string[]
+  danger?: boolean
+  empty: string
+}) {
+  if (claims.length === 0) return <EmptyState>{empty}</EmptyState>
+
+  return (
+    <ul className={danger ? "check-list danger" : "check-list"}>
+      {claims.map((claim) => (
+        <li key={claim}>
+          {danger ? <XCircle size={16} /> : <CheckCircle2 size={16} />}
+          <span>{claim}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 function KeyValue({ label, value }: { label: string; value: string }) {
   return (
     <div className="key-value">
@@ -769,16 +961,9 @@ function KeyValue({ label, value }: { label: string; value: string }) {
   )
 }
 
-function ControlButton({ icon: Icon, label }: { icon: typeof Activity; label: string }) {
-  return (
-    <button className="control-button" type="button">
-      <Icon size={17} />
-      <span>{label}</span>
-    </button>
-  )
-}
-
 function Timeline({ events, agents }: { events: TraceEvent[]; agents: AgentNode[] }) {
+  if (events.length === 0) return <EmptyState>No timeline events recorded.</EmptyState>
+
   return (
     <div className="timeline">
       {events.map((event) => {
@@ -787,11 +972,11 @@ function Timeline({ events, agents }: { events: TraceEvent[]; agents: AgentNode[
           <article className="timeline-row" key={event.id}>
             <div className="timeline-time">{formatTime(event.at)}</div>
             <div className="timeline-marker" />
-            <div>
+            <div className="timeline-body">
               <span>{event.type}</span>
               <h3>{event.title}</h3>
               <p>{event.detail}</p>
-              <small>{agent?.role ?? event.agentId}</small>
+              <small>{agent?.role ?? event.agentId ?? "run"}</small>
             </div>
           </article>
         )
@@ -808,6 +993,29 @@ function statusIcon(status: RunStatus) {
       return Eye
     case "veto_window":
       return Timer
+    case "published":
+      return CheckCircle2
+    case "blocked":
+      return ShieldAlert
+    case "failed":
+      return CircleAlert
+    case "overdue":
+      return Clock3
+  }
+}
+
+function executionStatusIcon(status: ExecutionJobStatus) {
+  switch (status) {
+    case "draft":
+      return Archive
+    case "scheduled":
+      return CalendarClock
+    case "notifying":
+      return Radio
+    case "veto_window":
+      return Timer
+    case "publishing":
+      return Send
     case "published":
       return CheckCircle2
     case "blocked":
@@ -842,6 +1050,13 @@ function formatShortDate(value: string) {
   }).format(new Date(value))
 }
 
+function formatDateTime(value: string) {
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value))
+}
+
 function formatTime(value: string) {
   return new Intl.DateTimeFormat(undefined, {
     hour: "numeric",
@@ -849,10 +1064,21 @@ function formatTime(value: string) {
   }).format(new Date(value))
 }
 
-function formatLatency(value: number) {
+function formatLatency(value?: number) {
+  if (typeof value !== "number") return "Not recorded"
   if (value < 1000) return `${value}ms`
   if (value < 60000) return `${(value / 1000).toFixed(1)}s`
   return `${Math.round(value / 60000)}m ${Math.round((value % 60000) / 1000)}s`
+}
+
+function formatMoney(value?: number) {
+  if (typeof value !== "number") return "Not recorded"
+  return `$${value.toFixed(value < 0.01 ? 4 : 2)}`
+}
+
+function formatNumber(value?: number) {
+  if (typeof value !== "number") return "Not recorded"
+  return value.toLocaleString()
 }
 
 function formatRemaining(value: string | undefined, now: number) {
@@ -864,4 +1090,10 @@ function formatRemaining(value: string | undefined, now: number) {
   const minutes = Math.floor(ms / 60000)
   const seconds = Math.floor((ms % 60000) / 1000)
   return `${minutes}m ${String(seconds).padStart(2, "0")}s`
+}
+
+function sumRecorded(...groups: Array<Array<number | undefined>>): number | undefined {
+  const values = groups.flat().filter((value): value is number => typeof value === "number")
+  if (values.length === 0) return undefined
+  return values.reduce((sum, value) => sum + value, 0)
 }

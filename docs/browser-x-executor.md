@@ -8,6 +8,8 @@ The boundary deliberately does not create OAuth tokens, read browser profiles, o
 
 Jobs live as JSON files under `scripts/x-execution/jobs/` by default. Set `WB_X_EXECUTION_DIR=/path/to/state` to use another state directory for tests or local rehearsals.
 
+The executor job is the execution source of truth. State-changing commands mirror the job into a Wingbeat run JSON when the run id matches. By default the mirror target is `public/data/latest-run.json`; pass `--run-json /absolute/path/to/run.json` to bind a job to a specific run file. If the default file is missing or has a different `id`, sync is skipped. If an explicit `--run-json` path is missing or has a different `id`, the command fails.
+
 The only job states are:
 
 - `queue`: payload and optional asset were prepared.
@@ -26,7 +28,8 @@ node scripts/x-execution/x-executor.mjs prepare \
   --copy "Today I built the safety boundary before letting the agent touch X." \
   --asset /absolute/path/to/asset.png \
   --asset-alt "Wingbeat execution trace preview" \
-  --veto-seconds 60
+  --veto-seconds 60 \
+  --run-json public/data/latest-run.json
 ```
 
 Inspect or list jobs:
@@ -66,6 +69,8 @@ node scripts/x-execution/x-executor.mjs update-receipt \
   --post-url "https://x.com/your_account/status/1234567890" \
   --verified-by codex
 ```
+
+`update-receipt` atomically writes the verified public URL, post id, timestamp, and `published` status into both the executor job and the synced Wingbeat run JSON.
 
 ## Browser Automation Contract
 

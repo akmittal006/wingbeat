@@ -7,7 +7,9 @@ import process from "node:process"
 
 const STATUSES = new Set(["queue", "veto", "ready", "published", "blocked"])
 const ROOT = path.resolve(new URL(".", import.meta.url).pathname)
+const REPO_ROOT = path.resolve(ROOT, "../..")
 const DEFAULT_STATE_DIR = path.join(ROOT, "jobs")
+const DEFAULT_RUN_JSON = path.join(REPO_ROOT, "public/data/latest-run.json")
 
 function stateDir() {
   return path.resolve(process.env.WB_X_EXECUTION_DIR || DEFAULT_STATE_DIR)
@@ -17,7 +19,7 @@ function usage() {
   return `Wingbeat X execution boundary
 
 Usage:
-  node scripts/x-execution/x-executor.mjs prepare --run-id RUN --copy "text" [--asset PATH] [--veto-seconds 60]
+  node scripts/x-execution/x-executor.mjs prepare --run-id RUN --copy "text" [--asset PATH] [--veto-seconds 60] [--run-json PATH]
   node scripts/x-execution/x-executor.mjs show --job-id JOB
   node scripts/x-execution/x-executor.mjs list
   node scripts/x-execution/x-executor.mjs block --job-id JOB --reason "reason"
@@ -73,10 +75,15 @@ function readJson(filePath) {
 }
 
 function writeJsonAtomic(filePath, value) {
-  ensureStateDir()
+  fs.mkdirSync(path.dirname(filePath), { recursive: true })
   const tmp = `${filePath}.${process.pid}.tmp`
   fs.writeFileSync(tmp, `${JSON.stringify(value, null, 2)}\n`)
   fs.renameSync(tmp, filePath)
+}
+
+function writeJobAtomic(filePath, value) {
+  ensureStateDir()
+  writeJsonAtomic(filePath, value)
 }
 
 function loadJob(jobId) {
@@ -92,8 +99,125 @@ function saveJob(job) {
     throw new Error(`Refusing to save unknown status "${job.status}"`)
   }
   job.updatedAt = now()
-  writeJsonAtomic(jobPath(job.id), job)
+  writeJobAtomic(jobPath(job.id), job)
   return job
+}
+
+function resolveRunJsonPath(args, job) {
+  if (typeof args["run-json"] === "string") return path.resolve(args["run-json"])
+  if (typeof job?.runJsonPath === "string") return job.runJsonPath
+  return DEFAULT_RUN_JSON
+}
+
+function readRunJsonIfMatched(runJsonPath, runId, explicit) {
+  if (!fs.existsSync(runJsonPath)) {
+    if (explicit) {
+      throw new Error(`Run JSON does not exist: ${runJsonPath}`)
+    }
+    return undefined
+  }
+  const run = readJson(runJsonPath)
+  if (run?.id !== runId) {
+    if (explicit) {
+      throw new Error(`Run JSON id ${run?.id ?? "<missing>"} does not match job runId ${runId}`)
+    }
+    return undefined
+  }
+  return run
+}
+
+function runStatusFromJob(job) {
+  return job.status
+}
+
+function executionHistoryStatus(job) {
+  if (job.status === "published") return "published"
+  if (job.status === "blocked") return "blocked"
+  if (job.status === "ready") return "ready"
+  if (job.status === "veto") return "veto"
+  return "queue"
+}
+
+function mirrorJobIntoRun(run, job) {
+  const mirroredStatus = runStatusFromJob(job)
+  run.status = mirroredStatus
+  run.vetoEndsAt = job.vetoEndsAt
+  run.executionJob = {
+    ...(run.executionJob ?? {}),
+    id: job.id,
+    runId: job.runId,
+    channel: job.channel,
+    status: mirroredStatus,
+    sourceOfTruth: "scripts/x-execution",
+    updatedAt: job.updatedAt,
+    vetoEndsAt: job.vetoEndsAt,
+    statusHistory: job.statusHistory,
+    payload: {
+      ...(run.executionJob?.payload ?? {}),
+      copy: job.preparedPayload.copy,
+      asset: job.preparedAsset?.path ?? run.executionJob?.payload?.asset,
+      assetSha256: job.preparedAsset?.sha256,
+      assetAltText: job.preparedAsset?.altText,
+    },
+    handoff: {
+      ...(run.executionJob?.handoff ?? {}),
+      executor: "scripts/x-execution/x-executor.mjs",
+      jobStatePath: jobPath(job.id),
+      browserTaskExportedAt: job.browserTask?.createdAt,
+    },
+    blockReason: job.blockReason,
+    receipt: job.receipt,
+  }
+  if (job.receipt) {
+    run.publishedUrl = job.receipt.postUrl
+    run.executionJob.publishedUrl = job.receipt.postUrl
+    run.executionJob.postId = job.receipt.postId
+    run.executionJob.publishedAt = job.receipt.publishedAt
+    run.executionJob.verifiedBy = job.receipt.verifiedBy
+  }
+  if (run.package?.executionHistory?.length) {
+    const latest = run.package.executionHistory[run.package.executionHistory.length - 1]
+    latest.status = executionHistoryStatus(job)
+    latest.detail =
+      job.receipt?.postUrl ??
+      job.blockReason ??
+      `Browser executor job ${job.id} is ${job.status}.`
+  }
+  return run
+}
+
+function syncRunJson(job, args = {}) {
+  const runJsonPath = resolveRunJsonPath(args, job)
+  const explicit = typeof args["run-json"] === "string" || Boolean(job.runJsonExplicit)
+  const run = readRunJsonIfMatched(runJsonPath, job.runId, explicit)
+  if (!run) {
+    job.lastRunJsonSync = {
+      status: "skipped",
+      reason: "missing-or-run-id-mismatch",
+      path: runJsonPath,
+      at: now(),
+    }
+    saveJob(job)
+    return job.lastRunJsonSync
+  }
+  mirrorJobIntoRun(run, job)
+  writeJsonAtomic(runJsonPath, run)
+  job.lastRunJsonSync = {
+    status: "synced",
+    path: runJsonPath,
+    runId: job.runId,
+    executionStatus: job.status,
+    receiptUrl: job.receipt?.postUrl,
+    at: now(),
+  }
+  saveJob(job)
+  return job.lastRunJsonSync
+}
+
+function saveAndSyncJob(job, args = {}) {
+  const saved = saveJob(job)
+  syncRunJson(saved, args)
+  return saved
 }
 
 function changeStatus(job, status, detail) {
@@ -168,6 +292,8 @@ function commandPrepare(args) {
   const runId = requireArg(args, "run-id")
   const copy = readCopy(args)
   const jobId = typeof args["job-id"] === "string" ? args["job-id"] : newJobId(runId)
+  const runJsonPath = resolveRunJsonPath(args)
+  const runJsonExplicit = typeof args["run-json"] === "string"
   const filePath = jobPath(jobId)
   if (fs.existsSync(filePath)) {
     throw new Error(`Job already exists: ${jobId}`)
@@ -183,6 +309,8 @@ function commandPrepare(args) {
     createdAt,
     updatedAt: createdAt,
     vetoEndsAt,
+    runJsonPath,
+    runJsonExplicit,
     preparedPayload: {
       copy,
       characterCount: [...copy].length,
@@ -202,7 +330,7 @@ function commandPrepare(args) {
     },
   }
   changeStatus(job, "veto", `Veto window opened for ${vetoSeconds} seconds.`)
-  saveJob(job)
+  saveAndSyncJob(job, args)
   return publicJob(job)
 }
 
@@ -226,7 +354,7 @@ function commandBlock(args) {
   }
   job.blockReason = requireArg(args, "reason")
   changeStatus(job, "blocked", job.blockReason)
-  return publicJob(saveJob(job))
+  return publicJob(saveAndSyncJob(job, args))
 }
 
 function commandAdvance(args) {
@@ -238,7 +366,7 @@ function commandAdvance(args) {
     throw new Error(`Veto window is still open until ${job.vetoEndsAt}`)
   }
   changeStatus(job, "ready", "Veto window elapsed without a block.")
-  return publicJob(saveJob(job))
+  return publicJob(saveAndSyncJob(job, args))
 }
 
 function commandExportBrowserTask(args) {
@@ -280,7 +408,7 @@ function commandExportBrowserTask(args) {
     at: now(),
     detail: "Browser publishing task exported after action-time confirmation.",
   })
-  saveJob(job)
+  saveAndSyncJob(job, args)
   return task
 }
 
@@ -307,7 +435,7 @@ function commandUpdateReceipt(args) {
     notes: typeof args.notes === "string" ? args.notes : undefined,
   }
   changeStatus(job, "published", `Receipt recorded for ${postUrl}`)
-  return publicJob(saveJob(job))
+  return publicJob(saveAndSyncJob(job, args))
 }
 
 function publicJob(job) {
@@ -321,8 +449,11 @@ function publicJob(job) {
     vetoEndsAt: job.vetoEndsAt,
     preparedPayload: job.preparedPayload,
     preparedAsset: job.preparedAsset,
+    runJsonPath: job.runJsonPath,
+    runJsonExplicit: job.runJsonExplicit,
     receipt: job.receipt,
     blockReason: job.blockReason,
+    lastRunJsonSync: job.lastRunJsonSync,
     statusHistory: job.statusHistory,
     safety: job.safety,
   }
@@ -334,20 +465,73 @@ function assert(condition, message) {
 
 function commandSelfTest() {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "wingbeat-x-execution-"))
+  const runJsonPath = path.join(tempDir, "latest-run.json")
+  const blockedRunJsonPath = path.join(tempDir, "blocked-run.json")
   const script = new URL(import.meta.url).pathname
   const originalStateDir = process.env.WB_X_EXECUTION_DIR
   process.env.WB_X_EXECUTION_DIR = tempDir
   try {
+    const writeRunFixture = (filePath, id) =>
+      writeJsonAtomic(filePath, {
+        id,
+        status: "running",
+        package: {
+          executionHistory: [
+            {
+              id: `exec-${id}`,
+              channel: "x",
+              status: "handoff_ready",
+              detail: "Waiting for executor.",
+            },
+          ],
+        },
+        executionJob: {
+          id: "pending-xjob",
+          runId: id,
+          channel: "x",
+          status: "handoff_ready",
+        },
+      })
+    writeRunFixture(runJsonPath, "test-run")
+    writeRunFixture(blockedRunJsonPath, "blocked-run")
+    const blockedPrepared = commandPrepare({
+      "job-id": "blocked-job",
+      "run-id": "blocked-run",
+      copy: "This one should be blocked.",
+      "veto-seconds": "60",
+      operator: "self-test",
+      "run-json": blockedRunJsonPath,
+    })
+    assert(blockedPrepared.status === "veto", "blocked flow should start in veto")
+    const blocked = commandBlock({
+      "job-id": "blocked-job",
+      reason: "self-test block",
+    })
+    assert(blocked.status === "blocked", "block should mark job blocked")
+    const blockedRun = readJson(blockedRunJsonPath)
+    assert(blockedRun.status === "blocked", "block should sync blocked status")
+    assert(blockedRun.executionJob.blockReason === "self-test block", "block should sync reason")
+    assert(
+      blockedRun.executionJob.statusHistory.map((item) => item.status).join(",") === "queue,veto,blocked",
+      "blocked flow should sync queue/veto/blocked history",
+    )
     const prepared = commandPrepare({
       "job-id": "test-job",
       "run-id": "test-run",
       copy: "Shipping a safer X execution boundary today.",
       "veto-seconds": "0",
       operator: "self-test",
+      "run-json": runJsonPath,
     })
     assert(prepared.status === "veto", "prepare should open veto")
+    let syncedRun = readJson(runJsonPath)
+    assert(syncedRun.status === "veto", "prepare should sync veto status")
+    assert(syncedRun.executionJob.id === "test-job", "prepare should sync executor job id")
+    assert(syncedRun.executionJob.sourceOfTruth === "scripts/x-execution", "run should name executor source of truth")
     const ready = commandAdvance({ "job-id": "test-job" })
     assert(ready.status === "ready", "advance should mark ready")
+    syncedRun = readJson(runJsonPath)
+    assert(syncedRun.status === "ready", "advance should sync ready status")
     let denied = false
     try {
       commandExportBrowserTask({ "job-id": "test-job", "confirm-action-time": "yes" })
@@ -367,6 +551,17 @@ function commandSelfTest() {
     })
     assert(published.status === "published", "receipt should publish")
     assert(published.receipt.postId === "1234567890", "receipt should parse post id")
+    syncedRun = readJson(runJsonPath)
+    assert(syncedRun.status === "published", "receipt should sync published status")
+    assert(syncedRun.publishedUrl === "https://x.com/example/status/1234567890", "receipt should sync public URL")
+    assert(syncedRun.executionJob.postId === "1234567890", "receipt should sync post id")
+    assert(syncedRun.executionJob.publishedAt, "receipt should sync timestamp")
+    assert(syncedRun.executionJob.receipt.postUrl === "https://x.com/example/status/1234567890", "receipt should sync receipt object")
+    assert(
+      syncedRun.executionJob.statusHistory.map((item) => item.status).join(",") ===
+        "queue,veto,ready,ready,published",
+      "receipt flow should sync queue/veto/ready/published history",
+    )
     return { ok: true, stateDir: tempDir, script }
   } finally {
     if (originalStateDir === undefined) {

@@ -1,0 +1,27 @@
+- name: good first issue
+  color: "7057ff"
+  description: Small, scoped work with clear acceptance criteria.
+- name: help wanted
+  color: "008672"
+  description: Maintainers welcome community help on this issue.
+- name: bug
+  color: "d73a4a"
+  description: Reproducible behavior that does not match the contract.
+- name: enhancement
+  color: "a2eeef"
+  description: A proposed improvement to existing behavior.
+- name: docs
+  color: "0075ca"
+  description: Documentation and contributor guidance.
+- name: agency
+  color: "5319e7"
+  description: Context, generation, evaluation, or agent orchestration.
+- name: executor
+  color: "fbca04"
+  description: Veto, browser handoff, state transitions, or receipts.
+- name: ui
+  color: "1d76db"
+  description: Operator console behavior or accessibility.
+- name: security
+  color: "b60205"
+  description: Public hardening work only; vulnerabilities must be private.

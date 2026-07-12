@@ -48,6 +48,10 @@ export type MemoryLayer = "current_job" | "project_history" | "brand_policy"
 
 export type PublishReceiptStatus = "verified" | "pending" | "failed"
 
+export type RunDataOrigin = "runtime" | "fixture"
+
+export type ExecutionPhase = "draft_evaluated" | "revision_passed" | "handoff_ready" | "receipt_verified"
+
 export interface ProjectContext {
   id: string
   name: string
@@ -217,6 +221,31 @@ export interface DashboardContentPackage {
     copy: string
     asset?: string
   }
+  evaluations?: RuntimeEvaluationSummary[]
+  contextReferences?: RuntimeContextReference[]
+  executionHistory?: Array<{
+    id: string
+    channel: Channel
+    status: ExecutionJobStatus
+    detail: string
+  }>
+}
+
+export interface RuntimeEvaluationSummary {
+  id: string
+  name: string
+  passed: boolean
+  score: number
+  findings: string[]
+}
+
+export interface RuntimeContextReference {
+  id: string
+  layer: MemoryLayer
+  source: string
+  label: string
+  digest?: string
+  excerpt: string
 }
 
 export interface ToolAccess {
@@ -286,16 +315,25 @@ export interface TraceEvent {
 export interface ExecutionJob {
   id: string
   runId: string
-  contentPackageId: string
-  adaptationId: string
+  contentPackageId?: string
+  adaptationId?: string
   channel: Channel
   status: ExecutionJobStatus
+  executionPhase?: ExecutionPhase
   scheduledFor: string
   vetoWindowSeconds: number
   vetoEndsAt?: string
   notification?: VetoNotification
   receiptId?: string
   failureReason?: string
+  payload?: {
+    copy: string
+    asset?: string
+  }
+  handoff?: {
+    executor: string
+    commandPreview: string
+  }
 }
 
 export interface VetoNotification {
@@ -351,6 +389,8 @@ export interface AgencyRun {
   project: string
   trigger: string
   status: RunStatus
+  dataOrigin?: RunDataOrigin
+  fixtureLabel?: string
   startedAt: string
   finishedAt?: string
   scheduledFor?: string
@@ -361,8 +401,27 @@ export interface AgencyRun {
   agents: AgentNode[]
   events: TraceEvent[]
   executionJobs?: ExecutionJob[]
+  executionJob?: ExecutionJob
   receipts?: PublishReceipt[]
   policy?: Policy
+  contextReferences?: RuntimeContextReference[]
+  selectedCrew?: string[]
+  evaluation?: {
+    weakDraft?: {
+      text: string
+      result: RuntimeEvaluationSummary
+    }
+    revisedDraft?: {
+      text: string
+      result: RuntimeEvaluationSummary
+    }
+  }
+  metrics?: {
+    totalLatencyMs: number
+    totalEstimatedCostUsd: number
+    agentCount: number
+    traceEventCount: number
+  }
 }
 
 export interface TraceTreeNode {
